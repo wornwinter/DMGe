@@ -1,0 +1,19 @@
+# depslib dependency file v1.0
+1422366790 source:/home/darren/projects/ZWGB/src/main.cpp
+	<boost/thread/thread.hpp>
+	<iostream>
+	<string>
+
+1422369553 source:/home/darren/projects/ZWGB/src/Debugger.cpp
+	"Debugger.h"
+
+1422369528 /home/darren/projects/ZWGB/include/Debugger.h
+	<iostream>
+	"GameBoy.h"
+
+1422369338 source:/home/darren/projects/ZWGB/src/GameBoy.cpp
+	"GameBoy.h"
+
+1422369301 /home/darren/projects/ZWGB/include/GameBoy.h
+	<iostream>
+
