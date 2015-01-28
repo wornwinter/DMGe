@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="ZWGB" />
+		<Option title="DMGe" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
@@ -30,7 +30,21 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-std=c++11" />
+			<Add directory="./include" />
 		</Compiler>
+		<Linker>
+			<Add library="boost_thread" />
+			<Add library="SDL2" />
+			<Add library="boost_system" />
+		</Linker>
+		<Unit filename="include/DMGCPU.h" />
+		<Unit filename="include/Debugger.h" />
+		<Unit filename="include/GameBoy.h" />
+		<Unit filename="src/DMGCPU.cpp" />
+		<Unit filename="src/Debugger.cpp" />
+		<Unit filename="src/GameBoy.cpp" />
+		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
