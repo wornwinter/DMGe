@@ -2,6 +2,7 @@
 
 c_GameBoy::c_GameBoy()
 {
+    CPU = new c_DMGCPU();
 }
 
 c_GameBoy::~c_GameBoy()

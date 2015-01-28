@@ -7,8 +7,12 @@
 #define GAMEBOY_H
 
 #include <iostream>
+#include "DMGCPU.h"
 
 class c_GameBoy {
+    private:
+        c_DMGCPU* CPU;
+
     public:
         c_GameBoy();
         ~c_GameBoy();
