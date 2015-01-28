@@ -73,6 +73,19 @@ void c_Debugger::MainLoop(void)
             else if(commandtokens[0] == "regs")
             {
             }
+            else if(commandtokens[0] == "help")
+            {
+                std::cout << "-----------------------" << std::endl
+                    << "GBDB usage" << std::endl
+                    << "-----------------------" << std::endl
+                    << "run - Unpause CPU and continue execution." << std::endl
+                    << "break [address] - Pause execution when PC = address." << std::endl
+                    << "read [address] - Read byte at address." << std::endl
+                    << "write [address] [data] - Write data to address." << std::endl
+                    << "regs - Dump registers to console." << std::endl
+                    << "help - Print this message." << std::endl
+                    << "-----------------------";
+            }
             else {
                 std::cout << "Error, unknown command: " << commandtokens[0];
             }
