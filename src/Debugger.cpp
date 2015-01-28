@@ -73,6 +73,10 @@ void c_Debugger::MainLoop(void)
             else if(commandtokens[0] == "regs")
             {
             }
+            else if(commandtokens[0] == "exit")
+            {
+                run = false;
+            }
             else if(commandtokens[0] == "help")
             {
                 std::cout << "-----------------------" << std::endl
@@ -83,6 +87,7 @@ void c_Debugger::MainLoop(void)
                     << "read [address] - Read byte at address." << std::endl
                     << "write [address] [data] - Write data to address." << std::endl
                     << "regs - Dump registers to console." << std::endl
+                    << "exit - Stop debugging and close the emulator." << std::endl
                     << "help - Print this message." << std::endl
                     << "-----------------------";
             }
