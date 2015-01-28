@@ -11,6 +11,8 @@
 class c_Debugger {
     private:
         c_GameBoy *GameBoy;
+        void MainLoop(void);
+        bool run = true;
 
     public:
         c_Debugger(c_GameBoy *GB);
