@@ -25,29 +25,35 @@
 #define MSB(x)                  (x & 0x80)
 #define LSB(x)                  (x & 0x01)
 
-
-typedef union
-{
-    struct
-    {
-        uint8_t hi;
-        uint8_t lo;
-    };
-    uint16_t word;
-}Register16_t;
-
-//Our CPU regisgers
-typedef struct
-{
-    //Our basic register, AF, BC, DE, HL
-    Register16_t AF, BC, DE, HL;
-
-    //Special Registers
-    Register16_t SP, PC;
-}regs_t;
-
 class c_DMGCPU
 {
+
+    typedef union
+    {
+        struct
+        {
+            uint8_t hi;
+            uint8_t lo;
+        };
+        uint16_t word;
+    }Register16_t;
+
+    //Our CPU regisgers
+    typedef struct
+    {
+        //Our basic register, AF, BC, DE, HL
+        Register16_t AF, BC, DE, HL;
+
+        //Special Registers
+        Register16_t SP, PC;
+    }regs_t;
+
+    //CPU clock structure
+    typedef struct
+    {
+        uint32_t m, t;
+    }clock_t;
+
 public:
     c_DMGCPU();
     ~c_DMGCPU();
@@ -58,7 +64,8 @@ private:
     void (c_DMGCPU::*OPCodesCB[0xFF])(void);
     void InitOpcodeTables();
 
-    regs_t Registers;
+    regs_t  Registers;
+    clock_t Clock;
 
     //OPCODES
     void OPCode0x00();
