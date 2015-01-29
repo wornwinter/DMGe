@@ -1,0 +1,7 @@
+*.o
+*.exe
+*.cbp
+*.depend
+ZWGB.layout
+ZWGB.cbp
+ZWGB.depend

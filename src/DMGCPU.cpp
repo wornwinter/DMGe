@@ -2,10 +2,331 @@
 
 c_DMGCPU::c_DMGCPU()
 {
-
+    InitOpcodeTables();
 }
 
 c_DMGCPU::~c_DMGCPU()
 {
 
+}
+
+void c_DMGCPU::InitOpcodeTables()
+{
+    memset(c_DMGCPU::OPCodes, NULL, 0xFF);
+    memset(c_DMGCPU::OPCodesCB, NULL, 0xFF);
+
+    //Fill our opcode table
+    OPCodes[0x00] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x01] = &c_DMGCPU::OPCode0x01;
+    OPCodes[0x02] = &c_DMGCPU::OPCode0x02;
+    OPCodes[0x02] = &c_DMGCPU::OPCode0x03;
+    OPCodes[0x03] = &c_DMGCPU::OPCode0x04;
+    OPCodes[0x04] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x05] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x06] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x07] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x08] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x09] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x0A] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x0B] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x0C] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x0D] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x0E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x0F] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x10] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x11] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x12] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x13] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x14] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x15] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x16] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x17] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x18] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x19] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x1A] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x1B] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x1C] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x1D] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x1E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x1F] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x20] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x21] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x22] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x23] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x24] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x25] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x26] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x27] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x28] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x29] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x2A] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x2B] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x2C] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x2D] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x2E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x2F] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x30] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x31] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x32] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x33] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x34] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x35] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x36] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x37] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x38] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x39] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x3A] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x3B] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x3C] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x3D] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x3E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x3F] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x40] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x41] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x42] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x43] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x44] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x45] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x46] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x47] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x48] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x49] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x4A] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x4B] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x4C] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x4D] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x4E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x4F] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x50] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x51] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x52] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x53] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x54] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x55] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x56] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x57] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x58] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x59] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x5A] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x5B] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x5C] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x5D] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x5E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x5F] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x60] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x61] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x62] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x63] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x64] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x65] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x66] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x67] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x68] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x69] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x6A] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x6B] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x6C] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x6D] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x6E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x6F] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x70] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x71] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x72] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x73] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x74] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x75] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x76] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x77] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x78] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x79] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x7A] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x7B] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x7C] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x7D] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x7E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x7F] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x80] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x81] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x82] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x83] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x84] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x85] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x86] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x87] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x88] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x89] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x8A] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x8B] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x8C] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x8D] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x8E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x8F] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x90] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x91] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x92] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x93] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x94] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x95] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x96] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x97] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x98] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x99] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x9A] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x9B] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x9C] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x9D] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x9E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x9F] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xA0] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xA1] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xA2] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xA3] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xA4] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xA5] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xA6] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xA7] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xA8] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xA9] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xAA] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xAB] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xAC] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xAD] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xAE] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xAF] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xB0] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xB1] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xB2] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xB3] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xB4] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xB5] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xB6] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xB7] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xB8] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xB9] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xBA] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xBB] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xBC] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xBD] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xBE] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xBF] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC0] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC1] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC2] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC3] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC4] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC5] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC6] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC7] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC8] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC9] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xCA] = &c_DMGCPU::OPCode0x00;
+    //Function to read a CB opcode, not an actual opcode in itself
+    OPCodes[0xCC] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xCD] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xCE] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xCF] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xD0] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xD1] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xD2] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xD3] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xD4] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xD5] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xD6] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xD7] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xD8] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xD9] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xDA] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xDB] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xDC] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xDD] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xDE] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xDF] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xE0] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xE1] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xE2] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xE3] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xE4] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xE5] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xE6] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xE7] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xE8] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xE9] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xEA] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xEB] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xEC] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xED] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xEE] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xEF] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xF0] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xF1] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xF2] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xF3] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xF4] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xF5] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xF6] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xF7] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xF8] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xF9] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xFA] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xFB] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xFC] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xFD] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xFE] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xFF] = &c_DMGCPU::OPCode0x00;
+}
+
+//NOP Instruction
+void c_DMGCPU::OPCode0x00()
+{
+    Registers.PC.word++;
+    Clock.m = 1;
+    Clock.t = 4;
+}
+
+//Load immediate 16-bit value into BC
+void c_DMGCPU::OPCode0x01()
+{
+    //TODO: MMU
+    //Registers.BC.word = mmu->readw(Registers.PC.word + 1);
+    Clock.m = 3;
+    Clock.t = 12;
+    Registers.PC.word += 3;
+}
+
+//Load A into the address stored in BC
+void c_DMGCPU::OPCode0x02()
+{
+    //TODO:MMU
+    //Assuming writeb(addr, value)
+    //mmu->writeb(Registers.BC.word, Registers.AF.hi)
+    Clock.m = 1;
+    Clock.t = 8;
+    Registers.PC.word += 1;
+}
+
+//Increment BC
+void c_DMGCPU::OPCode0x03()
+{
+    Registers.BC.word++;
+    Clock.m = 1;
+    Clock.t = 8;
+    Registers.PC.word += 1;
+}
+
+//Increment B
+void c_DMGCPU::OPCode0x04()
+{
+    UNSET_FLAG_BIT(FLAG_SUB); //Reset the subtraction bit in FLAGS
+
+    Registers.BC.hi++;
+
+    if(Registers.BC.hi > 0x0F) //Pretty sure this is how it's done, not 100%
+        SET_FLAG_BIT(FLAG_HC);
+
+    if(!(Registers.BC.hi & 0xFF))
+        SET_FLAG_BIT(FLAG_ZERO);
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word += 1;
 }
