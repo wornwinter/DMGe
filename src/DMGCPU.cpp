@@ -275,8 +275,8 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xFF] = &c_DMGCPU::OPCode0x00;
 }
 
-
+//NOP Instruction
 void c_DMGCPU::OPCode0x00()
 {
-
+    Registers.PC.word++;
 }

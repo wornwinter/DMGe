@@ -5,6 +5,26 @@
 #include <stdint.h>
 #include <stdio.h>
 
+//Should these be hexadecimal constants for efficiency??
+#define ZERO_BIT    7
+#define SUB_BIT     6
+#define HC_BIT      5
+#define CARRY_BIT   4
+
+#define FLAG_ZERO               (Registers.AF.lo & 0x80)
+#define FLAG_SUB                (Registers.AF.lo & 0x40)
+#define FLAG_HC                 (Registers.AF.lo & 0x20)
+#define FLAG_CARRY              (Registers.AF.lo & 0x10)
+
+#define SET_BIT(x,y)            (x |= (0x01 << y))
+#define SET_FLAG_BIT(x)         (Registers.AF.lo |= (0x01 << x))
+
+#define UNSET_BIT(x,y)          (x &= ~(0x01 << y))
+#define UNSET_FLAG_BIT(x)       (Registers.AF.lo &= ~(0x01 << x))
+
+#define MSB(x)                  (x & 0x80)
+#define LSB(x)                  (x & 0x01)
+
 
 typedef union
 {
