@@ -1,4 +1,5 @@
 #include "DMGCPU.h"
+#include "DMG_opcodes.h"
 
 c_DMGCPU::c_DMGCPU()
 {
@@ -12,6 +13,7 @@ c_DMGCPU::~c_DMGCPU()
 
 void c_DMGCPU::InitOpcodeTables()
 {
+    //Clear opcode tables with NULL (easy to check for invalid operation / unimplemented opcode)
     memset(c_DMGCPU::OPCodes, NULL, 0xFF);
     memset(c_DMGCPU::OPCodesCB, NULL, 0xFF);
 
@@ -316,17 +318,127 @@ void c_DMGCPU::OPCode0x03()
 //Increment B
 void c_DMGCPU::OPCode0x04()
 {
-    UNSET_FLAG_BIT(FLAG_SUB); //Reset the subtraction bit in FLAGS
+    UNSET_FLAG_BIT(SUB_BIT); //Reset the subtraction bit in FLAGS
 
-    Registers.BC.hi++;
+    if(Registers.BC.hi++ > 0x0F) //Pretty sure this is how it's done, not 100%
+        SET_FLAG_BIT(HC_BIT);
 
-    if(Registers.BC.hi > 0x0F) //Pretty sure this is how it's done, not 100%
-        SET_FLAG_BIT(FLAG_HC);
+    if(!(Registers.BC.hi++ & 0xFF))
+        SET_FLAG_BIT(ZERO_BIT);
 
-    if(!(Registers.BC.hi & 0xFF))
-        SET_FLAG_BIT(FLAG_ZERO);
+    Registers.BC.hi++; //Actually do the checks
 
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word += 1;
+}
+
+//Decrement B
+void c_DMGCPU::OPCode0x05()
+{
+    SET_FLAG_BIT(SUB_BIT);
+
+    if(Registers.BC.hi-- > 0xFF)
+        SET_FLAG_BIT(CARRY_BIT);
+
+    if(Registers.BC.hi-- > 0x0F)
+        SET_FLAG_BIT(HC_BIT);
+
+    Registers.BC.word--;
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load 9-bit immediate value into B
+void c_DMGCPU::OPCode0x06()
+{
+    //Registers.BC.hi = mmu->readb(Registers.PC.hi + 1);
+    Clock.m = 3;
+    Clock.t = 8;
+    Registers.PC.word += 2;
+}
+
+//Rotate A left through Carry bit (Bit 7 to carry and Carry bit)
+void c_DMGCPU::OPCode0x07()
+{
+    UNSET_FLAG_BIT(SUB_BIT);
+    UNSET_FLAG_BIT(ZERO_BIT);
+    UNSET_FLAG_BIT(HC_BIT);
+
+    if(MSB(Registers.AF.hi))
+        SET_FLAG_BIT(CARRY_BIT);
+
+    Registers.AF.hi <<= 1;
+    Registers.AF.hi |= Registers.AF.lo & CARRY_BIT;
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load the StackPointer into the address specified by immediate 16-bit value
+void c_DMGCPU::OPCode0x08()
+{
+    //mmu.writew(Registers.SP.word, mmu.readw(Registers.PC.word++));
+    Clock.m = 4; //Is this correct amount of machine cycles??
+    Clock.t = 20;
+    Registers.PC.word += 3;
+}
+
+//Add BC to HL and store in HL
+void c_DMGCPU::OPCode0x09()
+{
+    UNSET_FLAG_BIT(SUB_BIT);
+
+    if(Registers.HL.word + Registers.BC.word > 0xFF)
+        SET_FLAG_BIT(CARRY_BIT);
+
+    if(Registers.HL.word + Registers.BC.word > 0x0F)
+        SET_FLAG_BIT(HC_BIT);
+
+    Registers.HL.word += Registers.BC.word;
+
+    Clock.m = 1;
+    Clock.t = 8;
+    Registers.PC.word++;
+}
+
+//Load value at address in stored in BC into A
+void c_DMGCPU::OPCode0x0A()
+{
+    //Registers.AF.hi = mmu->readb(Registers.BC.word);
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Decrement B
+void c_DMGCPU::OPCode0x0B()
+{
+    Registers.BC.word--;
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Increment C
+void c_DMGCPU::OPCode0x0C()
+{
+    UNSET_FLAG_BIT(SUB_BIT);
+
+    if(!(Registers.BC.lo++ & 0xFF))
+        SET_FLAG_BIT(ZERO_BIT);
+
+    if(Registers.BC.lo++ > 0x0F)
+        SET_FLAG_BIT(HC_BIT);
+
+    Registers.BC.lo++;
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
 }

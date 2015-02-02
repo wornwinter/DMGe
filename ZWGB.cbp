@@ -43,12 +43,8 @@
 			<Add option="-std=c++11" />
 			<Add option="-Wall" />
 		</Compiler>
-		<Linker>
-			<Add library="boost_thread" />
-			<Add library="SDL2" />
-			<Add library="boost_system" />
-		</Linker>
 		<Unit filename="include/DMGCPU.h" />
+		<Unit filename="include/DMG_opcodes.h" />
 		<Unit filename="include/Debugger.h" />
 		<Unit filename="include/GameBoy.h" />
 		<Unit filename="src/DMGCPU.cpp" />

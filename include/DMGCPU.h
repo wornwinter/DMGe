@@ -6,21 +6,22 @@
 #include <stdio.h>
 
 //Should these be hexadecimal constants for efficiency??
-#define ZERO_BIT    7
-#define SUB_BIT     6
-#define HC_BIT      5
-#define CARRY_BIT   4
+#define ZERO_BIT    0x80
+#define SUB_BIT     0x40
+#define HC_BIT      0x20
+#define CARRY_BIT   0x10
 
 #define FLAG_ZERO               (Registers.AF.lo & 0x80)
 #define FLAG_SUB                (Registers.AF.lo & 0x40)
 #define FLAG_HC                 (Registers.AF.lo & 0x20)
 #define FLAG_CARRY              (Registers.AF.lo & 0x10)
 
+//Should these be inline functions instead (safety)???
 #define SET_BIT(x,y)            (x |= (0x01 << y))
-#define SET_FLAG_BIT(x)         (Registers.AF.lo |= (0x01 << x))
+#define SET_FLAG_BIT(x)         (Registers.AF.lo |= x)
 
 #define UNSET_BIT(x,y)          (x &= ~(0x01 << y))
-#define UNSET_FLAG_BIT(x)       (Registers.AF.lo &= ~(0x01 << x))
+#define UNSET_FLAG_BIT(x)       (Registers.AF.lo &= ~x)
 
 #define MSB(x)                  (x & 0x80)
 #define LSB(x)                  (x & 0x01)
@@ -583,7 +584,5 @@ private:
     void OPCodeCB0xFE();
     void OPCodeCB0xFF();
 };
-
-
 
 #endif // DMGCPU_H_INCLUDED
