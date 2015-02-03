@@ -3,7 +3,7 @@
 c_GameBoy::c_GameBoy(const char* romfname)
 {
     MMU = new c_MMU();
-    CPU = new c_DMGCPU();
+    CPU = new c_DMGCPU(MMU);
 }
 
 c_GameBoy::~c_GameBoy()

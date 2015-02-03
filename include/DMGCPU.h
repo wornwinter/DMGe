@@ -57,7 +57,7 @@ class c_DMGCPU
     }clock_t;
 
 public:
-    c_DMGCPU();
+    c_DMGCPU(c_MMU* pMMU);
     ~c_DMGCPU();
 
 private:
