@@ -4,6 +4,7 @@
 #include <cstring>
 #include <stdint.h>
 #include <stdio.h>
+#include "MMU.h"
 
 //Should these be hexadecimal constants for efficiency??
 #define ZERO_BIT    0x80
@@ -60,6 +61,8 @@ public:
     ~c_DMGCPU();
 
 private:
+    c_MMU* MMU;
+
     //Opcode tables
     void (c_DMGCPU::*OPCodes[0xFF])(void);
     void (c_DMGCPU::*OPCodesCB[0xFF])(void);

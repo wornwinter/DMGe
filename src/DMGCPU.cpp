@@ -1,9 +1,10 @@
 #include "DMGCPU.h"
 #include "DMG_opcodes.h"
 
-c_DMGCPU::c_DMGCPU()
+c_DMGCPU::c_DMGCPU(c_MMU* pMMU)
 {
     InitOpcodeTables();
+    MMU = pMMU;
 }
 
 c_DMGCPU::~c_DMGCPU()

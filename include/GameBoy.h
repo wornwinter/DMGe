@@ -8,13 +8,15 @@
 
 #include <iostream>
 #include "DMGCPU.h"
+#include "MMU.h"
 
 class c_GameBoy {
     private:
         c_DMGCPU* CPU;
+        c_MMU* MMU;
 
     public:
-        c_GameBoy();
+        c_GameBoy(const char* romfname);
         ~c_GameBoy();
 
         void Run(void);
