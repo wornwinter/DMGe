@@ -12,6 +12,26 @@ c_DMGCPU::~c_DMGCPU()
 
 }
 
+//Run one instruction.
+void c_DMGCPU::Tick()
+{
+    switch(MMU->ReadByte(Registers.PC.word))
+    {
+        case 0xCB:
+            //0xCB special opcode. Look up in separate opcode table.
+        break;
+
+        default:
+            //Anything else. Hopefully a standard opcode.
+            (this->*OPCodes[MMU->ReadByte(Registers.PC.word)])();
+        break;
+    }
+
+    //Keep track of machine and clock cycles.
+    ClockTotal.m += Clock.m;
+    ClockTotal.t += Clock.t;
+}
+
 void c_DMGCPU::InitOpcodeTables()
 {
     //Clear opcode tables with NULL (easy to check for invalid operation / unimplemented opcode)
@@ -224,6 +244,8 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xC9] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xCA] = &c_DMGCPU::OPCode0x00;
     //Function to read a CB opcode, not an actual opcode in itself
+    //There is a switch to check if it's a CB opcode now. I think
+    //we're better making a separate opcode table for them.
     OPCodes[0xCC] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xCD] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xCE] = &c_DMGCPU::OPCode0x00;
