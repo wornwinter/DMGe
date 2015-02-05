@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 {
     std::cout << "DMGe" << std::endl;
 
-    InitialiseThreads("test.gb");
+    InitialiseThreads("roms/tetris.gb");
 
     return 0;
 }

@@ -1,12 +1,12 @@
 # depslib dependency file v1.0
-1422369626 source:/home/darren/projects/ZWGB/src/main.cpp
+1423129308 source:/home/darren/projects/ZWGB/src/main.cpp
 	<boost/thread/thread.hpp>
 	<iostream>
 	<string>
 	"GameBoy.h"
 	"Debugger.h"
 
-1422448804 source:/home/darren/projects/ZWGB/src/Debugger.cpp
+1423129257 source:/home/darren/projects/ZWGB/src/Debugger.cpp
 	"Debugger.h"
 	<iostream>
 	<string>
@@ -19,18 +19,24 @@
 	<iostream>
 	"GameBoy.h"
 
-1422449443 source:/home/darren/projects/ZWGB/src/GameBoy.cpp
+1423129304 source:/home/darren/projects/ZWGB/src/GameBoy.cpp
 	"GameBoy.h"
 
-1422450184 /home/darren/projects/ZWGB/include/GameBoy.h
+1423127470 /home/darren/projects/ZWGB/include/GameBoy.h
 	<iostream>
 	"DMGCPU.h"
+	"MMU.h"
 
-1422441640 /home/darren/projects/ZWGB/include/DMGCPU.h
+1423128928 /home/darren/projects/ZWGB/include/DMGCPU.h
+	<cstring>
 	<stdint.h>
+	<stdio.h>
+	"MMU.h"
 
-1422441640 source:/home/darren/projects/ZWGB/src/DMGCPU.cpp
+1423129079 source:/home/darren/projects/ZWGB/src/DMGCPU.cpp
 	"DMGCPU.h"
+	"DMG_opcodes.h"
+	"debug.h"
 
 1422506081 source:e:\users\jesse\documents\github\dmge\src\debugger.cpp
 	"Debugger.h"
@@ -11180,4 +11186,30 @@
 	<boost/thread/detail/delete.hpp>
 	<boost/config/abi_prefix.hpp>
 	<boost/config/abi_suffix.hpp>
+
+1423127470 /home/darren/projects/ZWGB/include/MMU.h
+	<cstring>
+	<cstdint>
+	<iostream>
+	<fstream>
+	<stdio.h>
+	"debug.h"
+	"macro.h"
+
+1423127470 /home/darren/projects/ZWGB/include/debug.h
+	<iostream>
+	<string>
+	<cstdarg>
+	<cstdint>
+	<stdio.h>
+
+1423127579 /home/darren/projects/ZWGB/include/macro.h
+
+1423127470 source:/home/darren/projects/ZWGB/src/debug.cpp
+	"debug.h"
+
+1423127470 /home/darren/projects/ZWGB/include/DMG_opcodes.h
+
+1423127470 source:/home/darren/projects/ZWGB/src/MMU.cpp
+	"MMU.h"
 

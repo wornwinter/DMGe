@@ -1,5 +1,6 @@
 #include "DMGCPU.h"
 #include "DMG_opcodes.h"
+#include "debug.h"
 
 c_DMGCPU::c_DMGCPU(c_MMU* pMMU)
 {
@@ -15,21 +16,24 @@ c_DMGCPU::~c_DMGCPU()
 //Run one instruction.
 void c_DMGCPU::Tick()
 {
-    switch(MMU->ReadByte(Registers.PC.word))
+    if(running)
     {
-        case 0xCB:
-            //0xCB special opcode. Look up in separate opcode table.
-        break;
+        switch(MMU->ReadByte(Registers.PC.word))
+        {
+            case 0xCB:
+                //0xCB special opcode. Look up in separate opcode table.
+            break;
 
-        default:
-            //Anything else. Hopefully a standard opcode.
-            (this->*OPCodes[MMU->ReadByte(Registers.PC.word)])();
-        break;
+            default:
+                //Anything else. Hopefully a standard opcode.
+                (this->*OPCodes[MMU->ReadByte(Registers.PC.word)])();
+            break;
+        }
+
+        //Keep track of machine and clock cycles.
+        ClockTotal.m += Clock.m;
+        ClockTotal.t += Clock.t;
     }
-
-    //Keep track of machine and clock cycles.
-    ClockTotal.m += Clock.m;
-    ClockTotal.t += Clock.t;
 }
 
 void c_DMGCPU::InitOpcodeTables()
@@ -303,9 +307,11 @@ void c_DMGCPU::InitOpcodeTables()
 //NOP Instruction
 void c_DMGCPU::OPCode0x00()
 {
-    Registers.PC.word++;
-    Clock.m = 1;
-    Clock.t = 4;
+    DbgOut(DBG_CPU, VERBOSE_0, "\nUnknown opcode/NOP: 0x%x. PC: 0x%x", MMU->ReadByte(Registers.PC.word), Registers.PC.word);
+    running = false; //Halt CPU.
+    //Registers.PC.word++;
+    //Clock.m = 1;
+    //Clock.t = 4;
 }
 
 //Load immediate 16-bit value into BC

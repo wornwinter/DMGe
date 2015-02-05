@@ -73,6 +73,8 @@ private:
     clock_t Clock;
     clock_t ClockTotal;
 
+    bool running = true;
+
     //OPCODES
     void OPCode0x00();
     void OPCode0x01();
