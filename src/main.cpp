@@ -17,9 +17,9 @@ boost::thread* dbgthread;
 c_GameBoy* GameBoy;
 c_Debugger* Debugger;
 
-void InitialiseThreads(void)
+void InitialiseThreads(const char* romfname)
 {
-    GameBoy = new c_GameBoy();
+    GameBoy = new c_GameBoy(romfname);
     // Pass a pointer to the GameBoy class to the debugger. It will need this
     // for almost everything that it does.
     Debugger = new c_Debugger(GameBoy);
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 {
     std::cout << "DMGe" << std::endl;
 
-    InitialiseThreads();
+    InitialiseThreads("test.gb");
 
     return 0;
 }

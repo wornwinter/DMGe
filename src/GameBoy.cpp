@@ -1,8 +1,9 @@
 #include "GameBoy.h"
 
-c_GameBoy::c_GameBoy()
+c_GameBoy::c_GameBoy(const char* romfname)
 {
-    CPU = new c_DMGCPU();
+    MMU = new c_MMU();
+    CPU = new c_DMGCPU(MMU);
 }
 
 c_GameBoy::~c_GameBoy()
