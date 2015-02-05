@@ -25,6 +25,7 @@ void InitialiseThreads(const char* romfname)
     Debugger = new c_Debugger(GameBoy);
 
     // Create and start threads.
+
     emuthread = new boost::thread(boost::bind(&c_GameBoy::Run, GameBoy));
     emuthread->join();
 

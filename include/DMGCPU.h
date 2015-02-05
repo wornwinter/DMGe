@@ -59,6 +59,7 @@ class c_DMGCPU
 public:
     c_DMGCPU(c_MMU* pMMU);
     ~c_DMGCPU();
+    void Tick();
 
 private:
     c_MMU* MMU;
@@ -67,7 +68,6 @@ private:
     void (c_DMGCPU::*OPCodes[0xFF])(void);
     void (c_DMGCPU::*OPCodesCB[0xFF])(void);
     void InitOpcodeTables();
-    void Tick();
 
     regs_t  Registers;
     clock_t Clock;
