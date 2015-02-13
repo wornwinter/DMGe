@@ -1,3 +1,4 @@
 *.o
 *.exe
 roms/
+src/DMGCPU.cpp.save-failed

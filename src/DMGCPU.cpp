@@ -22,7 +22,7 @@ void c_DMGCPU::Tick()
         {
             case 0xCB:
                 //0xCB special opcode. Look up in separate opcode table.
-                DbgOut(DBG_CPU, VERBOSE_0, "0xCB opcode: 0x%x", MMU->ReadByte(Registers.PC.word + 1));
+                DbgOut(DBG_CPU, VERBOSE_2, "0xCB opcode: 0x%x", MMU->ReadByte(Registers.PC.word + 1));
                 (this->*OPCodesCB[MMU->ReadByte(Registers.PC.word + 1)])();
             break;
 
@@ -60,7 +60,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x0B] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0C] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0D] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x0E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x0E] = &c_DMGCPU::OPCode0x0E;
     OPCodes[0x0F] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x10] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x11] = &c_DMGCPU::OPCode0x00;
@@ -108,7 +108,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x3B] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x3C] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x3D] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x3E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x3E] = &c_DMGCPU::OPCode0x3E;
     OPCodes[0x3F] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x40] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x41] = &c_DMGCPU::OPCode0x00;
@@ -274,7 +274,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xDF] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xE0] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xE1] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xE2] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xE2] = &c_DMGCPU::OPCode0xE2;
     OPCodes[0xE3] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xE4] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xE5] = &c_DMGCPU::OPCode0x00;
@@ -474,6 +474,16 @@ void c_DMGCPU::OPCode0x0C()
     Registers.PC.word++;
 }
 
+//Load immediate 8-bit value into C.
+void c_DMGCPU::OPCode0x0E()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD C, d8");
+    Registers.BC.lo = MMU->ReadByte(Registers.PC.word + 1);
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word += 2;
+}
+
 //Relative jump if ZERO flag is not set. Add immediate (signed) value to PC.
 void c_DMGCPU::OPCode0x20()
 {
@@ -524,6 +534,16 @@ void c_DMGCPU::OPCode0x32()
     Registers.PC.word++;
 }
 
+//Load immediate 8-bit value into A.
+void c_DMGCPU::OPCode0x3E()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD A, d8");
+    Registers.AF.hi = MMU->ReadByte(Registers.PC.word + 1);
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word += 2;
+}
+
 //XOR A
 void c_DMGCPU::OPCode0xAF()
 {
@@ -531,6 +551,16 @@ void c_DMGCPU::OPCode0xAF()
     DbgOut(DBG_CPU, VERBOSE_2, "XOR A. A = 0x%x", Registers.AF.hi);
     Clock.m = 1;
     Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load 8-bit value in A into memory pointed to by 0xFF00 + C.
+void c_DMGCPU::OPCode0xE2()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD ($FF00+C), A");
+    MMU->WriteByte((0xFF00 + Registers.BC.lo), Registers.AF.hi);
+    Clock.m = 2;
+    Clock.t = 8;
     Registers.PC.word++;
 }
 
