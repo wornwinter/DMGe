@@ -289,8 +289,7 @@ void c_DMGCPU::OPCode0x00()
 //Load immediate 16-bit value into BC
 void c_DMGCPU::OPCode0x01()
 {
-    //TODO: MMU
-    //Registers.BC.word = mmu->readw(Registers.PC.word + 1);
+    Registers.BC.word = MMU->ReadWord(Registers.PC.word + 1);
     Clock.m = 3;
     Clock.t = 12;
     Registers.PC.word += 3;
@@ -299,9 +298,7 @@ void c_DMGCPU::OPCode0x01()
 //Load A into the address stored in BC
 void c_DMGCPU::OPCode0x02()
 {
-    //TODO:MMU
-    //Assuming writeb(addr, value)
-    //mmu->writeb(Registers.BC.word, Registers.AF.hi)
+    MMU->WriteByte(Registers.BC.word, Registers.AF.hi)
     Clock.m = 1;
     Clock.t = 8;
     Registers.PC.word += 1;
@@ -355,7 +352,7 @@ void c_DMGCPU::OPCode0x05()
 //Load 9-bit immediate value into B
 void c_DMGCPU::OPCode0x06()
 {
-    //Registers.BC.hi = mmu->readb(Registers.PC.hi + 1);
+    Registers.BC.hi = MMU->ReadByte(Registers.PC.hi + 1);
     Clock.m = 3;
     Clock.t = 8;
     Registers.PC.word += 2;
@@ -382,7 +379,7 @@ void c_DMGCPU::OPCode0x07()
 //Load the StackPointer into the address specified by immediate 16-bit value
 void c_DMGCPU::OPCode0x08()
 {
-    //mmu.writew(Registers.SP.word, mmu.readw(Registers.PC.word++));
+    MMU.WriteWord(Registers.SP.word, mmu.readw(Registers.PC.word++));
     Clock.m = 4; //Is this correct amount of machine cycles??
     Clock.t = 20;
     Registers.PC.word += 3;
@@ -409,7 +406,7 @@ void c_DMGCPU::OPCode0x09()
 //Load value at address in stored in BC into A
 void c_DMGCPU::OPCode0x0A()
 {
-    //Registers.AF.hi = mmu->readb(Registers.BC.word);
+    Registers.AF.hi = MMU->ReadByte(Registers.BC.word);
 
     Clock.m = 1;
     Clock.t = 4;
@@ -442,4 +439,28 @@ void c_DMGCPU::OPCode0x0C()
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
+}
+
+//Decrement C
+void c_DMGCPU::OPCode0x0D()
+{
+    SET_FLAG_BIT(SUB_BIT);
+
+    if(!(Registers.BC.lo++ & 0xFF))
+        SET_FLAG_BIT(ZERO_BIT);
+
+    if(Registers.BC.lo++ > 0x0F)
+        SET_FLAG_BIT(HC_BIT);
+
+    Registers.BC.lo--;
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load immediate 8-bit value into C
+void c_DMGCPU::OPCode0x0E()
+{
+    Registers.BC.lo = mmu->
 }
