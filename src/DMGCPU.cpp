@@ -22,6 +22,8 @@ void c_DMGCPU::Tick()
         {
             case 0xCB:
                 //0xCB special opcode. Look up in separate opcode table.
+                DbgOut(DBG_CPU, VERBOSE_0, "Error, 0xCB opcodes not implemented.");
+                running = false;
             break;
 
             default:
@@ -77,7 +79,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x1E] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x1F] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x20] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x21] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x21] = &c_DMGCPU::OPCode0x21;
     OPCodes[0x22] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x23] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x24] = &c_DMGCPU::OPCode0x00;
@@ -94,7 +96,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x2F] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x30] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x31] = &c_DMGCPU::OPCode0x31;
-    OPCodes[0x32] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x32] = &c_DMGCPU::OPCode0x32;
     OPCodes[0x33] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x34] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x35] = &c_DMGCPU::OPCode0x00;
@@ -469,6 +471,16 @@ void c_DMGCPU::OPCode0x0C()
     Registers.PC.word++;
 }
 
+//Load immediate 16-bit value into HL.
+void c_DMGCPU::OPCode0x21()
+{
+    Registers.HL.word = MMU->ReadWord(Registers.PC.word + 1);
+    DbgOut(DBG_CPU, VERBOSE_2, "LD HL, d16. HL = 0x%x", Registers.HL.word);
+    Registers.PC.word += 3;
+    Clock.m = 3;
+    Clock.t = 12;
+}
+
 //Load immediate 16-bit value into SP.
 void c_DMGCPU::OPCode0x31()
 {
@@ -477,6 +489,17 @@ void c_DMGCPU::OPCode0x31()
     Registers.PC.word += 3;
     Clock.m = 3;
     Clock.t = 12;
+}
+
+//Load 8-bit value in A into memory location pointed to by HL. Decrement HL.
+void c_DMGCPU::OPCode0x32()
+{
+    MMU->WriteByte(Registers.HL.word, Registers.AF.hi);
+    DbgOut(DBG_CPU, VERBOSE_2, "LD (HL-), A. HL = 0x%x. A = 0x%x", Registers.HL.word, Registers.AF.hi);
+    Registers.HL.word--;
+    Clock.m = 1;
+    Clock.t = 8;
+    Registers.PC.word++;
 }
 
 //XOR A
