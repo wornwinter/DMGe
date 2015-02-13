@@ -93,7 +93,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x2E] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x2F] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x30] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x31] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x31] = &c_DMGCPU::OPCode0x31;
     OPCodes[0x32] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x33] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x34] = &c_DMGCPU::OPCode0x00;
@@ -219,7 +219,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xAC] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xAD] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xAE] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xAF] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xAF] = &c_DMGCPU::OPCode0xAF;
     OPCodes[0xB0] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xB1] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xB2] = &c_DMGCPU::OPCode0x00;
@@ -464,6 +464,26 @@ void c_DMGCPU::OPCode0x0C()
 
     Registers.BC.lo++;
 
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load immediate 16-bit value into SP.
+void c_DMGCPU::OPCode0x31()
+{
+    Registers.SP.word = MMU->ReadWord(Registers.PC.word + 1);
+    DbgOut(DBG_CPU, VERBOSE_2, "LD SP, d16. SP = 0x%x", Registers.SP.word);
+    Registers.PC.word += 3;
+    Clock.m = 3;
+    Clock.t = 12;
+}
+
+//XOR A
+void c_DMGCPU::OPCode0xAF()
+{
+    Registers.AF.hi ^= Registers.AF.hi;
+    DbgOut(DBG_CPU, VERBOSE_2, "XOR A. A = 0x%x", Registers.AF.hi);
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
