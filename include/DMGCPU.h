@@ -59,6 +59,7 @@ class c_DMGCPU
 public:
     c_DMGCPU(c_MMU* pMMU);
     ~c_DMGCPU();
+    void Tick();
 
 private:
     c_MMU* MMU;
@@ -70,6 +71,9 @@ private:
 
     regs_t  Registers;
     clock_t Clock;
+    clock_t ClockTotal;
+
+    bool running = true;
 
     //OPCODES
     void OPCode0x00();

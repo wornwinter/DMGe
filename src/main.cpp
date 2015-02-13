@@ -25,6 +25,7 @@ void InitialiseThreads(const char* romfname)
     Debugger = new c_Debugger(GameBoy);
 
     // Create and start threads.
+
     emuthread = new boost::thread(boost::bind(&c_GameBoy::Run, GameBoy));
     emuthread->join();
 
@@ -36,7 +37,7 @@ int main(int argc, char* argv[])
 {
     std::cout << "DMGe" << std::endl;
 
-    InitialiseThreads("test.gb");
+    InitialiseThreads("roms/tetris.gb");
 
     return 0;
 }
