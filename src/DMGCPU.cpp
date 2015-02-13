@@ -312,7 +312,8 @@ void c_DMGCPU::InitOpcodeTables()
 //NOP Instruction
 void c_DMGCPU::OPCode0x00()
 {
-    DbgOut(DBG_CPU, VERBOSE_0, "\nUnknown opcode/NOP: 0x%x. PC: 0x%x", MMU->ReadByte(Registers.PC.word), Registers.PC.word);
+    DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
+    DbgOut(DBG_CPU, VERBOSE_0, "Unknown opcode/NOP: 0x%x. PC: 0x%x", MMU->ReadByte(Registers.PC.word), Registers.PC.word);
     running = false; //Halt CPU.
     //Dump Registers.
     DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
