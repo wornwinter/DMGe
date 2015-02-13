@@ -58,7 +58,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x09] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0A] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0B] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x0C] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x0C] = &c_DMGCPU::OPCode0x0C;
     OPCodes[0x0D] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0E] = &c_DMGCPU::OPCode0x0E;
     OPCodes[0x0F] = &c_DMGCPU::OPCode0x00;
@@ -165,7 +165,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x74] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x75] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x76] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x77] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x77] = &c_DMGCPU::OPCode0x77;
     OPCodes[0x78] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x79] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x7A] = &c_DMGCPU::OPCode0x00;
@@ -272,7 +272,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xDD] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xDE] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xDF] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xE0] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xE0] = &c_DMGCPU::OPCode0xE0;
     OPCodes[0xE1] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xE2] = &c_DMGCPU::OPCode0xE2;
     OPCodes[0xE3] = &c_DMGCPU::OPCode0x00;
@@ -309,7 +309,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodesCB[0x7C] = &c_DMGCPU::OPCodeCB0x7C;
 }
 
-//NOP Instruction
+//NOP Instruction - Temporarily using as unknown opcode. BIOS doesn't use NOP.
 void c_DMGCPU::OPCode0x00()
 {
     DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
@@ -561,6 +561,16 @@ void c_DMGCPU::OPCode0x3E()
     Registers.PC.word += 2;
 }
 
+//Store 8-bit value in register A into pointer HL.
+void c_DMGCPU::OPCode0x77()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD (HL), A");
+    MMU->WriteByte(Registers.HL.word, Registers.AF.hi);
+    Clock.m = 1;
+    Clock.t = 8;
+    Registers.PC.word++;
+}
+
 //XOR A
 void c_DMGCPU::OPCode0xAF()
 {
@@ -569,6 +579,16 @@ void c_DMGCPU::OPCode0xAF()
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
+}
+
+//Load 8-bit value in A into memory pointed to by 0xFF00 + 8-bit immediate value.
+void c_DMGCPU::OPCode0xE0()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD ($FF00 + d8), A");
+    MMU->WriteByte((0xFF00 + MMU->ReadByte(Registers.PC.word + 1)), Registers.AF.hi);
+    Clock.m = 2;
+    Clock.t = 12;
+    Registers.PC.word += 2;
 }
 
 //Load 8-bit value in A into memory pointed to by 0xFF00 + C.
