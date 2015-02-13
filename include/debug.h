@@ -16,7 +16,7 @@
 #define VERBOSE_1 1
 #define VERBOSE_2 2 // Very detailed output. Shows individual opcodes as they are executed.
 
-#define VERBOSE_LEVEL 0
+#define VERBOSE_LEVEL 2
 
 void DbgOut(int src, int verbosity, const char *fmt, ...);
 

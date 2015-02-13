@@ -11216,7 +11216,7 @@
 1423823360 source:c:\users\darren\documents\github\dmge\src\debug.cpp
 	"debug.h"
 
-1423823360 c:\users\darren\documents\github\dmge\include\debug.h
+1423823987 c:\users\darren\documents\github\dmge\include\debug.h
 	<iostream>
 	<string>
 	<cstdarg>
@@ -11257,4 +11257,24 @@
 	"macro.h"
 
 1423823360 c:\users\darren\documents\github\dmge\include\macro.h
+
+1423823692 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
+	"DMGCPU.h"
+	"DMG_opcodes.h"
+	"debug.h"
+
+1423823360 c:\users\darren\documents\github\dmge\include\dmg_opcodes.h
+
+1423823360 source:c:\users\darren\documents\github\dmge\src\gameboy.cpp
+	"GameBoy.h"
+
+1423823360 source:c:\users\darren\documents\github\dmge\src\mmu.cpp
+	"MMU.h"
+
+1423823964 source:c:\users\darren\documents\github\dmge\src\main.cpp
+	<boost/thread/thread.hpp>
+	<iostream>
+	<string>
+	"GameBoy.h"
+	"Debugger.h"
 
