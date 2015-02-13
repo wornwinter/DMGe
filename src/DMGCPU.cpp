@@ -304,6 +304,9 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xFD] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xFE] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xFF] = &c_DMGCPU::OPCode0x00;
+
+    //CB opcode table. Make sure to update tick function when opcodes are implemented.
+    //OPCodesCB[0x7B] = &c_DMGCPU::OPCodeCB0x7B;
 }
 
 //NOP Instruction
@@ -510,4 +513,12 @@ void c_DMGCPU::OPCode0xAF()
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
+}
+
+// CB opcodes.
+
+//Test bit 7 of E register. Reset N. Set Z flag if bit is zero. Set H.
+void c_DMGCPU::OPCodeCB0x7B()
+{
+
 }
