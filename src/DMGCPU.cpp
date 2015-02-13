@@ -78,7 +78,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x1D] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x1E] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x1F] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x20] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x20] = &c_DMGCPU::OPCode0x20;
     OPCodes[0x21] = &c_DMGCPU::OPCode0x21;
     OPCodes[0x22] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x23] = &c_DMGCPU::OPCode0x00;
@@ -474,6 +474,24 @@ void c_DMGCPU::OPCode0x0C()
     Registers.PC.word++;
 }
 
+//Relative jump if ZERO flag is not set. Add immediate (signed) value to PC.
+void c_DMGCPU::OPCode0x20()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "JR NZ, d8");
+    if(!FLAG_ZERO)
+    {
+        //Zero flag is set. Jump.
+        Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2;
+        DbgOut(DBG_CPU, VERBOSE_2, "Zero bit set. Jumping to 0x%x", Registers.PC.word);
+        Clock.t = 12;
+    }
+    else {
+        Registers.PC.word += 2;
+        Clock.t = 8;
+    }
+    Clock.m = 2;
+}
+
 //Load immediate 16-bit value into HL.
 void c_DMGCPU::OPCode0x21()
 {
@@ -523,13 +541,13 @@ void c_DMGCPU::OPCodeCB0x7C()
     DbgOut(DBG_CPU, VERBOSE_2,  "BIT 7, H. H = 0x%x", Registers.HL.hi);
     if(!(Registers.HL.hi & 0x80))
     {
-        SET_FLAG_BIT(FLAG_ZERO);
+        SET_FLAG_BIT(ZERO_BIT);
     }
     else {
-        UNSET_FLAG_BIT(FLAG_ZERO);
+        UNSET_FLAG_BIT(ZERO_BIT);
     }
-    SET_FLAG_BIT(FLAG_HC);
-    UNSET_FLAG_BIT(FLAG_SUB);
+    SET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(SUB_BIT);
     Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word += 2; //2 bytes, as this is a 2-byte opcode.
