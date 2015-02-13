@@ -63,7 +63,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x0E] = &c_DMGCPU::OPCode0x0E;
     OPCodes[0x0F] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x10] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x11] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x11] = &c_DMGCPU::OPCode0x11;
     OPCodes[0x12] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x13] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x14] = &c_DMGCPU::OPCode0x00;
@@ -72,7 +72,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x17] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x18] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x19] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x1A] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x1A] = &c_DMGCPU::OPCode0x1A;
     OPCodes[0x1B] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x1C] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x1D] = &c_DMGCPU::OPCode0x00;
@@ -448,6 +448,26 @@ void c_DMGCPU::OPCode0x09()
 
     Registers.HL.word += Registers.BC.word;
 
+    Clock.m = 1;
+    Clock.t = 8;
+    Registers.PC.word++;
+}
+
+//Load immediate 16-bit value into DE.
+void c_DMGCPU::OPCode0x11()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD DE, d16");
+    Registers.DE.word = MMU->ReadWord(Registers.PC.word + 1);
+    Registers.PC.word += 3;
+    Clock.m = 3;
+    Clock.t = 12;
+}
+
+//Load value pointed to by DE into A.
+void c_DMGCPU::OPCode0x1A()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD A, (DE)");
+    Registers.AF.hi = MMU->ReadByte(Registers.DE.word);
     Clock.m = 1;
     Clock.t = 8;
     Registers.PC.word++;
