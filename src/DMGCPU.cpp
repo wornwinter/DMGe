@@ -482,11 +482,12 @@ void c_DMGCPU::OPCode0x20()
     {
         //Zero flag is set. Jump.
         Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2;
-        DbgOut(DBG_CPU, VERBOSE_2, "Zero bit set. Jumping to 0x%x", Registers.PC.word);
+        DbgOut(DBG_CPU, VERBOSE_2, "Zero bit not set. Jumping to 0x%x", Registers.PC.word);
         Clock.t = 12;
     }
     else {
         Registers.PC.word += 2;
+        DbgOut(DBG_CPU, VERBOSE_2, "Zero bit set, not jumping.");
         Clock.t = 8;
     }
     Clock.m = 2;
