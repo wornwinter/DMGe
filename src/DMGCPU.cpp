@@ -247,13 +247,13 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xC6] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xC7] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xC8] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xC9] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC9] = &c_DMGCPU::OPCode0xC9;
     OPCodes[0xCA] = &c_DMGCPU::OPCode0x00;
     //Function to read a CB opcode, not an actual opcode in itself
     //There is a switch to check if it's a CB opcode now. I think
     //we're better making a separate opcode table for them.
     OPCodes[0xCC] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xCD] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xCD] = &c_DMGCPU::OPCode0xCD;
     OPCodes[0xCE] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xCF] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xD0] = &c_DMGCPU::OPCode0x00;
@@ -619,6 +619,31 @@ void c_DMGCPU::OPCode0xE2()
     Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word++;
+}
+
+//Return from function.
+void c_DMGCPU::OPCode0xC9()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "RET");
+    //Increment SP to find the return address.
+    Registers.SP.word += 2;
+    Registers.PC.word = MMU->ReadWord(Registers.SP.word);
+    Clock.m = 1;
+    Clock.t = 16;
+}
+
+//Call function at immediate 16-bit address. Store address of next function in the stack + decrement stack pointer.
+void c_DMGCPU::OPCode0xCD()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "CALL a16");
+    //Write address of next instruction to the stack and decrement SP.
+    MMU->WriteWord(Registers.SP.word, Registers.PC.word + 3);
+    //We wrote two bytes, so decrement accordingly. (Stack grows downwards).
+    Registers.SP.word -= 2;
+    //Set PC to address of function.
+    Registers.PC.word = MMU->ReadWord(Registers.PC.word + 1);
+    Clock.m = 3;
+    Clock.t = 24;
 }
 
 // CB opcodes.
