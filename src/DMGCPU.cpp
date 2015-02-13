@@ -22,8 +22,8 @@ void c_DMGCPU::Tick()
         {
             case 0xCB:
                 //0xCB special opcode. Look up in separate opcode table.
-                DbgOut(DBG_CPU, VERBOSE_0, "Error, 0xCB opcodes not implemented.");
-                running = false;
+                DbgOut(DBG_CPU, VERBOSE_0, "0xCB opcode: 0x%x", MMU->ReadByte(Registers.PC.word + 1));
+                (this->*OPCodesCB[MMU->ReadByte(Registers.PC.word + 1)])();
             break;
 
             default:
@@ -306,7 +306,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xFF] = &c_DMGCPU::OPCode0x00;
 
     //CB opcode table. Make sure to update tick function when opcodes are implemented.
-    //OPCodesCB[0x7B] = &c_DMGCPU::OPCodeCB0x7B;
+    OPCodesCB[0x7C] = &c_DMGCPU::OPCodeCB0x7C;
 }
 
 //NOP Instruction
@@ -517,8 +517,20 @@ void c_DMGCPU::OPCode0xAF()
 
 // CB opcodes.
 
-//Test bit 7 of E register. Reset N. Set Z flag if bit is zero. Set H.
-void c_DMGCPU::OPCodeCB0x7B()
+//Test bit 7(msb) of E register. Reset N. Set Z flag if bit is zero. Set H.
+void c_DMGCPU::OPCodeCB0x7C()
 {
-
+    DbgOut(DBG_CPU, VERBOSE_2,  "BIT 7, H. H = 0x%x", Registers.HL.hi);
+    if(!(Registers.HL.hi & 0x80))
+    {
+        SET_FLAG_BIT(FLAG_ZERO);
+    }
+    else {
+        UNSET_FLAG_BIT(FLAG_ZERO);
+    }
+    SET_FLAG_BIT(FLAG_HC);
+    UNSET_FLAG_BIT(FLAG_SUB);
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word += 2; //2 bytes, as this is a 2-byte opcode.
 }

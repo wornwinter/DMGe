@@ -34,8 +34,8 @@ class c_DMGCPU
     {
         struct
         {
-            uint8_t hi;
             uint8_t lo;
+            uint8_t hi;
         };
         uint16_t word;
     }Register16_t;
