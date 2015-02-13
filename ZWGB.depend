@@ -11213,3 +11213,48 @@
 1423127470 source:/home/darren/projects/ZWGB/src/MMU.cpp
 	"MMU.h"
 
+1423823360 source:c:\users\darren\documents\github\dmge\src\debug.cpp
+	"debug.h"
+
+1423823360 c:\users\darren\documents\github\dmge\include\debug.h
+	<iostream>
+	<string>
+	<cstdarg>
+	<cstdint>
+	<stdio.h>
+
+1423823360 source:c:\users\darren\documents\github\dmge\src\debugger.cpp
+	"Debugger.h"
+	<iostream>
+	<string>
+	<vector>
+	<iterator>
+	<algorithm>
+	<boost/tokenizer.hpp>
+
+1423823360 c:\users\darren\documents\github\dmge\include\debugger.h
+	<iostream>
+	"GameBoy.h"
+
+1423823360 c:\users\darren\documents\github\dmge\include\gameboy.h
+	<iostream>
+	"DMGCPU.h"
+	"MMU.h"
+
+1423823360 c:\users\darren\documents\github\dmge\include\dmgcpu.h
+	<cstring>
+	<stdint.h>
+	<stdio.h>
+	"MMU.h"
+
+1423823360 c:\users\darren\documents\github\dmge\include\mmu.h
+	<cstring>
+	<cstdint>
+	<iostream>
+	<fstream>
+	<stdio.h>
+	"debug.h"
+	"macro.h"
+
+1423823360 c:\users\darren\documents\github\dmge\include\macro.h
+

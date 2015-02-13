@@ -326,7 +326,7 @@ void c_DMGCPU::OPCode0x01()
 //Load A into the address stored in BC
 void c_DMGCPU::OPCode0x02()
 {
-    MMU->WriteByte(Registers.BC.word, Registers.AF.hi)
+    MMU->WriteByte(Registers.BC.word, Registers.AF.hi);
     Clock.m = 1;
     Clock.t = 8;
     Registers.PC.word += 1;
@@ -407,7 +407,7 @@ void c_DMGCPU::OPCode0x07()
 //Load the StackPointer into the address specified by immediate 16-bit value
 void c_DMGCPU::OPCode0x08()
 {
-    MMU.WriteWord(Registers.SP.word, mmu.readw(Registers.PC.word++));
+    MMU->WriteWord(Registers.SP.word, MMU->ReadWord(Registers.PC.word++));
     Clock.m = 4; //Is this correct amount of machine cycles??
     Clock.t = 20;
     Registers.PC.word += 3;
