@@ -314,6 +314,22 @@ void c_DMGCPU::OPCode0x00()
 {
     DbgOut(DBG_CPU, VERBOSE_0, "\nUnknown opcode/NOP: 0x%x. PC: 0x%x", MMU->ReadByte(Registers.PC.word), Registers.PC.word);
     running = false; //Halt CPU.
+    //Dump Registers.
+    DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
+    DbgOut(DBG_CPU, VERBOSE_0, "Register Dump");
+    DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
+    DbgOut(DBG_CPU, VERBOSE_0, "A = 0x%x", Registers.AF.hi);
+    DbgOut(DBG_CPU, VERBOSE_0, "B = 0x%x", Registers.BC.hi);
+    DbgOut(DBG_CPU, VERBOSE_0, "C = 0x%x", Registers.BC.lo);
+    DbgOut(DBG_CPU, VERBOSE_0, "D = 0x%x", Registers.DE.hi);
+    DbgOut(DBG_CPU, VERBOSE_0, "E = 0x%x", Registers.DE.lo);
+    DbgOut(DBG_CPU, VERBOSE_0, "F = 0x%x", Registers.AF.lo);
+    DbgOut(DBG_CPU, VERBOSE_0, "H = 0x%x", Registers.HL.hi);
+    DbgOut(DBG_CPU, VERBOSE_0, "L = 0x%x", Registers.HL.lo);
+    DbgOut(DBG_CPU, VERBOSE_0, "PC = 0x%x", Registers.PC.word);
+    DbgOut(DBG_CPU, VERBOSE_0, "SP = 0x%x", Registers.SP.word);
+    DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
+
     //Registers.PC.word++;
     //Clock.m = 1;
     //Clock.t = 4;
