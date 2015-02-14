@@ -48,12 +48,11 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x00] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x01] = &c_DMGCPU::OPCode0x01;
     OPCodes[0x02] = &c_DMGCPU::OPCode0x02;
-    OPCodes[0x02] = &c_DMGCPU::OPCode0x03;
-    OPCodes[0x03] = &c_DMGCPU::OPCode0x04;
-    OPCodes[0x04] = &c_DMGCPU::OPCode0x05;
-    OPCodes[0x05] = &c_DMGCPU::OPCode0x06;
-    OPCodes[0x06] = &c_DMGCPU::OPCode0x07;
-    OPCodes[0x07] = &c_DMGCPU::OPCode0x08;
+    OPCodes[0x03] = &c_DMGCPU::OPCode0x03;
+    OPCodes[0x04] = &c_DMGCPU::OPCode0x04;
+    OPCodes[0x05] = &c_DMGCPU::OPCode0x05;
+    OPCodes[0x06] = &c_DMGCPU::OPCode0x06;
+    OPCodes[0x07] = &c_DMGCPU::OPCode0x07;
     OPCodes[0x08] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x09] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0A] = &c_DMGCPU::OPCode0x00;
@@ -643,6 +642,7 @@ void c_DMGCPU::OPCode0x4F()
     Clock.t = 4;
     Registers.PC.word++;
 }
+
 
 //XOR A
 void c_DMGCPU::OPCode0xAF()
