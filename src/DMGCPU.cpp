@@ -50,11 +50,11 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x02] = &c_DMGCPU::OPCode0x02;
     OPCodes[0x02] = &c_DMGCPU::OPCode0x03;
     OPCodes[0x03] = &c_DMGCPU::OPCode0x04;
-    OPCodes[0x04] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x05] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x06] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x07] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x08] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x04] = &c_DMGCPU::OPCode0x05;
+    OPCodes[0x05] = &c_DMGCPU::OPCode0x06;
+    OPCodes[0x06] = &c_DMGCPU::OPCode0x07;
+    OPCodes[0x07] = &c_DMGCPU::OPCode0x08;
+    OPCodes[0x08] = &c_DMGCPU::OPCode0x09;
     OPCodes[0x09] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0A] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0B] = &c_DMGCPU::OPCode0x00;
@@ -125,7 +125,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x4C] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x4D] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x4E] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x4F] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x4F] = &c_DMGCPU::OPCode0x4F;
     OPCodes[0x50] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x51] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x52] = &c_DMGCPU::OPCode0x00;
@@ -243,7 +243,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xC2] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xC3] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xC4] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xC5] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC5] = &c_DMGCPU::OPCode0xC5;
     OPCodes[0xC6] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xC7] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xC8] = &c_DMGCPU::OPCode0x00;
@@ -313,7 +313,7 @@ void c_DMGCPU::InitOpcodeTables()
 void c_DMGCPU::OPCode0x00()
 {
     DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
-    DbgOut(DBG_CPU, VERBOSE_0, "Unknown opcode/NOP: 0x%x. PC: 0x%x", MMU->ReadByte(Registers.PC.word), Registers.PC.word);
+    DbgOut(DBG_CPU, VERBOSE_0, "Unknown opcode/%s: 0x%x. PC: 0x%x", DMG_opcodes[MMU->ReadByte(Registers.PC.word)], MMU->ReadByte(Registers.PC.word), Registers.PC.word);
     running = false; //Halt CPU.
     //Dump Registers.
     DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
@@ -591,6 +591,16 @@ void c_DMGCPU::OPCode0x77()
     Registers.PC.word++;
 }
 
+//Load Register A into Register C
+void c_DMGCPU::OPCode0x4F()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD C, A");
+    Registers.AF.hi = Registers.BC.lo;
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //XOR A
 void c_DMGCPU::OPCode0xAF()
 {
@@ -599,6 +609,19 @@ void c_DMGCPU::OPCode0xAF()
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
+}
+
+//Push BC onto the stack
+void c_DMGCPU::OPCode0xC5()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "PUSH BC");
+    //Push BC onto the stack according to where the stackpointer is
+    MMU->WriteWord(Registers.SP.word, Registers.BC.word);
+    //Increment the stackpointer DOWNWARDS
+    Registers.SP.word -= 2;
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word += 1;
 }
 
 //Load 8-bit value in A into memory pointed to by 0xFF00 + 8-bit immediate value.
