@@ -14,12 +14,12 @@
 				<Compiler>
 					<Add option="-std=c++11" />
 					<Add option="-g" />
-					<Add directory="E:/Users/Jesse/Documents/Github/DMGe/include" />
-					<Add directory="E:/Users/Jesse/Documents/Github/LIBRARIES/boost_1_57_0" />
+					<Add option="-D_DEBUG" />
+					<Add directory="./include" />
 				</Compiler>
 				<Linker>
-					<Add library="E:\Users\Jesse\Documents\Github\LIBRARIES\boost_1_57_0\stage\lib\libboost_system-mgw47-mt-d-1_57.a" />
-					<Add library="E:\Users\Jesse\Documents\Github\LIBRARIES\boost_1_57_0\stage\lib\libboost_thread-mgw47-mt-d-1_57.a" />
+					<Add library="boost_system-mgw47-mt-d-1_57" />
+					<Add library="boost_thread-mgw47-mt-d-1_57" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -47,9 +47,13 @@
 		<Unit filename="include/DMG_opcodes.h" />
 		<Unit filename="include/Debugger.h" />
 		<Unit filename="include/GameBoy.h" />
+		<Unit filename="include/MMU.h" />
+		<Unit filename="include/debug.h" />
 		<Unit filename="src/DMGCPU.cpp" />
 		<Unit filename="src/Debugger.cpp" />
 		<Unit filename="src/GameBoy.cpp" />
+		<Unit filename="src/MMU.cpp" />
+		<Unit filename="src/debug.cpp" />
 		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />
