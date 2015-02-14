@@ -80,8 +80,8 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x1F] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x20] = &c_DMGCPU::OPCode0x20;
     OPCodes[0x21] = &c_DMGCPU::OPCode0x21;
-    OPCodes[0x22] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x23] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x22] = &c_DMGCPU::OPCode0x22;
+    OPCodes[0x23] = &c_DMGCPU::OPCode0x23;
     OPCodes[0x24] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x25] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x26] = &c_DMGCPU::OPCode0x00;
@@ -293,7 +293,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xF2] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xF3] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xF4] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xF5] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xF5] = &c_DMGCPU::OPCode0xF5;
     OPCodes[0xF6] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xF7] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xF8] = &c_DMGCPU::OPCode0x00;
@@ -575,6 +575,24 @@ void c_DMGCPU::OPCode0x21()
     Clock.t = 12;
 }
 
+//Load A into the address stored in HL + 1
+void c_DMGCPU::OPCode0x22()
+{
+    MMU->WriteByte(Registers.HL.word + 1, Registers.AF.hi);
+    Clock.m = 1;
+    Clock.t = 8;
+    Registers.PC.word++;
+}
+
+//Increment HL
+void c_DMGCPU::OPCode0x23()
+{
+    Registers.HL.word++;
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //Load immediate 16-bit value into SP.
 void c_DMGCPU::OPCode0x31()
 {
@@ -706,10 +724,22 @@ void c_DMGCPU::OPCode0xCD()
     Clock.t = 24;
 }
 
-//
+//OR A with immediate 8-bit value,store result in A
 void c_DMGCPU::OPCode0xF5()
 {
+    DbgOut(DBG_CPU, VERBOSE_2, "OR d8");
 
+    UNSET_FLAG_BIT(SUB_BIT);
+    UNSET_FLAG_BIT(CARRY_BIT);
+    UNSET_FLAG_BIT(HC_BIT);
+    //OR A with d8
+    Registers.AF.hi |= MMU->ReadByte(Registers.PC.word++);
+
+    if(!(Registers.AF.hi & 0xFF))
+        SET_FLAG_BIT(ZERO_BIT);
+    Clock.m = 1;
+    Clock.t = 8;
+    Registers.PC.word += 2;
 }
 
 // CB opcodes.
