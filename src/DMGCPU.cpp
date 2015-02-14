@@ -54,7 +54,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x05] = &c_DMGCPU::OPCode0x06;
     OPCodes[0x06] = &c_DMGCPU::OPCode0x07;
     OPCodes[0x07] = &c_DMGCPU::OPCode0x08;
-    OPCodes[0x08] = &c_DMGCPU::OPCode0x09;
+    OPCodes[0x08] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x09] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0A] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0B] = &c_DMGCPU::OPCode0x00;
@@ -69,7 +69,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x14] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x15] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x16] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x17] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x17] = &c_DMGCPU::OPCode0x17;
     OPCodes[0x18] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x19] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x1A] = &c_DMGCPU::OPCode0x1A;
@@ -239,7 +239,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xBE] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xBF] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xC0] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xC1] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC1] = &c_DMGCPU::OPCode0xC1;
     OPCodes[0xC2] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xC3] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xC4] = &c_DMGCPU::OPCode0x00;
@@ -306,6 +306,8 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xFF] = &c_DMGCPU::OPCode0x00;
 
     //CB opcode table. Make sure to update tick function when opcodes are implemented.
+    OPCodesCB[0x11] = &c_DMGCPU::OPCodeCB0x11;
+    OPCodesCB[0x17] = &c_DMGCPU::OPCodeCB0x17;
     OPCodesCB[0x7C] = &c_DMGCPU::OPCodeCB0x7C;
 }
 
@@ -463,6 +465,29 @@ void c_DMGCPU::OPCode0x11()
     Clock.t = 12;
 }
 
+//Rotate A left. Bit 7 to Carry, Carry bit to Bit 0
+void c_DMGCPU::OPCode0x17()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "RLA");
+    //Unset Flag bits
+    UNSET_FLAG_BIT(ZERO_BIT);
+    UNSET_FLAG_BIT(SUB_BIT);
+    UNSET_FLAG_BIT(HC_BIT);
+
+    //MSB of the A register
+    uint8_t bit7 = MSB(Registers.AF.hi);
+    uint8_t cflag = FLAG_CARRY; //Carry at this point in time (not AFTER the shift)
+
+    if(bit7)
+        SET_FLAG_BIT(CARRY_BIT);
+
+    Registers.AF.hi <<= 1;
+    Registers.AF.hi |= cflag;
+    Clock.m = 1;
+    Clock.t =4;
+    Registers.PC.word++;
+}
+
 //Load value pointed to by DE into A.
 void c_DMGCPU::OPCode0x1A()
 {
@@ -611,6 +636,18 @@ void c_DMGCPU::OPCode0xAF()
     Registers.PC.word++;
 }
 
+//POP BC from the Stack
+void c_DMGCPU::OPCode0xC1()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "POP BC");
+    //Increment Stack pointer to find address
+    Registers.SP.word += 2;
+    Clock.m = 1;
+    Clock.t = 12;
+    Registers.BC.word = MMU->ReadWord(Registers.SP.word);
+    Registers.PC.word++;
+}
+
 //Push BC onto the stack
 void c_DMGCPU::OPCode0xC5()
 {
@@ -621,7 +658,7 @@ void c_DMGCPU::OPCode0xC5()
     Registers.SP.word -= 2;
     Clock.m = 1;
     Clock.t = 4;
-    Registers.PC.word += 1;
+    Registers.PC.word++;
 }
 
 //Load 8-bit value in A into memory pointed to by 0xFF00 + 8-bit immediate value.
@@ -669,13 +706,67 @@ void c_DMGCPU::OPCode0xCD()
     Clock.t = 24;
 }
 
+//
+void c_DMGCPU::OPCode0xF5()
+{
+
+}
+
 // CB opcodes.
+
+//Rotate C left through the Carry Flag
+void c_DMGCPU::OPCodeCB0x11()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "RL C");
+    //Unset flag bits
+    UNSET_FLAG_BIT(SUB_BIT);
+    UNSET_FLAG_BIT(HC_BIT);
+
+    //Move BIT 7 to Carry Flag
+    uint8_t bit7 = MSB(Registers.BC.lo);
+
+    if(bit7)
+        SET_FLAG_BIT(CARRY_BIT);
+
+    Registers.BC.lo <<= 1;
+
+    if(FLAG_CARRY)
+        Registers.BC.lo |= 0x01;
+
+    Clock.t = 1;
+    Clock.m = 8;
+    Registers.PC.word += 2;
+}
+
+//Rotate A left
+void c_DMGCPU::OPCodeCB0x17()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "RL A");
+    //Unset flag bits
+    UNSET_FLAG_BIT(SUB_BIT);
+    UNSET_FLAG_BIT(HC_BIT);
+
+    //Move BIT 7 to Carry Flag
+    uint8_t bit7 = MSB(Registers.AF.hi);
+
+    if(bit7)
+        SET_FLAG_BIT(CARRY_BIT);
+
+    Registers.AF.hi <<= 1;
+
+    if(FLAG_CARRY)
+        Registers.AF.hi |= 0x01;
+
+    Clock.t = 1;
+    Clock.m = 8;
+    Registers.PC.word += 2;
+}
 
 //Test bit 7(msb) of E register. Reset N. Set Z flag if bit is zero. Set H.
 void c_DMGCPU::OPCodeCB0x7C()
 {
     DbgOut(DBG_CPU, VERBOSE_2,  "BIT 7, H. H = 0x%x", Registers.HL.hi);
-    if(!(Registers.HL.hi & 0x80))
+    if(!(MSB(Registers.HL.hi)))
     {
         SET_FLAG_BIT(ZERO_BIT);
     }
