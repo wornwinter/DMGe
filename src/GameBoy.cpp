@@ -14,11 +14,8 @@ c_GameBoy::~c_GameBoy()
 {
 }
 
+//Called by application in event loop.
 void c_GameBoy::Run(void)
 {
-    std::cout << "GameBoy thread running." << std::endl;
-    while(1)
-    {
-        CPU->Tick();
-    }
+    CPU->Tick();
 }
