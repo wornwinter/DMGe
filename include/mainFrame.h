@@ -11,6 +11,7 @@
 
 #define MENU_START 4
 #define MENU_STOP 5
+#define MENU_SUPPRESS 6
 
 //Main window class definition.
 class mainFrame : public wxFrame

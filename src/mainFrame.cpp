@@ -11,6 +11,10 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
     menuEmu->Append(MENU_START, "&Start");
     menuEmu->Append(MENU_STOP, "&Stop");
 
+    #ifdef _DEBUG
+    menuEmu->Append(MENU_SUPPRESS, "Suppress debug output. (Not implemented)");
+    #endif // _DEBUG
+
     wxMenuBar* menuBar = new wxMenuBar;
     menuBar->Append(menuFile, "&File");
     menuBar->Append(menuEmu, "&Emulation");
