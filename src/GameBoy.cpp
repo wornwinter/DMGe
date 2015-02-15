@@ -17,5 +17,6 @@ c_GameBoy::~c_GameBoy()
 //Called by application in event loop.
 void c_GameBoy::Run(void)
 {
-    CPU->Tick();
+    if(!pause)
+        CPU->Tick();
 }
