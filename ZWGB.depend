@@ -15098,6 +15098,9 @@
 	<wx/wx.h>
 	"GameBoy.h"
 
-1423960180 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
+1424128371 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
 	"mainFrame.h"
+	"logo.xpm"
+
+1424127991 c:\users\darren\documents\github\dmge\include\logo.xpm
 

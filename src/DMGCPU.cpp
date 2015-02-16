@@ -1,11 +1,16 @@
 #include "DMGCPU.h"
 #include "DMG_opcodes.h"
 #include "debug.h"
+#include <cstring>
 
 c_DMGCPU::c_DMGCPU(c_MMU* pMMU)
 {
     InitOpcodeTables();
     MMU = pMMU;
+
+    //Reset everything to zero. Stops a weird bug where the PC starts at the top of GB memory.
+    memset(&Registers, 0, sizeof(Registers));
+
 }
 
 c_DMGCPU::~c_DMGCPU()
