@@ -15,11 +15,23 @@
 					<Add option="-std=c++11" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-DwxUSE_UNICODE=0" />
 					<Add directory="./include" />
+					<Add directory="C:/wxWidgets/include" />
 				</Compiler>
 				<Linker>
 					<Add library="boost_system-mgw47-mt-d-1_57" />
 					<Add library="boost_thread-mgw47-mt-d-1_57" />
+					<Add library="wxmsw30" />
+					<Add library="wxexpat" />
+					<Add library="wxjpeg" />
+					<Add library="wxpng" />
+					<Add library="wxregex" />
+					<Add library="wxscintilla" />
+					<Add library="wxtiff" />
+					<Add library="wxzlib" />
+					<Add library="wxmsw30_gl" />
+					<Add directory="C:/wxWidgets/lib/gcc_dll" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -42,19 +54,27 @@
 		<Compiler>
 			<Add option="-std=c++11" />
 			<Add option="-Wall" />
+			<Add directory="C:/wxWidgets/include" />
 		</Compiler>
+		<Linker>
+			<Add directory="C:/wxWidgets/lib/gcc_dll" />
+		</Linker>
 		<Unit filename="include/DMGCPU.h" />
 		<Unit filename="include/DMG_opcodes.h" />
 		<Unit filename="include/Debugger.h" />
 		<Unit filename="include/GameBoy.h" />
 		<Unit filename="include/MMU.h" />
+		<Unit filename="include/app.h" />
 		<Unit filename="include/debug.h" />
+		<Unit filename="include/mainFrame.h" />
 		<Unit filename="src/DMGCPU.cpp" />
 		<Unit filename="src/Debugger.cpp" />
 		<Unit filename="src/GameBoy.cpp" />
 		<Unit filename="src/MMU.cpp" />
+		<Unit filename="src/app.cpp" />
 		<Unit filename="src/debug.cpp" />
 		<Unit filename="src/main.cpp" />
+		<Unit filename="src/mainFrame.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
