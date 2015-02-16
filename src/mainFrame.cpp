@@ -1,4 +1,5 @@
 #include "mainFrame.h"
+#include "logo.xpm"
 
 mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
     : wxFrame(NULL, wxID_ANY, title, pos, size)
@@ -20,6 +21,9 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
     menuBar->Append(menuEmu, "&Emulation");
 
     SetMenuBar(menuBar);
+
+    wxIcon mainIcon(logo_xpm);
+    SetIcon(mainIcon);
 
     gameboy = new c_GameBoy("roms/tetris.gb");
     gameboy->pause = true;
