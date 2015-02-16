@@ -25,7 +25,7 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
     gameboy->pause = true;
 
     wxTimer* timer = new wxTimer(this, GB_TIMER);
-    timer->Start(16); //Interval in milliseconds.
+    timer->Start(1); //Interval in milliseconds.
 }
 
 wxBEGIN_EVENT_TABLE(mainFrame, wxFrame)
