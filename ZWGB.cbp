@@ -23,6 +23,7 @@
 					<Add library="boost_system-mgw47-mt-d-1_57" />
 					<Add library="boost_thread-mgw47-mt-d-1_57" />
 					<Add library="wxmsw30" />
+<<<<<<< HEAD
 					<Add library="wxexpat" />
 					<Add library="wxjpeg" />
 					<Add library="wxpng" />
@@ -31,6 +32,8 @@
 					<Add library="wxtiff" />
 					<Add library="wxzlib" />
 					<Add library="wxmsw30_gl" />
+=======
+>>>>>>> origin/master
 					<Add directory="C:/wxWidgets/lib/gcc_dll" />
 				</Linker>
 			</Target>

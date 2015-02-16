@@ -385,14 +385,12 @@ void c_DMGCPU::OPCode0x04()
 //Decrement B
 void c_DMGCPU::OPCode0x05()
 {
+    DbgOut(DBG_CPU, VERBOSE_2, "DEC B");
     SET_FLAG_BIT(SUB_BIT);
 
-    Registers.BC.word--;
+    Registers.BC.hi--;
 
-    if(Registers.BC.hi-- > 0xFF)
-        SET_FLAG_BIT(CARRY_BIT);
-
-    if(Registers.BC.hi-- > 0x0F)
+    if((Registers.BC.hi & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
 
     if(Registers.BC.hi == 0)

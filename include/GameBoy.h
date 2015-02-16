@@ -18,6 +18,7 @@ class c_GameBoy {
     public:
         c_GameBoy(const char* romfname);
         ~c_GameBoy();
+        bool pause = true;
 
         void Run(void);
 };
