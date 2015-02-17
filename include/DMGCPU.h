@@ -27,6 +27,8 @@
 #define MSB(x)                  (x & 0x80)
 #define LSB(x)                  (x & 0x01)
 
+#define BYTESWAP(x)             ((x << 8) | (x & 0x00FF))
+
 class c_DMGCPU
 {
 

@@ -11,6 +11,11 @@ c_DMGCPU::c_DMGCPU(c_MMU* pMMU)
     //Reset everything to zero. Stops a weird bug where the PC starts at the top of GB memory.
     memset(&Registers, 0, sizeof(Registers));
 
+#ifdef _DEBUG
+    Registers.PC.word = 0x000C; //Skips that huge loop at the start for debugging purposes.
+    Registers.SP.word = 0xFFFE;
+#endif // _DEBUG
+
 }
 
 c_DMGCPU::~c_DMGCPU()
@@ -408,11 +413,12 @@ void c_DMGCPU::OPCode0x05()
     Registers.PC.word++;
 }
 
-//Load 9-bit immediate value into B
+//Load 8-bit immediate value into B
 void c_DMGCPU::OPCode0x06()
 {
-    Registers.BC.hi = MMU->ReadByte(Registers.PC.hi + 1);
-    Clock.m = 3;
+    Registers.BC.hi = MMU->ReadByte(Registers.PC.word + 1);
+    DbgOut(DBG_CPU, VERBOSE_2, "LD B, d8. B = 0x%x", Registers.BC.hi);
+    Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word += 2;
 }
@@ -665,23 +671,25 @@ void c_DMGCPU::OPCode0xAF()
 //POP BC from the Stack
 void c_DMGCPU::OPCode0xC1()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "POP BC");
-    //Increment Stack pointer to find address
     Registers.SP.word += 2;
+    Registers.BC.hi = MMU->ReadByte(Registers.SP.word);
+    Registers.BC.lo = MMU->ReadByte(Registers.SP.word + 1);
+    DbgOut(DBG_CPU, VERBOSE_2, "POP BC. New BC = 0x%x.", Registers.BC.word);
+    Registers.PC.word++;
     Clock.m = 1;
     Clock.t = 12;
-    Registers.BC.word = MMU->ReadWord(Registers.SP.word);
-    Registers.PC.word++;
 }
 
 //Push BC onto the stack
 void c_DMGCPU::OPCode0xC5()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "PUSH BC");
+    DbgOut(DBG_CPU, VERBOSE_2, "PUSH BC. BC = 0x%x", Registers.BC.word);
     //Push BC onto the stack according to where the stackpointer is
     MMU->WriteWord(Registers.SP.word, Registers.BC.word);
+
     //Increment the stackpointer DOWNWARDS
     Registers.SP.word -= 2;
+
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
@@ -710,10 +718,10 @@ void c_DMGCPU::OPCode0xE2()
 //Return from function.
 void c_DMGCPU::OPCode0xC9()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "RET");
     //Increment SP to find the return address.
     Registers.SP.word += 2;
-    Registers.PC.word = MMU->ReadWord(Registers.SP.word);
+    Registers.PC.word = MMU->ReadWord(Registers.PC.word);
+    DbgOut(DBG_CPU, VERBOSE_2, "RET. Return address = 0x%x", Registers.PC.word);
     Clock.m = 1;
     Clock.t = 16;
 }
@@ -721,13 +729,13 @@ void c_DMGCPU::OPCode0xC9()
 //Call function at immediate 16-bit address. Store address of next function in the stack + decrement stack pointer.
 void c_DMGCPU::OPCode0xCD()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "CALL a16");
     //Write address of next instruction to the stack and decrement SP.
     MMU->WriteWord(Registers.SP.word, Registers.PC.word + 3);
+    DbgOut(DBG_CPU, VERBOSE_2, "CALL a16. Return address = 0x%x", Registers.PC.word+3);
     //We wrote two bytes, so decrement accordingly. (Stack grows downwards).
-    Registers.SP.word -= 2;
     //Set PC to address of function.
     Registers.PC.word = MMU->ReadWord(Registers.PC.word + 1);
+    Registers.SP.word -= 2;
     Clock.m = 3;
     Clock.t = 24;
 }
@@ -756,20 +764,23 @@ void c_DMGCPU::OPCode0xF5()
 void c_DMGCPU::OPCodeCB0x11()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "RL C");
+    //Store carry flag.
+    uint8_t carryi = FLAG_CARRY ? 1 : 0;
+    uint8_t regi = Registers.BC.lo;
+
     //Unset flag bits
     UNSET_FLAG_BIT(SUB_BIT);
     UNSET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(ZERO_BIT);
+    UNSET_FLAG_BIT(CARRY_BIT);
 
-    //Move BIT 7 to Carry Flag
-    uint8_t bit7 = MSB(Registers.BC.lo);
 
-    if(bit7)
+    if(MSB(Registers.BC.lo))
         SET_FLAG_BIT(CARRY_BIT);
 
-    Registers.BC.lo <<= 1;
+    regi = (regi << 1) | carryi;
 
-    if(FLAG_CARRY)
-        Registers.BC.lo |= 0x01;
+    Registers.BC.lo = regi;
 
     Clock.t = 1;
     Clock.m = 8;
@@ -780,20 +791,23 @@ void c_DMGCPU::OPCodeCB0x11()
 void c_DMGCPU::OPCodeCB0x17()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "RL A");
+    //Store carry flag.
+    uint8_t carryi = FLAG_CARRY ? 1 : 0;
+    uint8_t regi = Registers.AF.hi;
+
     //Unset flag bits
     UNSET_FLAG_BIT(SUB_BIT);
     UNSET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(ZERO_BIT);
+    UNSET_FLAG_BIT(CARRY_BIT);
 
-    //Move BIT 7 to Carry Flag
-    uint8_t bit7 = MSB(Registers.AF.hi);
 
-    if(bit7)
+    if(MSB(Registers.AF.hi))
         SET_FLAG_BIT(CARRY_BIT);
 
-    Registers.AF.hi <<= 1;
+    regi = (regi << 1) | carryi;
 
-    if(FLAG_CARRY)
-        Registers.AF.hi |= 0x01;
+    Registers.AF.hi = regi;
 
     Clock.t = 1;
     Clock.m = 8;
