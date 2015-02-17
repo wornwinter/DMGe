@@ -671,9 +671,8 @@ void c_DMGCPU::OPCode0xAF()
 //POP BC from the Stack
 void c_DMGCPU::OPCode0xC1()
 {
+    Registers.BC.word = MMU->ReadWord(Registers.SP.word);
     Registers.SP.word += 2;
-    Registers.BC.hi = MMU->ReadByte(Registers.SP.word);
-    Registers.BC.lo = MMU->ReadByte(Registers.SP.word + 1);
     DbgOut(DBG_CPU, VERBOSE_2, "POP BC. New BC = 0x%x.", Registers.BC.word);
     Registers.PC.word++;
     Clock.m = 1;
@@ -684,11 +683,10 @@ void c_DMGCPU::OPCode0xC1()
 void c_DMGCPU::OPCode0xC5()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "PUSH BC. BC = 0x%x", Registers.BC.word);
-    //Push BC onto the stack according to where the stackpointer is
-    MMU->WriteWord(Registers.SP.word, Registers.BC.word);
-
     //Increment the stackpointer DOWNWARDS
     Registers.SP.word -= 2;
+    //Push BC onto the stack according to where the stackpointer is
+    MMU->WriteWord(Registers.SP.word, Registers.BC.word);
 
     Clock.m = 1;
     Clock.t = 4;
@@ -718,9 +716,8 @@ void c_DMGCPU::OPCode0xE2()
 //Return from function.
 void c_DMGCPU::OPCode0xC9()
 {
-    //Increment SP to find the return address.
+    Registers.PC.word = MMU->ReadWord(Registers.SP.word);
     Registers.SP.word += 2;
-    Registers.PC.word = MMU->ReadWord(Registers.PC.word);
     DbgOut(DBG_CPU, VERBOSE_2, "RET. Return address = 0x%x", Registers.PC.word);
     Clock.m = 1;
     Clock.t = 16;
@@ -730,12 +727,11 @@ void c_DMGCPU::OPCode0xC9()
 void c_DMGCPU::OPCode0xCD()
 {
     //Write address of next instruction to the stack and decrement SP.
+    Registers.SP.word -= 2;
     MMU->WriteWord(Registers.SP.word, Registers.PC.word + 3);
     DbgOut(DBG_CPU, VERBOSE_2, "CALL a16. Return address = 0x%x", Registers.PC.word+3);
-    //We wrote two bytes, so decrement accordingly. (Stack grows downwards).
     //Set PC to address of function.
     Registers.PC.word = MMU->ReadWord(Registers.PC.word + 1);
-    Registers.SP.word -= 2;
     Clock.m = 3;
     Clock.t = 24;
 }

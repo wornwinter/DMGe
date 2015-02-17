@@ -111,7 +111,7 @@ uint8_t c_MMU::ReadByte(uint16_t addr)
 
 uint16_t c_MMU::ReadWord(uint16_t addr)
 {
-    return BytesToWord(ReadByte(addr), ReadByte(addr+0x01));
+    return (ReadByte(addr) | (ReadByte(addr+1) << 8));
 }
 
 void c_MMU::WriteByte(uint16_t addr, uint8_t data)
@@ -215,8 +215,8 @@ void c_MMU::WriteByte(uint16_t addr, uint8_t data)
 
 void c_MMU::WriteWord(uint16_t addr, uint16_t data)
 {
-    WriteByte(addr, UpperByte(data));
-    WriteByte(addr+1, LowerByte(data));
+    WriteByte(addr, data & 255);
+    WriteByte(addr+1, data >> 8);
 }
 
 void c_MMU::MapBIOS(bool ismap)
