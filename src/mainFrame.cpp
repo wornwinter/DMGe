@@ -42,7 +42,9 @@ wxEND_EVENT_TABLE()
 void mainFrame::Tick(wxIdleEvent& event)
 {
     gameboy->Run();
-    event.RequestMore(true);
+
+    if(!gameboy->pause)
+        event.RequestMore(true);
 }
 
 void mainFrame::StartEmulation(wxCommandEvent& event)
