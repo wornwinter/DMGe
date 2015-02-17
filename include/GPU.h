@@ -15,7 +15,7 @@ class c_GPU {
         c_MMU *MMU;
         uint32_t stateclock;
         uint8_t state;
-        uint16_t line;
+        uint8_t line;
 
     public:
         c_GPU(c_MMU* pMMU);

@@ -17,6 +17,9 @@ c_GPU::~c_GPU()
 
 void c_GPU::Tick(uint32_t clock)
 {
+    //Current scanline should always be written here.
+    MMU->WriteByte(0xFF44, line);
+
     stateclock += clock;
 
     switch(state)
@@ -62,6 +65,7 @@ void c_GPU::Tick(uint32_t clock)
 
         case STATE_VBLANK:
             DbgOut(DBG_VID, VERBOSE_1, "STATE = VBLANK");
+            //MMU->WriteByte(0xFF0F, 0x01); //Set VBLANK interrupt flag.
             if(stateclock >= 456)
             {
                 stateclock = 0;

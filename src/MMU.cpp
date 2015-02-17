@@ -190,6 +190,16 @@ void c_MMU::WriteByte(uint16_t addr, uint8_t data)
                             //IO.
                             switch(addr & 0x00F0)
                             {
+                                case 0x00:
+                                    switch(addr & 0x000F)
+                                    {
+                                        //Interrupt flags.
+                                        case 0x0F:
+                                            DbgOut(DBG_MMU, VERBOSE_1, "Writing interrupt flags.");
+                                            intflags = data;
+                                        break;
+                                    }
+                                break;
                                 //GPU
                                 case 0x40:
                                 case 0x50:

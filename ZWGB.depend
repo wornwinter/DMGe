@@ -11216,7 +11216,7 @@
 1423823360 source:c:\users\darren\documents\github\dmge\src\debug.cpp
 	"debug.h"
 
-1424186719 c:\users\darren\documents\github\dmge\include\debug.h
+1424189827 c:\users\darren\documents\github\dmge\include\debug.h
 	<iostream>
 	<string>
 	<cstdarg>
@@ -11270,7 +11270,7 @@
 1424188183 source:c:\users\darren\documents\github\dmge\src\gameboy.cpp
 	"GameBoy.h"
 
-1424180143 source:c:\users\darren\documents\github\dmge\src\mmu.cpp
+1424190073 source:c:\users\darren\documents\github\dmge\src\mmu.cpp
 	"MMU.h"
 
 1423932292 source:c:\users\darren\documents\github\dmge\src\main.cpp
@@ -15106,6 +15106,10 @@
 
 1424127991 c:\users\darren\documents\github\dmge\include\logo.xpm
 
-1424188608 c:\users\darren\documents\github\dmge\include\gpu.h
+1424190375 c:\users\darren\documents\github\dmge\include\gpu.h
 	"MMU.h"
+
+1424189586 source:c:\users\darren\documents\github\dmge\src\gpu.cpp
+	"GPU.h"
+	"debug.h"
 
