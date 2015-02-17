@@ -62,6 +62,7 @@ public:
     c_DMGCPU(c_MMU* pMMU);
     ~c_DMGCPU();
     void Tick();
+    uint32_t GetClock();
 
 private:
     c_MMU* MMU;

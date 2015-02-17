@@ -11236,12 +11236,13 @@
 	<iostream>
 	"GameBoy.h"
 
-1424123856 c:\users\darren\documents\github\dmge\include\gameboy.h
+1424188148 c:\users\darren\documents\github\dmge\include\gameboy.h
 	<iostream>
 	"DMGCPU.h"
 	"MMU.h"
+	"GPU.h"
 
-1424177060 c:\users\darren\documents\github\dmge\include\dmgcpu.h
+1424187793 c:\users\darren\documents\github\dmge\include\dmgcpu.h
 	<cstring>
 	<stdint.h>
 	<stdio.h>
@@ -11258,7 +11259,7 @@
 
 1423823360 c:\users\darren\documents\github\dmge\include\macro.h
 
-1424186682 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
+1424187839 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
 	"DMGCPU.h"
 	"DMG_opcodes.h"
 	"debug.h"
@@ -11266,7 +11267,7 @@
 
 1423823360 c:\users\darren\documents\github\dmge\include\dmg_opcodes.h
 
-1424123856 source:c:\users\darren\documents\github\dmge\src\gameboy.cpp
+1424188183 source:c:\users\darren\documents\github\dmge\src\gameboy.cpp
 	"GameBoy.h"
 
 1424180143 source:c:\users\darren\documents\github\dmge\src\mmu.cpp
@@ -15104,4 +15105,7 @@
 	"logo.xpm"
 
 1424127991 c:\users\darren\documents\github\dmge\include\logo.xpm
+
+1424188608 c:\users\darren\documents\github\dmge\include\gpu.h
+	"MMU.h"
 

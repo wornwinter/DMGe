@@ -9,11 +9,13 @@
 #include <iostream>
 #include "DMGCPU.h"
 #include "MMU.h"
+#include "GPU.h"
 
 class c_GameBoy {
     private:
         c_DMGCPU* CPU;
         c_MMU* MMU;
+        c_GPU* GPU;
 
     public:
         c_GameBoy(const char* romfname);

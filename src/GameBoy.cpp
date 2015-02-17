@@ -4,6 +4,8 @@ c_GameBoy::c_GameBoy(const char* romfname)
 {
     MMU = new c_MMU();
     CPU = new c_DMGCPU(MMU);
+    GPU = new c_GPU(MMU);
+
     MMU->LoadBIOS("roms/bios.bin");
     //At the minute this should be a rom without bank switching. Tetris for example.
     MMU->LoadROM(romfname);
@@ -18,5 +20,8 @@ c_GameBoy::~c_GameBoy()
 void c_GameBoy::Run(void)
 {
     if(!pause)
-        CPU->Tick();
+    {
+       CPU->Tick();
+       GPU->Tick(CPU->GetClock());
+    }
 }

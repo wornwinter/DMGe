@@ -23,6 +23,12 @@ c_DMGCPU::~c_DMGCPU()
 
 }
 
+//Returns clock periods taken for last instruction.
+uint32_t c_DMGCPU::GetClock()
+{
+    return Clock.t;
+}
+
 //Run one instruction.
 void c_DMGCPU::Tick()
 {
