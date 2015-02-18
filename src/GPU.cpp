@@ -29,6 +29,16 @@ void c_GPU::UpdateTile(uint16_t addr, uint8_t data)
     uint8_t y = (addrtrans >> 1) & 7;
 
     DbgOut(DBG_CPU, VERBOSE_0, "Updating tile: %i. Line: %i", tileindex, y);
+
+    uint8_t sx, x;
+
+    for(x = 0; x < 8; x++)
+    {
+        sx = 1 << (7-x);
+
+        tileset[tileindex][y][x] = ((vram[addrtrans] & sx) ? 1 : 0)
+        + ((vram[addrtrans+1] & sx) ? 2 : 0);
+    }
 }
 
 void c_GPU::Tick(uint32_t clock)
@@ -79,7 +89,6 @@ void c_GPU::Tick(uint32_t clock)
 
         case STATE_VBLANK:
             DbgOut(DBG_VID, VERBOSE_1, "STATE = VBLANK");
-            //MMU->WriteByte(0xFF0F, 0x01); //Set VBLANK interrupt flag.
             if(stateclock >= 456)
             {
                 stateclock = 0;
