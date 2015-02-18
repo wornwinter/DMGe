@@ -544,15 +544,15 @@ void c_DMGCPU::OPCode0x0C()
 //Decrement C
 void c_DMGCPU::OPCode0x0D()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "DEC D");
+    DbgOut(DBG_CPU, VERBOSE_2, "DEC C");
     SET_FLAG_BIT(SUB_BIT);
 
-    Registers.DE.hi--;
+    Registers.BC.lo--;
 
-    if((Registers.DE.hi & 0xF) == 0xF)
+    if((Registers.BC.lo & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
 
-    if(Registers.DE.hi == 0)
+    if(Registers.BC.lo == 0)
         SET_FLAG_BIT(ZERO_BIT);
     else
         UNSET_FLAG_BIT(ZERO_BIT);
@@ -600,6 +600,7 @@ void c_DMGCPU::OPCode0x10()
 
     Clock.m = 1;
     Clock.t = 4;
+
     //Sit around and do nothing until either a button is pressed (stored in A) or the joypad is presssed
     while(Registers.AF.hi == 0 || MMU->ReadByte(0xFF00) == 0);;
 
@@ -619,6 +620,17 @@ void c_DMGCPU::OPCode0x11()
     Clock.t = 12;
 }
 
+//Load A into the address pointed to by DE
+void c_DMGCPU::OPCode0x12()
+{
+    //Load doesn't affect flags
+    DbgOut(DBG_CPU, VERBOSE_2, "LD (DE), A A=0x%x, DE=0x%x", Registers.AF.hi, Registers.DE.word);
+    MMU->WriteByte(Registers.DE.word, Registers.AF.hi);
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word++;
+}
+
 //Increment DE
 void c_DMGCPU::OPCode0x13()
 {
@@ -629,6 +641,7 @@ void c_DMGCPU::OPCode0x13()
     Clock.m = 1;
     Clock.t = 8;
 }
+
 
 //Rotate A left. Bit 7 to Carry, Carry bit to Bit 0
 void c_DMGCPU::OPCode0x17()
