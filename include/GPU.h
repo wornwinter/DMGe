@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <stdio.h>
 #include "debug.h"
 #include "macro.h"
@@ -21,10 +22,15 @@ class c_GPU {
         uint32_t stateclock;
         uint8_t state;
         uint8_t line;
+        uint8_t tileset[384][8];
+        uint8_t vram[0x1FFF];
 
     public:
         c_GPU();
         ~c_GPU();
+        void WriteByte(uint16_t addr, uint8_t data);
+        void UpdateTile(uint16_t addr, uint8_t data);
+
         void Tick(uint32_t clock);
 
 };

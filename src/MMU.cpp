@@ -144,7 +144,8 @@ void c_MMU::WriteByte(uint16_t addr, uint8_t data)
             // Video RAM
             case 0x8:
             case 0x9:
-                vram[addr - 0x8000] = data;
+                //Forward write request on to GPU.
+                GPU->WriteByte(addr, data);
             break;
 
             // External RAM
@@ -197,7 +198,6 @@ void c_MMU::WriteByte(uint16_t addr, uint8_t data)
                                     {
                                         //Interrupt flags.
                                         case 0x0F:
-                                            DbgOut(DBG_MMU, VERBOSE_1, "Writing interrupt flags.");
                                             intflags = data;
                                         break;
                                     }

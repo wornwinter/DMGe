@@ -7,11 +7,28 @@ c_GPU::c_GPU()
     stateclock = 0;
     state = 0;
     line = 0;
+    memset(&tileset, 0, sizeof(tileset));
 }
 
 c_GPU::~c_GPU()
 {
 
+}
+
+void c_GPU::WriteByte(uint16_t addr, uint8_t data)
+{
+    //Translate address and write.
+    vram[addr & 0x1FFF] = data;
+    UpdateTile(addr, data);
+}
+
+void c_GPU::UpdateTile(uint16_t addr, uint8_t data)
+{
+    uint16_t addrtrans = addr & 0x1FFF;
+    uint16_t tileindex = (addrtrans >> 4) & 0x511;
+    uint8_t y = (addrtrans >> 1) & 7;
+
+    DbgOut(DBG_CPU, VERBOSE_0, "Updating tile: %i. Line: %i", tileindex, y);
 }
 
 void c_GPU::Tick(uint32_t clock)

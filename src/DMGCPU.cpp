@@ -107,7 +107,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x2B] = &c_DMGCPU::OPCode0x2B;
     OPCodes[0x2C] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x2D] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x2E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x2E] = &c_DMGCPU::OPCode0x2E;
     OPCodes[0x2F] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x30] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x31] = &c_DMGCPU::OPCode0x31;
@@ -1007,6 +1007,16 @@ void c_DMGCPU::OPCode0x2B()
     Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word++;
+}
+
+//Load immediate 8-bit value into L.
+void c_DMGCPU::OPCode0x2E()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD L, d8");
+    Registers.HL.lo = MMU->ReadByte(Registers.PC.word);
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word += 2;
 }
 
 //Load immediate 16-bit value into SP.
