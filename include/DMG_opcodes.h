@@ -132,6 +132,7 @@ const char* DMG_opcodes[0xFF] =
     "LD L, A",
     "LD (HL), B",
     "LD (HL), C",
+    "LD (HL), D",
     "LD (HL), E",
     "LD (HL), H",
     "LD (HL), L",
