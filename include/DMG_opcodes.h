@@ -16,7 +16,7 @@
 
 */
 
-const char* DMG_opcodes[0xFF] =
+const char* DMG_opcodes[256] =
 {
     "NOP",
     "LD BC, d16",
