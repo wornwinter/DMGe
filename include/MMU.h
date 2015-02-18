@@ -15,6 +15,8 @@
 #define SET_INT_SERIAL(x)   intflags = ((intflags & 0xF7) | (x << 3))
 #define SET_INT_JOYPAD(x)   intflags = ((intflags & 0xEF) | (x << 4))
 
+class c_GPU;
+
 class c_MMU {
     private:
         uint8_t memory[0xFFFF];
@@ -29,9 +31,10 @@ class c_MMU {
 
         uint8_t activerombank = 1;
         bool biosmapped = false;
+        c_GPU* GPU;
 
     public:
-        c_MMU();
+        c_MMU(c_GPU* pGPU);
         ~c_MMU();
         uint8_t ReadByte(uint16_t addr);
         uint16_t ReadWord(uint16_t addr);

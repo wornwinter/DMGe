@@ -23,8 +23,6 @@
 					<Add library="boost_system-mgw47-mt-d-1_57" />
 					<Add library="boost_thread-mgw47-mt-d-1_57" />
 					<Add library="wxmsw30" />
-<<<<<<< HEAD
-					<Add library="wxexpat" />
 					<Add library="wxjpeg" />
 					<Add library="wxpng" />
 					<Add library="wxregex" />
@@ -32,8 +30,6 @@
 					<Add library="wxtiff" />
 					<Add library="wxzlib" />
 					<Add library="wxmsw30_gl" />
-=======
->>>>>>> origin/master
 					<Add directory="C:/wxWidgets/lib/gcc_dll" />
 				</Linker>
 			</Target>
@@ -65,6 +61,7 @@
 		<Unit filename="include/DMGCPU.h" />
 		<Unit filename="include/DMG_opcodes.h" />
 		<Unit filename="include/Debugger.h" />
+		<Unit filename="include/GPU.h" />
 		<Unit filename="include/GameBoy.h" />
 		<Unit filename="include/MMU.h" />
 		<Unit filename="include/app.h" />
@@ -72,6 +69,7 @@
 		<Unit filename="include/mainFrame.h" />
 		<Unit filename="src/DMGCPU.cpp" />
 		<Unit filename="src/Debugger.cpp" />
+		<Unit filename="src/GPU.cpp" />
 		<Unit filename="src/GameBoy.cpp" />
 		<Unit filename="src/MMU.cpp" />
 		<Unit filename="src/app.cpp" />

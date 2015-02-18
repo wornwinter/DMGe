@@ -1,10 +1,13 @@
 #include "GameBoy.h"
+#include "DMGCPU.h"
+#include "GPU.h"
+#include "MMU.h"
 
 c_GameBoy::c_GameBoy(const char* romfname)
 {
-    MMU = new c_MMU();
+    GPU = new c_GPU();
+    MMU = new c_MMU(GPU);
     CPU = new c_DMGCPU(MMU);
-    GPU = new c_GPU(MMU);
 
     MMU->LoadBIOS("roms/bios.bin");
     //At the minute this should be a rom without bank switching. Tetris for example.

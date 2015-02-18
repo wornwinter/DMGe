@@ -1,10 +1,9 @@
 #include "GPU.h"
 #include "debug.h"
 
-c_GPU::c_GPU(c_MMU* pMMU)
+c_GPU::c_GPU()
 {
     DbgOut(DBG_VID, VERBOSE_0, "Initialising GPU...");
-    MMU = pMMU;
     stateclock = 0;
     state = 0;
     line = 0;
@@ -17,8 +16,6 @@ c_GPU::~c_GPU()
 
 void c_GPU::Tick(uint32_t clock)
 {
-    //Current scanline should always be written here.
-    MMU->WriteByte(0xFF44, line);
 
     stateclock += clock;
 

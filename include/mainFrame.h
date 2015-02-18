@@ -3,7 +3,6 @@
 
 #include <wx/wx.h>
 #include <stdlib.h> //Exit signal stuff
-#include "GameBoy.h"
 
 #define GB_TIMER 1
 
@@ -13,6 +12,8 @@
 #define MENU_START 4
 #define MENU_STOP 5
 #define MENU_SUPPRESS 6
+
+class c_GameBoy;
 
 //Main window class definition.
 class mainFrame : public wxFrame

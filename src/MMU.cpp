@@ -1,7 +1,9 @@
 #include "MMU.h"
+#include "GPU.h"
 
-c_MMU::c_MMU()
+c_MMU::c_MMU(c_GPU* pGPU)
 {
+    GPU = pGPU;
 }
 
 c_MMU::~c_MMU()

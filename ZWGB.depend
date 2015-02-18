@@ -11236,11 +11236,8 @@
 	<iostream>
 	"GameBoy.h"
 
-1424188148 c:\users\darren\documents\github\dmge\include\gameboy.h
+1424259228 c:\users\darren\documents\github\dmge\include\gameboy.h
 	<iostream>
-	"DMGCPU.h"
-	"MMU.h"
-	"GPU.h"
 
 1424187793 c:\users\darren\documents\github\dmge\include\dmgcpu.h
 	<cstring>
@@ -11248,7 +11245,7 @@
 	<stdio.h>
 	"MMU.h"
 
-1423823360 c:\users\darren\documents\github\dmge\include\mmu.h
+1424258960 c:\users\darren\documents\github\dmge\include\mmu.h
 	<cstring>
 	<cstdint>
 	<iostream>
@@ -11259,19 +11256,23 @@
 
 1423823360 c:\users\darren\documents\github\dmge\include\macro.h
 
-1424187839 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
+1424252089 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
 	"DMGCPU.h"
 	"DMG_opcodes.h"
 	"debug.h"
 	<cstring>
 
-1423823360 c:\users\darren\documents\github\dmge\include\dmg_opcodes.h
+1424252089 c:\users\darren\documents\github\dmge\include\dmg_opcodes.h
 
-1424188183 source:c:\users\darren\documents\github\dmge\src\gameboy.cpp
+1424259232 source:c:\users\darren\documents\github\dmge\src\gameboy.cpp
 	"GameBoy.h"
-
-1424190073 source:c:\users\darren\documents\github\dmge\src\mmu.cpp
+	"DMGCPU.h"
+	"GPU.h"
 	"MMU.h"
+
+1424259189 source:c:\users\darren\documents\github\dmge\src\mmu.cpp
+	"MMU.h"
+	"GPU.h"
 
 1423932292 source:c:\users\darren\documents\github\dmge\src\main.cpp
 	<iostream>
@@ -15096,20 +15097,26 @@
 1423933032 c:\users\darren\documents\github\dmge\include\app.h
 	<wx/wx.h>
 
-1424184051 c:\users\darren\documents\github\dmge\include\mainframe.h
+1424259285 c:\users\darren\documents\github\dmge\include\mainframe.h
 	<wx/wx.h>
-	"GameBoy.h"
+	<stdlib.h>
 
-1424184676 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
+1424252089 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
 	"mainFrame.h"
 	"logo.xpm"
 
 1424127991 c:\users\darren\documents\github\dmge\include\logo.xpm
 
-1424190375 c:\users\darren\documents\github\dmge\include\gpu.h
-	"MMU.h"
+1424259323 c:\users\darren\documents\github\dmge\include\gpu.h
+	<cstring>
+	<cstdint>
+	<iostream>
+	<fstream>
+	<stdio.h>
+	"debug.h"
+	"macro.h"
 
-1424189586 source:c:\users\darren\documents\github\dmge\src\gpu.cpp
+1424258653 source:c:\users\darren\documents\github\dmge\src\gpu.cpp
 	"GPU.h"
 	"debug.h"
 

@@ -7,9 +7,10 @@
 #define GAMEBOY_H
 
 #include <iostream>
-#include "DMGCPU.h"
-#include "MMU.h"
-#include "GPU.h"
+
+class c_DMGCPU;
+class c_GPU;
+class c_MMU;
 
 class c_GameBoy {
     private:
