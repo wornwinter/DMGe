@@ -15097,12 +15097,14 @@
 1423933032 c:\users\darren\documents\github\dmge\include\app.h
 	<wx/wx.h>
 
-1424259285 c:\users\darren\documents\github\dmge\include\mainframe.h
+1424279624 c:\users\darren\documents\github\dmge\include\mainframe.h
 	<wx/wx.h>
+	<wx/glcanvas.h>
 	<stdlib.h>
 
-1424259290 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
+1424279851 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
 	"mainFrame.h"
+	"canvas.h"
 	"logo.xpm"
 	"GameBoy.h"
 
@@ -15121,4 +15123,51 @@
 1424262117 source:c:\users\darren\documents\github\dmge\src\gpu.cpp
 	"GPU.h"
 	"debug.h"
+
+1412631242 c:\wxwidgets\include\wx\glcanvas.h
+	"wx/defs.h"
+	"wx/app.h"
+	"wx/palette.h"
+	"wx/window.h"
+	"wx/msw/glcanvas.h"
+	"wx/x11/glcanvas.h"
+	"wx/gtk/glcanvas.h"
+	"wx/gtk1/glcanvas.h"
+	"wx/osx/glcanvas.h"
+	"wx/cocoa/glcanvas.h"
+
+1412631244 c:\wxwidgets\include\wx\msw\glcanvas.h
+	"wx/palette.h"
+	"wx/msw/wrapwin.h"
+	<GL/gl.h>
+
+1412631244 c:\wxwidgets\include\wx\x11\glcanvas.h
+	"wx/unix/glx11.h"
+
+1412631244 c:\wxwidgets\include\wx\unix\glx11.h
+	<GL/glx.h>
+
+1412631242 c:\wxwidgets\include\wx\gtk\glcanvas.h
+	"wx/unix/glx11.h"
+
+1412631242 c:\wxwidgets\include\wx\gtk1\glcanvas.h
+	"wx/unix/glx11.h"
+
+1412631244 c:\wxwidgets\include\wx\osx\glcanvas.h
+	<OpenGL/gl.h>
+	"wx/vector.h"
+
+1412631242 c:\wxwidgets\include\wx\cocoa\glcanvas.h
+	"wx/window.h"
+	<OpenGL/gl.h>
+
+1424281674 c:\users\darren\documents\github\dmge\include\canvas.h
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glext.h>
+	<wx/glcanvas.h>
+	<wx/dcclient.h>
+
+1424281334 source:c:\users\darren\documents\github\dmge\src\canvas.cpp
+	"canvas.h"
 

@@ -2,7 +2,10 @@
 #define MAINFRAME_H
 
 #include <wx/wx.h>
+#include <wx/glcanvas.h>
 #include <stdlib.h> //Exit signal stuff
+
+
 
 #define GB_TIMER 1
 
@@ -14,6 +17,8 @@
 #define MENU_SUPPRESS 6
 
 class c_GameBoy;
+class c_Canvas;
+
 
 //Main window class definition.
 class mainFrame : public wxFrame

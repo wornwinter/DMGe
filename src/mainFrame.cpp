@@ -1,4 +1,5 @@
 #include "mainFrame.h"
+#include "canvas.h"
 #include "logo.xpm"
 #include "GameBoy.h"
 
@@ -26,6 +27,9 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
     wxIcon mainIcon(logo_xpm);
     SetIcon(mainIcon);
+
+    c_Canvas *glCanvas = new c_Canvas(this);
+
 
     gameboy = new c_GameBoy("roms/tetris.gb");
     gameboy->pause = true;
