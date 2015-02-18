@@ -7,6 +7,7 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
     //File Menu
     wxMenu* menuFile = new wxMenu;
     menuFile->Append(MENU_OPEN, "&Open");
+    menuFile->Append(MENU_EXIT, "&Exit");
 
     wxMenu* menuEmu = new wxMenu;
     menuEmu->Append(MENU_START, "&Start");
@@ -37,6 +38,7 @@ wxBEGIN_EVENT_TABLE(mainFrame, wxFrame)
     EVT_IDLE(mainFrame::Tick)
     EVT_MENU(MENU_START, mainFrame::StartEmulation)
     EVT_MENU(MENU_STOP, mainFrame::StopEmulation)
+    EVT_MENU(MENU_EXIT, mainFrame::Exit)
 wxEND_EVENT_TABLE()
 
 void mainFrame::Tick(wxIdleEvent& event)
@@ -55,4 +57,9 @@ void mainFrame::StartEmulation(wxCommandEvent& event)
 void mainFrame::StopEmulation(wxCommandEvent& event)
 {
     gameboy->pause = true;
+}
+
+void mainFrame::Exit(wxCommandEvent& event)
+{
+    exit(EXIT_SUCCESS);
 }
