@@ -69,8 +69,8 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x05] = &c_DMGCPU::OPCode0x05;
     OPCodes[0x06] = &c_DMGCPU::OPCode0x06;
     OPCodes[0x07] = &c_DMGCPU::OPCode0x07;
-    OPCodes[0x08] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x09] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x08] = &c_DMGCPU::OPCode0x08;
+    OPCodes[0x09] = &c_DMGCPU::OPCode0x09;
     OPCodes[0x0A] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0B] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0C] = &c_DMGCPU::OPCode0x0C;
@@ -451,12 +451,13 @@ void c_DMGCPU::OPCode0x07()
     UNSET_FLAG_BIT(SUB_BIT);
     UNSET_FLAG_BIT(ZERO_BIT);
     UNSET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(CARRY_BIT);
 
     if(MSB(Registers.AF.hi))
         SET_FLAG_BIT(CARRY_BIT);
 
     Registers.AF.hi <<= 1;
-    Registers.AF.hi |= Registers.AF.lo & CARRY_BIT;
+    Registers.AF.hi |= (Registers.AF.lo & CARRY_BIT) >> 4;
 
     Clock.m = 1;
     Clock.t = 4;
@@ -490,57 +491,13 @@ void c_DMGCPU::OPCode0x09()
     Registers.PC.word++;
 }
 
-//Load immediate 16-bit value into DE.
-void c_DMGCPU::OPCode0x11()
-{
-    DbgOut(DBG_CPU, VERBOSE_2, "LD DE, d16");
-    Registers.DE.word = MMU->ReadWord(Registers.PC.word + 1);
-    Registers.PC.word += 3;
-    Clock.m = 3;
-    Clock.t = 12;
-}
-
-//Rotate A left. Bit 7 to Carry, Carry bit to Bit 0
-void c_DMGCPU::OPCode0x17()
-{
-    DbgOut(DBG_CPU, VERBOSE_2, "RLA");
-    //Unset Flag bits
-    UNSET_FLAG_BIT(ZERO_BIT);
-    UNSET_FLAG_BIT(SUB_BIT);
-    UNSET_FLAG_BIT(HC_BIT);
-
-    //MSB of the A register
-    uint8_t bit7 = MSB(Registers.AF.hi);
-    uint8_t cflag = FLAG_CARRY; //Carry at this point in time (not AFTER the shift)
-
-    if(bit7)
-        SET_FLAG_BIT(CARRY_BIT);
-
-    Registers.AF.hi <<= 1;
-    Registers.AF.hi |= cflag;
-    Clock.m = 1;
-    Clock.t =4;
-    Registers.PC.word++;
-}
-
-//Load value pointed to by DE into A.
-void c_DMGCPU::OPCode0x1A()
-{
-    DbgOut(DBG_CPU, VERBOSE_2, "LD A, (DE)");
-    Registers.AF.hi = MMU->ReadByte(Registers.DE.word);
-    Clock.m = 1;
-    Clock.t = 8;
-    Registers.PC.word++;
-}
-
-//Load value at address in stored in BC into A
+//Load value pointed to by BC into A
 void c_DMGCPU::OPCode0x0A()
 {
     Registers.AF.hi = MMU->ReadByte(Registers.BC.word);
-
-    Clock.m = 1;
-    Clock.t = 4;
-    Registers.PC.word++;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD A, (BC), A = 0x%x", Registers.AF.hi);
+    Clock.m = 3;
+    Clock.t = 8;
 }
 
 //Decrement B
@@ -615,6 +572,53 @@ void c_DMGCPU::OPCode0x0E()
     Registers.PC.word += 2;
 }
 
+//Rotate A right through Carry bit (Bit 7 to carry and Carry bit)
+void c_DMGCPU::OPCode0x0F()
+{
+    UNSET_FLAG_BIT(SUB_BIT);
+    UNSET_FLAG_BIT(ZERO_BIT);
+    UNSET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(CARRY_BIT);
+
+    if(LSB(Registers.AF.hi))
+        SET_FLAG_BIT(CARRY_BIT);
+
+    Registers.AF.hi >>= 1;
+    Registers.AF.hi |= (Registers.AF.lo & CARRY_BIT) << 3;
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//STOP 0
+void c_DMGCPU::OPCode0x10()
+{
+
+    //According to http://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html
+    //"Instruction STOP has according to manuals opcode 10 00 and thus is 2 bytes long. Anyhow it seems there is no reason for it so some assemblers code it simply as one byte instruction 10."
+
+    Clock.m = 1;
+    Clock.t = 4;
+    //Sit around and do nothing until either a button is pressed (stored in A) or the joypad is presssed
+    while(Registers.AF.hi == 0 || MMU->ReadByte(0xFF00) == 0);;
+
+    if(MMU->ReadByte(Registers.PC.word + 1) == 0x00)
+        Registers.PC.word += 2;
+    else
+        Registers.PC.word++;
+}
+
+//Load immediate 16-bit value into DE.
+void c_DMGCPU::OPCode0x11()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD DE, d16");
+    Registers.DE.word = MMU->ReadWord(Registers.PC.word + 1);
+    Registers.PC.word += 3;
+    Clock.m = 3;
+    Clock.t = 12;
+}
+
 //Increment DE
 void c_DMGCPU::OPCode0x13()
 {
@@ -624,6 +628,39 @@ void c_DMGCPU::OPCode0x13()
     Registers.PC.word++;
     Clock.m = 1;
     Clock.t = 8;
+}
+
+//Rotate A left. Bit 7 to Carry, Carry bit to Bit 0
+void c_DMGCPU::OPCode0x17()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "RLA");
+    //Unset Flag bits
+    UNSET_FLAG_BIT(ZERO_BIT);
+    UNSET_FLAG_BIT(SUB_BIT);
+    UNSET_FLAG_BIT(HC_BIT);
+
+    //MSB of the A register
+    uint8_t bit7 = MSB(Registers.AF.hi);
+    uint8_t cflag = FLAG_CARRY; //Carry at this point in time (not AFTER the shift)
+
+    if(bit7)
+        SET_FLAG_BIT(CARRY_BIT);
+
+    Registers.AF.hi <<= 1;
+    Registers.AF.hi |= cflag;
+    Clock.m = 1;
+    Clock.t =4;
+    Registers.PC.word++;
+}
+
+//Load value pointed to by DE into A.
+void c_DMGCPU::OPCode0x1A()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD A, (DE)");
+    Registers.AF.hi = MMU->ReadByte(Registers.DE.word);
+    Clock.m = 1;
+    Clock.t = 8;
+    Registers.PC.word++;
 }
 
 //Load immediate 8-bit value into E.
