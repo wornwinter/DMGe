@@ -2,6 +2,7 @@
 #define MAINFRAME_H
 
 #include <wx/wx.h>
+#include <stdlib.h> //Exit signal stuff
 #include "GameBoy.h"
 
 #define GB_TIMER 1
@@ -21,6 +22,7 @@ class mainFrame : public wxFrame
         void Tick(wxIdleEvent& event);
         void StartEmulation(wxCommandEvent& event);
         void StopEmulation(wxCommandEvent& event);
+        void Exit(wxCommandEvent& event);
 
     private:
         c_GameBoy* gameboy;
