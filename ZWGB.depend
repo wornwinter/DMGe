@@ -11213,17 +11213,17 @@
 1423127470 source:/home/darren/projects/ZWGB/src/MMU.cpp
 	"MMU.h"
 
-1423958010 source:c:\users\darren\documents\github\dmge\src\debug.cpp
+1423823360 source:c:\users\darren\documents\github\dmge\src\debug.cpp
 	"debug.h"
 
-1423958010 c:\users\darren\documents\github\dmge\include\debug.h
+1424189827 c:\users\darren\documents\github\dmge\include\debug.h
 	<iostream>
 	<string>
 	<cstdarg>
 	<cstdint>
 	<stdio.h>
 
-1423958010 source:c:\users\darren\documents\github\dmge\src\debugger.cpp
+1423823360 source:c:\users\darren\documents\github\dmge\src\debugger.cpp
 	"Debugger.h"
 	<iostream>
 	<string>
@@ -11232,22 +11232,23 @@
 	<algorithm>
 	<boost/tokenizer.hpp>
 
-1423958010 c:\users\darren\documents\github\dmge\include\debugger.h
+1423823360 c:\users\darren\documents\github\dmge\include\debugger.h
 	<iostream>
 	"GameBoy.h"
 
-1423959661 c:\users\darren\documents\github\dmge\include\gameboy.h
+1424188148 c:\users\darren\documents\github\dmge\include\gameboy.h
 	<iostream>
 	"DMGCPU.h"
 	"MMU.h"
+	"GPU.h"
 
-1423958010 c:\users\darren\documents\github\dmge\include\dmgcpu.h
+1424187793 c:\users\darren\documents\github\dmge\include\dmgcpu.h
 	<cstring>
 	<stdint.h>
 	<stdio.h>
 	"MMU.h"
 
-1423958010 c:\users\darren\documents\github\dmge\include\mmu.h
+1423823360 c:\users\darren\documents\github\dmge\include\mmu.h
 	<cstring>
 	<cstdint>
 	<iostream>
@@ -11256,22 +11257,23 @@
 	"debug.h"
 	"macro.h"
 
-1423958010 c:\users\darren\documents\github\dmge\include\macro.h
+1423823360 c:\users\darren\documents\github\dmge\include\macro.h
 
-1423958010 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
+1424187839 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
 	"DMGCPU.h"
 	"DMG_opcodes.h"
 	"debug.h"
+	<cstring>
 
-1423958010 c:\users\darren\documents\github\dmge\include\dmg_opcodes.h
+1423823360 c:\users\darren\documents\github\dmge\include\dmg_opcodes.h
 
-1423959683 source:c:\users\darren\documents\github\dmge\src\gameboy.cpp
+1424188183 source:c:\users\darren\documents\github\dmge\src\gameboy.cpp
 	"GameBoy.h"
 
-1423958010 source:c:\users\darren\documents\github\dmge\src\mmu.cpp
+1424190073 source:c:\users\darren\documents\github\dmge\src\mmu.cpp
 	"MMU.h"
 
-1423958010 source:c:\users\darren\documents\github\dmge\src\main.cpp
+1423932292 source:c:\users\darren\documents\github\dmge\src\main.cpp
 	<iostream>
 	<string>
 	<wx/wx.h>
@@ -15087,17 +15089,27 @@
 	<commdlg.h>
 	"wx/msw/winundef.h"
 
-1423958010 source:c:\users\darren\documents\github\dmge\src\app.cpp
+1423932831 source:c:\users\darren\documents\github\dmge\src\app.cpp
 	"app.h"
 	"mainFrame.h"
 
-1423958010 c:\users\darren\documents\github\dmge\include\app.h
+1423933032 c:\users\darren\documents\github\dmge\include\app.h
 	<wx/wx.h>
 
-1423960126 c:\users\darren\documents\github\dmge\include\mainframe.h
+1424184051 c:\users\darren\documents\github\dmge\include\mainframe.h
 	<wx/wx.h>
 	"GameBoy.h"
 
-1423960180 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
+1424184676 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
 	"mainFrame.h"
+	"logo.xpm"
+
+1424127991 c:\users\darren\documents\github\dmge\include\logo.xpm
+
+1424190375 c:\users\darren\documents\github\dmge\include\gpu.h
+	"MMU.h"
+
+1424189586 source:c:\users\darren\documents\github\dmge\src\gpu.cpp
+	"GPU.h"
+	"debug.h"
 

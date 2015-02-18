@@ -18,7 +18,7 @@ class mainFrame : public wxFrame
 {
     public:
         mainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
-        void Tick(wxTimerEvent& event);
+        void Tick(wxIdleEvent& event);
         void StartEmulation(wxCommandEvent& event);
         void StopEmulation(wxCommandEvent& event);
 

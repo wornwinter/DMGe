@@ -1,16 +1,32 @@
 #include "DMGCPU.h"
 #include "DMG_opcodes.h"
 #include "debug.h"
+#include <cstring>
 
 c_DMGCPU::c_DMGCPU(c_MMU* pMMU)
 {
     InitOpcodeTables();
     MMU = pMMU;
+
+    //Reset everything to zero. Stops a weird bug where the PC starts at the top of GB memory.
+    memset(&Registers, 0, sizeof(Registers));
+
+#ifdef _DEBUG
+    Registers.PC.word = 0x000C; //Skips that huge loop at the start for debugging purposes.
+    Registers.SP.word = 0xFFFE;
+#endif // _DEBUG
+
 }
 
 c_DMGCPU::~c_DMGCPU()
 {
 
+}
+
+//Returns clock periods taken for last instruction.
+uint32_t c_DMGCPU::GetClock()
+{
+    return Clock.t;
 }
 
 //Run one instruction.
@@ -58,13 +74,13 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x0A] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0B] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x0C] = &c_DMGCPU::OPCode0x0C;
-    OPCodes[0x0D] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x0D] = &c_DMGCPU::OPCode0x0D;
     OPCodes[0x0E] = &c_DMGCPU::OPCode0x0E;
     OPCodes[0x0F] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x10] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x11] = &c_DMGCPU::OPCode0x11;
     OPCodes[0x12] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x13] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x13] = &c_DMGCPU::OPCode0x13;
     OPCodes[0x14] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x15] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x16] = &c_DMGCPU::OPCode0x00;
@@ -75,7 +91,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x1B] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x1C] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x1D] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x1E] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x1E] = &c_DMGCPU::OPCode0x1E;
     OPCodes[0x1F] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x20] = &c_DMGCPU::OPCode0x20;
     OPCodes[0x21] = &c_DMGCPU::OPCode0x21;
@@ -85,7 +101,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x25] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x26] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x27] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x28] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x28] = &c_DMGCPU::OPCode0x28;
     OPCodes[0x29] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x2A] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x2B] = &c_DMGCPU::OPCode0x00;
@@ -106,7 +122,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x3A] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x3B] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x3C] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x3D] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x3D] = &c_DMGCPU::OPCode0x3D;
     OPCodes[0x3E] = &c_DMGCPU::OPCode0x3E;
     OPCodes[0x3F] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x40] = &c_DMGCPU::OPCode0x00;
@@ -132,7 +148,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x54] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x55] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x56] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x57] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x57] = &c_DMGCPU::OPCode0x57;
     OPCodes[0x58] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x59] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x5A] = &c_DMGCPU::OPCode0x00;
@@ -148,7 +164,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x64] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x65] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x66] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x67] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x67] = &c_DMGCPU::OPCode0x67;
     OPCodes[0x68] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x69] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x6A] = &c_DMGCPU::OPCode0x00;
@@ -168,7 +184,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x78] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x79] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x7A] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x7B] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x7B] = &c_DMGCPU::OPCode0x7B;
     OPCodes[0x7C] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x7D] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x7E] = &c_DMGCPU::OPCode0x00;
@@ -281,13 +297,13 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xE7] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xE8] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xE9] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xEA] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xEA] = &c_DMGCPU::OPCode0xEA;
     OPCodes[0xEB] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xEC] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xED] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xEE] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xEF] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xF0] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xF0] = &c_DMGCPU::OPCode0xF0;
     OPCodes[0xF1] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xF2] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xF3] = &c_DMGCPU::OPCode0x00;
@@ -301,7 +317,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xFB] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xFC] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xFD] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xFE] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xFE] = &c_DMGCPU::OPCode0xFE;
     OPCodes[0xFF] = &c_DMGCPU::OPCode0x00;
 
     //CB opcode table. Make sure to update tick function when opcodes are implemented.
@@ -340,6 +356,7 @@ void c_DMGCPU::OPCode0x00()
 //Load immediate 16-bit value into BC
 void c_DMGCPU::OPCode0x01()
 {
+    DbgOut(DBG_CPU, VERBOSE_2, "LD BC, d16");
     Registers.BC.word = MMU->ReadWord(Registers.PC.word + 1);
     Clock.m = 3;
     Clock.t = 12;
@@ -349,37 +366,52 @@ void c_DMGCPU::OPCode0x01()
 //Load A into the address stored in BC
 void c_DMGCPU::OPCode0x02()
 {
+    DbgOut(DBG_CPU, VERBOSE_2, "LD (BC), A");
     MMU->WriteByte(Registers.BC.word, Registers.AF.hi);
     Clock.m = 1;
     Clock.t = 8;
-    Registers.PC.word += 1;
+    Registers.PC.word++;
 }
 
 //Increment BC
 void c_DMGCPU::OPCode0x03()
 {
+    DbgOut(DBG_CPU, VERBOSE_2, "INC BC");
     Registers.BC.word++;
     Clock.m = 1;
     Clock.t = 8;
-    Registers.PC.word += 1;
+    Registers.PC.word++;
 }
 
 //Increment B
 void c_DMGCPU::OPCode0x04()
 {
-    UNSET_FLAG_BIT(SUB_BIT); //Reset the subtraction bit in FLAGS
+    DbgOut(DBG_CPU, VERBOSE_2, "INC B");
 
-    if(Registers.BC.hi++ > 0x0F) //Pretty sure this is how it's done, not 100%
-        SET_FLAG_BIT(HC_BIT);
+    uint8_t result = Registers.BC.hi + 1;
 
-    if(!(Registers.BC.hi++ & 0xFF))
-        SET_FLAG_BIT(ZERO_BIT);
+    if(result == 0)
+        SET_FLAG_BIT(FLAG_ZERO);
+    else
+        UNSET_FLAG_BIT(FLAG_ZERO);
 
-    Registers.BC.hi++; //Actually do the checks
+    UNSET_FLAG_BIT(SUB_BIT);
+
+    if((result & 0xF) > 0xF)
+        SET_FLAG_BIT(FLAG_HC);
+    else
+        UNSET_FLAG_BIT(FLAG_HC);
+
+    if((Registers.BC.hi + 1) > 0xFF)
+        SET_FLAG_BIT(FLAG_CARRY);
+    else
+        UNSET_FLAG_BIT(FLAG_CARRY);
+
+    Registers.BC.hi = result;
 
     Clock.m = 1;
     Clock.t = 4;
-    Registers.PC.word += 1;
+    Registers.PC.word++;
 }
 
 //Decrement B
@@ -403,11 +435,12 @@ void c_DMGCPU::OPCode0x05()
     Registers.PC.word++;
 }
 
-//Load 9-bit immediate value into B
+//Load 8-bit immediate value into B
 void c_DMGCPU::OPCode0x06()
 {
-    Registers.BC.hi = MMU->ReadByte(Registers.PC.hi + 1);
-    Clock.m = 3;
+    Registers.BC.hi = MMU->ReadByte(Registers.PC.word + 1);
+    DbgOut(DBG_CPU, VERBOSE_2, "LD B, d8. B = 0x%x", Registers.BC.hi);
+    Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word += 2;
 }
@@ -523,15 +556,49 @@ void c_DMGCPU::OPCode0x0B()
 //Increment C
 void c_DMGCPU::OPCode0x0C()
 {
+    DbgOut(DBG_CPU, VERBOSE_2, "INC C");
+
+    uint8_t result = Registers.BC.lo + 1;
+
+    if(result == 0)
+        SET_FLAG_BIT(FLAG_ZERO);
+    else
+        UNSET_FLAG_BIT(FLAG_ZERO);
+
     UNSET_FLAG_BIT(SUB_BIT);
 
-    if(!(Registers.BC.lo++ & 0xFF))
-        SET_FLAG_BIT(ZERO_BIT);
+    if((result & 0xF) > 0xF)
+        SET_FLAG_BIT(FLAG_HC);
+    else
+        UNSET_FLAG_BIT(FLAG_HC);
 
-    if(Registers.BC.lo++ > 0x0F)
+    if((Registers.BC.lo + 1) > 0xFF)
+        SET_FLAG_BIT(FLAG_CARRY);
+    else
+        UNSET_FLAG_BIT(FLAG_CARRY);
+
+    Registers.BC.lo = result;
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Decrement C
+void c_DMGCPU::OPCode0x0D()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "DEC D");
+    SET_FLAG_BIT(SUB_BIT);
+
+    Registers.DE.hi--;
+
+    if((Registers.DE.hi & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
 
-    Registers.BC.lo++;
+    if(Registers.DE.hi == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
     Clock.m = 1;
     Clock.t = 4;
@@ -543,6 +610,27 @@ void c_DMGCPU::OPCode0x0E()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "LD C, d8");
     Registers.BC.lo = MMU->ReadByte(Registers.PC.word + 1);
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word += 2;
+}
+
+//Increment DE
+void c_DMGCPU::OPCode0x13()
+{
+    //Flags not affected because this is a 16-bit addition.
+    Registers.DE.word++;
+    DbgOut(DBG_CPU, VERBOSE_2, "INC DE. DE = 0x%x", Registers.DE.word);
+    Registers.PC.word++;
+    Clock.m = 1;
+    Clock.t = 8;
+}
+
+//Load immediate 8-bit value into E.
+void c_DMGCPU::OPCode0x1E()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD E, d8");
+    Registers.DE.lo = MMU->ReadByte(Registers.PC.word+1);
     Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word += 2;
@@ -595,6 +683,25 @@ void c_DMGCPU::OPCode0x23()
     Registers.PC.word++;
 }
 
+//Jump relative if zero bit is set.
+void c_DMGCPU::OPCode0x28()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "JR Z, d8");
+    if(FLAG_ZERO)
+    {
+        //Zero flag is set. Jump.
+        Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2;
+        DbgOut(DBG_CPU, VERBOSE_2, "Zero bit set. Jumping to 0x%x", Registers.PC.word);
+        Clock.t = 12;
+    }
+    else {
+        Registers.PC.word += 2;
+        DbgOut(DBG_CPU, VERBOSE_2, "Zero bit not set, not jumping.");
+        Clock.t = 8;
+    }
+    Clock.m = 2;
+}
+
 //Load immediate 16-bit value into SP.
 void c_DMGCPU::OPCode0x31()
 {
@@ -616,6 +723,27 @@ void c_DMGCPU::OPCode0x32()
     Registers.PC.word++;
 }
 
+//Decrement A
+void c_DMGCPU::OPCode0x3D()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "DEC A");
+    SET_FLAG_BIT(SUB_BIT);
+
+    Registers.AF.hi--;
+
+    if((Registers.AF.hi & 0xF) == 0xF)
+        SET_FLAG_BIT(HC_BIT);
+
+    if(Registers.AF.hi == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //Load immediate 8-bit value into A.
 void c_DMGCPU::OPCode0x3E()
 {
@@ -626,6 +754,26 @@ void c_DMGCPU::OPCode0x3E()
     Registers.PC.word += 2;
 }
 
+//Load A into D.
+void c_DMGCPU::OPCode0x57()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD D, A");
+    Registers.DE.hi = Registers.AF.hi;
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load A into H.
+void c_DMGCPU::OPCode0x67()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD H, A");
+    Registers.HL.hi = Registers.AF.hi;
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //Store 8-bit value in register A into pointer HL.
 void c_DMGCPU::OPCode0x77()
 {
@@ -633,6 +781,16 @@ void c_DMGCPU::OPCode0x77()
     MMU->WriteByte(Registers.HL.word, Registers.AF.hi);
     Clock.m = 1;
     Clock.t = 8;
+    Registers.PC.word++;
+}
+
+//Load E into A.
+void c_DMGCPU::OPCode0x7B()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD A, E");
+    Registers.AF.hi = Registers.DE.lo;
+    Clock.m = 1;
+    Clock.t = 4;
     Registers.PC.word++;
 }
 
@@ -660,23 +818,23 @@ void c_DMGCPU::OPCode0xAF()
 //POP BC from the Stack
 void c_DMGCPU::OPCode0xC1()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "POP BC");
-    //Increment Stack pointer to find address
+    Registers.BC.word = MMU->ReadWord(Registers.SP.word);
     Registers.SP.word += 2;
+    DbgOut(DBG_CPU, VERBOSE_2, "POP BC. New BC = 0x%x.", Registers.BC.word);
+    Registers.PC.word++;
     Clock.m = 1;
     Clock.t = 12;
-    Registers.BC.word = MMU->ReadWord(Registers.SP.word);
-    Registers.PC.word++;
 }
 
 //Push BC onto the stack
 void c_DMGCPU::OPCode0xC5()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "PUSH BC");
-    //Push BC onto the stack according to where the stackpointer is
-    MMU->WriteWord(Registers.SP.word, Registers.BC.word);
+    DbgOut(DBG_CPU, VERBOSE_2, "PUSH BC. BC = 0x%x", Registers.BC.word);
     //Increment the stackpointer DOWNWARDS
     Registers.SP.word -= 2;
+    //Push BC onto the stack according to where the stackpointer is
+    MMU->WriteWord(Registers.SP.word, Registers.BC.word);
+
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
@@ -705,10 +863,9 @@ void c_DMGCPU::OPCode0xE2()
 //Return from function.
 void c_DMGCPU::OPCode0xC9()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "RET");
-    //Increment SP to find the return address.
-    Registers.SP.word += 2;
     Registers.PC.word = MMU->ReadWord(Registers.SP.word);
+    Registers.SP.word += 2;
+    DbgOut(DBG_CPU, VERBOSE_2, "RET. Return address = 0x%x", Registers.PC.word);
     Clock.m = 1;
     Clock.t = 16;
 }
@@ -716,15 +873,35 @@ void c_DMGCPU::OPCode0xC9()
 //Call function at immediate 16-bit address. Store address of next function in the stack + decrement stack pointer.
 void c_DMGCPU::OPCode0xCD()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "CALL a16");
     //Write address of next instruction to the stack and decrement SP.
-    MMU->WriteWord(Registers.SP.word, Registers.PC.word + 3);
-    //We wrote two bytes, so decrement accordingly. (Stack grows downwards).
     Registers.SP.word -= 2;
+    MMU->WriteWord(Registers.SP.word, Registers.PC.word + 3);
+    DbgOut(DBG_CPU, VERBOSE_2, "CALL a16. Return address = 0x%x", Registers.PC.word+3);
     //Set PC to address of function.
     Registers.PC.word = MMU->ReadWord(Registers.PC.word + 1);
     Clock.m = 3;
     Clock.t = 24;
+}
+
+//Write A to 16-bit immediate address.
+void c_DMGCPU::OPCode0xEA()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD (a16), A");
+    MMU->WriteByte(Registers.PC.word+1, Registers.AF.hi);
+
+    Clock.m = 3;
+    Clock.t = 16;
+    Registers.PC.word += 3;
+}
+
+//Load memory location 0xFF00 + immediate 8-bit into A.
+void c_DMGCPU::OPCode0xF0()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LDH A, (a8)");
+    Registers.AF.hi = MMU->ReadByte(0xFF00 + MMU->ReadByte(Registers.PC.word+1));
+    Clock.m = 2;
+    Clock.t = 12;
+    Registers.PC.word += 2;
 }
 
 //OR A with immediate 8-bit value,store result in A
@@ -751,23 +928,55 @@ void c_DMGCPU::OPCode0xF5()
 void c_DMGCPU::OPCodeCB0x11()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "RL C");
+    //Store carry flag.
+    uint8_t carryi = FLAG_CARRY ? 1 : 0;
+    uint8_t regi = Registers.BC.lo;
+
     //Unset flag bits
     UNSET_FLAG_BIT(SUB_BIT);
     UNSET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(ZERO_BIT);
+    UNSET_FLAG_BIT(CARRY_BIT);
 
-    //Move BIT 7 to Carry Flag
-    uint8_t bit7 = MSB(Registers.BC.lo);
 
-    if(bit7)
+    if(MSB(Registers.BC.lo))
         SET_FLAG_BIT(CARRY_BIT);
 
-    Registers.BC.lo <<= 1;
+    regi = (regi << 1) | carryi;
 
-    if(FLAG_CARRY)
-        Registers.BC.lo |= 0x01;
+    Registers.BC.lo = regi;
 
     Clock.t = 1;
     Clock.m = 8;
+    Registers.PC.word += 2;
+}
+
+//Compare A with n.
+void c_DMGCPU::OPCode0xFE()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "CP A, d8");
+    uint8_t n = MMU->ReadByte(Registers.PC.word+1);
+
+    //This whole instruction is basically a subtraction but we throw away the results, so set SUB bit.
+    SET_FLAG_BIT(SUB_BIT);
+
+    if(Registers.AF.hi == n)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    if(Registers.AF.hi < n)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
+
+    if(((Registers.AF.hi - n) & 0xF) > (Registers.AF.hi & 0xF))
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    Clock.m = 2;
+    Clock.t = 8;
     Registers.PC.word += 2;
 }
 
@@ -775,20 +984,23 @@ void c_DMGCPU::OPCodeCB0x11()
 void c_DMGCPU::OPCodeCB0x17()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "RL A");
+    //Store carry flag.
+    uint8_t carryi = FLAG_CARRY ? 1 : 0;
+    uint8_t regi = Registers.AF.hi;
+
     //Unset flag bits
     UNSET_FLAG_BIT(SUB_BIT);
     UNSET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(ZERO_BIT);
+    UNSET_FLAG_BIT(CARRY_BIT);
 
-    //Move BIT 7 to Carry Flag
-    uint8_t bit7 = MSB(Registers.AF.hi);
 
-    if(bit7)
+    if(MSB(Registers.AF.hi))
         SET_FLAG_BIT(CARRY_BIT);
 
-    Registers.AF.hi <<= 1;
+    regi = (regi << 1) | carryi;
 
-    if(FLAG_CARRY)
-        Registers.AF.hi |= 0x01;
+    Registers.AF.hi = regi;
 
     Clock.t = 1;
     Clock.m = 8;
