@@ -15161,13 +15161,13 @@
 	"wx/window.h"
 	<OpenGL/gl.h>
 
-1424281674 c:\users\darren\documents\github\dmge\include\canvas.h
+1424283268 c:\users\darren\documents\github\dmge\include\canvas.h
 	<GL/gl.h>
 	<GL/glu.h>
 	<GL/glext.h>
 	<wx/glcanvas.h>
 	<wx/dcclient.h>
 
-1424281334 source:c:\users\darren\documents\github\dmge\src\canvas.cpp
+1424281739 source:c:\users\darren\documents\github\dmge\src\canvas.cpp
 	"canvas.h"
 

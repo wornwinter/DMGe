@@ -9,8 +9,14 @@
 #include <wx/dcclient.h>
 
 class c_Canvas : public wxGLCanvas {
+
+    typedef struct {
+        uint8_t r, g, b;
+    } t_Pixel;
+
     private:
         bool init;
+        t_Pixel pixels[160*144];
     public:
         c_Canvas(wxWindow *parent,
                     const wxWindowID id = -1,
@@ -25,8 +31,10 @@ class c_Canvas : public wxGLCanvas {
         void OnEraseBackGround(wxEraseEvent& event);
         void OnEnterWindow(wxMouseEvent& event);
 
-        void Render(void);
         void InitGL(void);
+
+        void GenTestPattern(void);
+        void PutPixel(uint8_t x, uint8_t y, t_Pixel data);
 
     DECLARE_EVENT_TABLE()
 };
