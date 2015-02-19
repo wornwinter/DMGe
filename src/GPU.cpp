@@ -58,12 +58,6 @@ void c_GPU::RenderScanline()
     for(addr = 0x9800; addr < 0x9BFF; addr++)
     {
         uint8_t tileindex = vram[addr & 0x1FFF];
-        //DbgOut(DBG_CPU, VERBOSE_0, "Drawing tile: %i", tileindex);
-        //Read tilemap and draw tiles.
-        for(x = 0; x < 160; x++)
-        {
-
-        }
     }
 }
 

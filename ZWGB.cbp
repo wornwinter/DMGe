@@ -30,6 +30,9 @@
 					<Add library="wxtiff" />
 					<Add library="wxzlib" />
 					<Add library="wxmsw30_gl" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add library="glaux" />
 					<Add directory="C:/wxWidgets/lib/gcc_dll" />
 				</Linker>
 			</Target>
@@ -65,6 +68,7 @@
 		<Unit filename="include/GameBoy.h" />
 		<Unit filename="include/MMU.h" />
 		<Unit filename="include/app.h" />
+		<Unit filename="include/canvas.h" />
 		<Unit filename="include/debug.h" />
 		<Unit filename="include/mainFrame.h" />
 		<Unit filename="src/DMGCPU.cpp" />
@@ -73,6 +77,7 @@
 		<Unit filename="src/GameBoy.cpp" />
 		<Unit filename="src/MMU.cpp" />
 		<Unit filename="src/app.cpp" />
+		<Unit filename="src/canvas.cpp" />
 		<Unit filename="src/debug.cpp" />
 		<Unit filename="src/main.cpp" />
 		<Unit filename="src/mainFrame.cpp" />
