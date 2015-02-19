@@ -2,10 +2,12 @@
 #include "DMGCPU.h"
 #include "GPU.h"
 #include "MMU.h"
+#include "canvas.h"
 
-c_GameBoy::c_GameBoy(const char* romfname)
+c_GameBoy::c_GameBoy(const char* romfname, c_Canvas* cnv)
 {
-    GPU = new c_GPU();
+    canvas = cnv;
+    GPU = new c_GPU(canvas);
     MMU = new c_MMU(GPU);
     CPU = new c_DMGCPU(MMU);
 

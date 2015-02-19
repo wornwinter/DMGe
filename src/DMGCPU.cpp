@@ -84,7 +84,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x14] = &c_DMGCPU::OPCode0x14;
     OPCodes[0x15] = &c_DMGCPU::OPCode0x15;
     OPCodes[0x16] = &c_DMGCPU::OPCode0x16;
-    OPCodes[0x17] = &c_DMGCPU::OPCode0x17;
+    OPCodes[0x17] = &c_DMGCPU::OPCodeCB0x17;
     OPCodes[0x18] = &c_DMGCPU::OPCode0x18;
     OPCodes[0x19] = &c_DMGCPU::OPCode0x19;
     OPCodes[0x1A] = &c_DMGCPU::OPCode0x1A;
@@ -613,8 +613,8 @@ void c_DMGCPU::OPCode0x10()
 //Load immediate 16-bit value into DE.
 void c_DMGCPU::OPCode0x11()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "LD DE, d16");
     Registers.DE.word = MMU->ReadWord(Registers.PC.word + 1);
+    DbgOut(DBG_CPU, VERBOSE_2, "LD DE, d16. DE = 0x%x", Registers.DE.word);
     Registers.PC.word += 3;
     Clock.m = 3;
     Clock.t = 12;
@@ -747,8 +747,8 @@ void c_DMGCPU::OPCode0x19()
 //Load value pointed to by DE into A.
 void c_DMGCPU::OPCode0x1A()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "LD A, (DE)");
     Registers.AF.hi = MMU->ReadByte(Registers.DE.word);
+    DbgOut(DBG_CPU, VERBOSE_2, "LD A, (DE). A = 0x%x", Registers.AF.hi);
     Clock.m = 1;
     Clock.t = 8;
     Registers.PC.word++;
@@ -866,13 +866,13 @@ void c_DMGCPU::OPCode0x21()
     Clock.t = 12;
 }
 
-//Load A into the address stored in HL + 1
 void c_DMGCPU::OPCode0x22()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "LD (HLI), A");
-    MMU->WriteByte(Registers.HL.word + 1, Registers.AF.hi);
+    DbgOut(DBG_CPU, VERBOSE_2, "LD (HL+), A");
+    MMU->WriteByte(Registers.HL.word, Registers.AF.hi);
     Clock.m = 1;
     Clock.t = 8;
+    Registers.HL.word++;
     Registers.PC.word++;
 }
 
@@ -1115,7 +1115,7 @@ void c_DMGCPU::OPCode0x7B()
 void c_DMGCPU::OPCode0x4F()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "LD C, A");
-    Registers.AF.hi = Registers.BC.lo;
+    Registers.BC.lo = Registers.AF.hi;
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
@@ -1204,7 +1204,7 @@ void c_DMGCPU::OPCode0xCD()
 void c_DMGCPU::OPCode0xEA()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "LD (a16), A");
-    MMU->WriteByte(Registers.PC.word+1, Registers.AF.hi);
+    MMU->WriteByte(MMU->ReadWord(Registers.PC.word+1), Registers.AF.hi);
 
     Clock.m = 3;
     Clock.t = 16;
@@ -1256,14 +1256,14 @@ void c_DMGCPU::OPCodeCB0x11()
     UNSET_FLAG_BIT(CARRY_BIT);
 
 
-    if(MSB(Registers.BC.lo))
+    if(MSB(Registers.BC.lo) > 0)
         SET_FLAG_BIT(CARRY_BIT);
 
     regi = (regi << 1) | carryi;
 
     Registers.BC.lo = regi;
 
-    Clock.t = 1;
+    Clock.t = 2;
     Clock.m = 8;
     Registers.PC.word += 2;
 }
@@ -1300,7 +1300,6 @@ void c_DMGCPU::OPCode0xFE()
 //Rotate A left
 void c_DMGCPU::OPCodeCB0x17()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "RL A");
     //Store carry flag.
     uint8_t carryi = FLAG_CARRY ? 1 : 0;
     uint8_t regi = Registers.AF.hi;
@@ -1312,16 +1311,18 @@ void c_DMGCPU::OPCodeCB0x17()
     UNSET_FLAG_BIT(CARRY_BIT);
 
 
-    if(MSB(Registers.AF.hi))
+    if(MSB(Registers.AF.hi) > 0)
         SET_FLAG_BIT(CARRY_BIT);
 
     regi = (regi << 1) | carryi;
 
+    DbgOut(DBG_CPU, VERBOSE_2, "RL A. Aorig = 0x%x. Anow= 0x%x carryi = %i.", Registers.AF.hi, regi, carryi);
     Registers.AF.hi = regi;
 
     Clock.t = 1;
-    Clock.m = 8;
-    Registers.PC.word += 2;
+    Clock.m = 4;
+    //Needs to be changed.
+    Registers.PC.word += 1;
 }
 
 //Test bit 7(msb) of E register. Reset N. Set Z flag if bit is zero. Set H.

@@ -10,6 +10,8 @@
 #include "debug.h"
 #include "macro.h"
 
+class c_Canvas;
+
 //GPU state definitions.
 #define STATE_OAM_READ 2
 #define STATE_VRAM_READ 3
@@ -25,9 +27,11 @@ class c_GPU {
         //Three dimensional array for tiles. Tile index, y, x.
         uint8_t tileset[384][8][8];
         uint8_t vram[0x1FFF];
+        c_Canvas* canvas;
+        void RenderScanline();
 
     public:
-        c_GPU();
+        c_GPU(c_Canvas *cnv);
         ~c_GPU();
         void WriteByte(uint16_t addr, uint8_t data);
         void UpdateTile(uint16_t addr, uint8_t data);

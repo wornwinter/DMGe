@@ -34,7 +34,7 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
     glCanvas = new c_Canvas(panel, -1, wxDefaultPosition, wxSize(160 * SCALE, 144 * SCALE));
 
 
-    gameboy = new c_GameBoy("roms/tetris.gb");
+    gameboy = new c_GameBoy("roms/tetris.gb", glCanvas);
     gameboy->pause = true;
 
     //wxTimer* timer = new wxTimer(this, GB_TIMER);
@@ -52,7 +52,8 @@ wxEND_EVENT_TABLE()
 void mainFrame::Tick(wxIdleEvent& event)
 {
     gameboy->Run();
-
+    //Redraw canvas.
+    glCanvas->Refresh();
     if(!gameboy->pause)
         event.RequestMore(true);
 }
