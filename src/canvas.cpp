@@ -30,12 +30,39 @@ void c_Canvas::OnPaint(wxPaintEvent& event)
         init = true;
     }
 
-    //This needs a LOT of work. Going to try drawing using textured tris/quads instead.
-    glClear(GL_COLOR_BUFFER_BIT);
-    glDrawPixels(160, 144, GL_RGB, GL_UNSIGNED_BYTE, &pixels);
+    int x, y;
+
+    for(x = 10; x < 30; x++)
+    {
+        for(y = 10; y < 30; y++)
+        {
+            t_Pixel test;
+            test.r = 100;
+            test.g = 0;
+            test.b = 0;
+            PutPixel(x, y, test);
+        }
+    }
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-1.0, 1.0, -1.0, 1.0, 5, 100);
+    glTranslatef(0.0f, 0.0f, -6.0f);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glBegin(GL_QUADS);
+        glColor3b(100, 100, 100);
+		glVertex3f(-1.0f, 1.0f, 0.0f);					// Top Left
+		glVertex3f( 1.0f, 1.0f, 0.0f);					// Top Right
+		glVertex3f( 1.0f,-1.0f, 0.0f);					// Bottom Right
+		glVertex3f(-1.0f,-1.0f, 0.0f);					// Bottom Left
+	glEnd();
+
 	SwapBuffers();
-	event.Skip();
-	//DbgOut(DBG_APP, VERBOSE_0, "Paint");
 }
 
 //Generates a greyscale XOR pattern.
@@ -65,8 +92,12 @@ void c_Canvas::PutPixel(uint8_t x, uint8_t y, t_Pixel data)
 void c_Canvas::InitGL(void)
 {
     SetCurrent();
-    //Set clear colour to black.
-    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glViewport(0, 0, 160, 144);
+
+    glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
+	glClearDepth(1.0f);
+
 }
 

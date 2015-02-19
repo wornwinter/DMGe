@@ -15090,7 +15090,7 @@
 	<commdlg.h>
 	"wx/msw/winundef.h"
 
-1423932831 source:c:\users\darren\documents\github\dmge\src\app.cpp
+1424303510 source:c:\users\darren\documents\github\dmge\src\app.cpp
 	"app.h"
 	"mainFrame.h"
 
@@ -15102,7 +15102,7 @@
 	<wx/glcanvas.h>
 	<stdlib.h>
 
-1424279851 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
+1424303916 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
 	"mainFrame.h"
 	"canvas.h"
 	"logo.xpm"
@@ -15161,13 +15161,14 @@
 	"wx/window.h"
 	<OpenGL/gl.h>
 
-1424283268 c:\users\darren\documents\github\dmge\include\canvas.h
+1424303900 c:\users\darren\documents\github\dmge\include\canvas.h
 	<GL/gl.h>
 	<GL/glu.h>
 	<GL/glext.h>
 	<wx/glcanvas.h>
 	<wx/dcclient.h>
 
-1424281739 source:c:\users\darren\documents\github\dmge\src\canvas.cpp
+1424303270 source:c:\users\darren\documents\github\dmge\src\canvas.cpp
 	"canvas.h"
+	"debug.h"
 
