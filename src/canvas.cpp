@@ -30,20 +30,6 @@ void c_Canvas::OnPaint(wxPaintEvent& event)
         init = true;
     }
 
-    int x, y;
-
-    for(x = 10; x < 40; x++)
-    {
-        for(y = 10; y < 40; y++)
-        {
-            t_Pixel pix;
-            pix.r = 255;
-            pix.g = 0;
-            pix.b = 0;
-            PutPixel(x, y, pix);
-        }
-    }
-
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-1.0, 1.0, -1.0, 1.0, 5, 100);
@@ -92,6 +78,19 @@ void c_Canvas::GenTestPattern(void)
             pix.r = c;
             pix.g = c;
             pix.b = c;
+            PutPixel(x, y, pix);
+        }
+    }
+
+    //Draw 40x40 red square at (10, 10) to show origin.
+    for(x = 10; x < 40; x++)
+    {
+        for(y = 10; y < 40; y++)
+        {
+            t_Pixel pix;
+            pix.r = 255;
+            pix.g = 0;
+            pix.b = 0;
             PutPixel(x, y, pix);
         }
     }
