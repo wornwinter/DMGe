@@ -18,7 +18,7 @@ class c_Canvas : public wxGLCanvas {
 
     private:
         bool init;
-        t_Pixel pixels[(160 * SCALE)*(144 * SCALE)];
+        t_Pixel pixels[160*144];
         GLuint tex;
 
     public:

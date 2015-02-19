@@ -30,11 +30,24 @@ void c_Canvas::OnPaint(wxPaintEvent& event)
         init = true;
     }
 
+    int x, y;
+
+    for(x = 10; x < 40; x++)
+    {
+        for(y = 10; y < 40; y++)
+        {
+            t_Pixel pix;
+            pix.r = 255;
+            pix.g = 0;
+            pix.b = 0;
+            PutPixel(x, y, pix);
+        }
+    }
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-1.0, 1.0, -1.0, 1.0, 5, 100);
     glTranslatef(0.0f, 0.0f, -6.0f);
-    glScalef(SCALE, SCALE, 0.0f);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -49,7 +62,7 @@ void c_Canvas::OnPaint(wxPaintEvent& event)
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 160 * SCALE, 144 * SCALE, 0, GL_RGB, GL_UNSIGNED_BYTE, &pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 160, 144, 0, GL_RGB, GL_UNSIGNED_BYTE, &pixels);
 
 	glBegin(GL_QUADS);
         glTexCoord2f(0.0, 0.0);
@@ -70,9 +83,9 @@ void c_Canvas::GenTestPattern(void)
 {
     int x, y;
 
-    for(x = 0; x < 160 * SCALE; x++)
+    for(x = 0; x < 160; x++)
     {
-        for(y = 0; y < 144 * SCALE; y++)
+        for(y = 0; y < 144; y++)
         {
             uint8_t c = x ^ y;
             t_Pixel pix;
@@ -86,7 +99,7 @@ void c_Canvas::GenTestPattern(void)
 
 void c_Canvas::PutPixel(uint8_t x, uint8_t y, t_Pixel data)
 {
-    pixels[(160 * SCALE)*y+x] = data;
+    pixels[160*y+x] = data;
 }
 
 void c_Canvas::InitGL(void)
