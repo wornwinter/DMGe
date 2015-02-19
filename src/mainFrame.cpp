@@ -28,7 +28,10 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
     wxIcon mainIcon(logo_xpm);
     SetIcon(mainIcon);
 
-    c_Canvas *glCanvas = new c_Canvas(this);
+    //Use a panel for absolute positioning. Temporary.
+    wxPanel* panel = new wxPanel(this, -1);
+
+    c_Canvas *glCanvas = new c_Canvas(panel, -1, wxDefaultPosition, wxSize(160, 144));
 
 
     gameboy = new c_GameBoy("roms/tetris.gb");

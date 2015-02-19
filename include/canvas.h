@@ -27,9 +27,6 @@ class c_Canvas : public wxGLCanvas {
         virtual ~c_Canvas(void);
 
         void OnPaint(wxPaintEvent& event);
-        void OnSize(wxSizeEvent& event);
-        void OnEraseBackGround(wxEraseEvent& event);
-        void OnEnterWindow(wxMouseEvent& event);
 
         void InitGL(void);
 
