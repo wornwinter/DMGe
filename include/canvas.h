@@ -8,6 +8,8 @@
 #include <wx/glcanvas.h>
 #include <wx/dcclient.h>
 
+#define SCALE 2
+
 class c_Canvas : public wxGLCanvas {
 
     typedef struct {
@@ -16,7 +18,7 @@ class c_Canvas : public wxGLCanvas {
 
     private:
         bool init;
-        t_Pixel pixels[160*144];
+        t_Pixel pixels[(160 * SCALE)*(144 * SCALE)];
         GLuint tex;
 
     public:
