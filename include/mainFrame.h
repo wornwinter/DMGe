@@ -32,6 +32,7 @@ class mainFrame : public wxFrame
 
     private:
         c_GameBoy* gameboy;
+        c_Canvas *glCanvas;
         wxDECLARE_EVENT_TABLE();
 };
 

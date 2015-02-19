@@ -12,7 +12,6 @@ c_Canvas::c_Canvas(wxWindow *parent, const wxWindowID id,
 
 c_Canvas::~c_Canvas(void)
 {
-
 }
 
 BEGIN_EVENT_TABLE(c_Canvas, wxGLCanvas)
