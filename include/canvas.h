@@ -8,7 +8,9 @@
 #include <wx/glcanvas.h>
 #include <wx/dcclient.h>
 
-#define SCALE 2
+#define SCALE2x 2
+#define SCALE3x 3
+#define SCALE4x 4
 
 class c_Canvas : public wxGLCanvas {
 
@@ -18,7 +20,7 @@ class c_Canvas : public wxGLCanvas {
 
     private:
         bool init;
-        t_Pixel pixels[(160 * SCALE)*(144 * SCALE)];
+        t_Pixel pixels[160*144];
         GLuint tex;
 
     public:
@@ -36,6 +38,8 @@ class c_Canvas : public wxGLCanvas {
 
         void GenTestPattern(void);
         void PutPixel(uint8_t x, uint8_t y, t_Pixel data);
+
+        void Scale(uint8_t factor);
 
     DECLARE_EVENT_TABLE()
 };
