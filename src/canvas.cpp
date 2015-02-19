@@ -30,20 +30,6 @@ void c_Canvas::OnPaint(wxPaintEvent& event)
         init = true;
     }
 
-    int x, y;
-
-    for(x = 10; x < 30; x++)
-    {
-        for(y = 10; y < 30; y++)
-        {
-            t_Pixel test;
-            test.r = 100;
-            test.g = 0;
-            test.b = 0;
-            PutPixel(x, y, test);
-        }
-    }
-
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-1.0, 1.0, -1.0, 1.0, 5, 100);
@@ -52,15 +38,28 @@ void c_Canvas::OnPaint(wxPaintEvent& event)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+    glEnable(GL_TEXTURE_2D);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 160, 144, 0, GL_RGB, GL_UNSIGNED_BYTE, &pixels);
+
 	glBegin(GL_QUADS);
-        glColor3b(100, 100, 100);
-		glVertex3f(-1.0f, 1.0f, 0.0f);					// Top Left
-		glVertex3f( 1.0f, 1.0f, 0.0f);					// Top Right
-		glVertex3f( 1.0f,-1.0f, 0.0f);					// Bottom Right
-		glVertex3f(-1.0f,-1.0f, 0.0f);					// Bottom Left
-	glEnd();
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(-1.0f, 1.0f, 0.0f);					// Top Left
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f( 1.0f, 1.0f, 0.0f);					// Top Right
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f( 1.0f,-1.0f, 0.0f);					// Bottom Right
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(-1.0f,-1.0f, 0.0f);					// Bottom Left
+    glEnd();
 
 	SwapBuffers();
 }
@@ -98,6 +97,8 @@ void c_Canvas::InitGL(void)
     glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
 	glClearDepth(1.0f);
+
+	glGenTextures(GL_TEXTURE_2D, &tex);
 
 }
 

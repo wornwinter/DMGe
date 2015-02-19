@@ -17,6 +17,8 @@ class c_Canvas : public wxGLCanvas {
     private:
         bool init;
         t_Pixel pixels[160*144];
+        GLuint tex;
+
     public:
         c_Canvas(wxWindow *parent,
                     const wxWindowID id = -1,
