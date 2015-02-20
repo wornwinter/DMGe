@@ -26,7 +26,7 @@ void c_GPU::WriteByte(uint16_t addr, uint8_t data)
     vram[addrtrans] = data;
 
     UpdateTile(addr, data);
-    DbgOut(DBG_VID, VERBOSE_0, "GPU write. Addr: 0x%x. Translated: 0x%x. Data: 0x%x", addr, addrtrans, data);
+    DbgOut(DBG_VID, VERBOSE_1, "GPU write. Addr: 0x%x. Translated: 0x%x. Data: 0x%x", addr, addrtrans, data);
 }
 
 void c_GPU::UpdateTile(uint16_t addr, uint8_t data)
@@ -35,7 +35,7 @@ void c_GPU::UpdateTile(uint16_t addr, uint8_t data)
     uint16_t tileindex = (addrtrans >> 4);
     uint8_t y = (addrtrans >> 1) & 7;
 
-    DbgOut(DBG_CPU, VERBOSE_0, "Updating tile: %i. Line: %i", tileindex, y);
+    DbgOut(DBG_CPU, VERBOSE_1, "Updating tile: %i. Line: %i", tileindex, y);
 
     uint8_t sx, x;
 
@@ -119,6 +119,7 @@ void c_GPU::Tick(uint32_t clock)
                     //Finished drawing the last time. State should be VBLANK now.
                     state = STATE_VBLANK;
                     //Draw framebuffer to the screen here.
+                    canvas->Refresh();
                 }
                 else {
                     state = STATE_OAM_READ;

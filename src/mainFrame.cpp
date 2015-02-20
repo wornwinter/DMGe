@@ -52,8 +52,6 @@ wxEND_EVENT_TABLE()
 void mainFrame::Tick(wxIdleEvent& event)
 {
     gameboy->Run();
-    //Redraw canvas.
-    glCanvas->Refresh();
     if(!gameboy->pause)
         event.RequestMore(true);
 }
