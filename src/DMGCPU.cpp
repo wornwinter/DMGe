@@ -108,8 +108,8 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x2C] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x2D] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x2E] = &c_DMGCPU::OPCode0x2E;
-    OPCodes[0x2F] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x30] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x2F] = &c_DMGCPU::OPCode0x2F;
+    OPCodes[0x30] = &c_DMGCPU::OPCode0x30;
     OPCodes[0x31] = &c_DMGCPU::OPCode0x31;
     OPCodes[0x32] = &c_DMGCPU::OPCode0x32;
     OPCodes[0x33] = &c_DMGCPU::OPCode0x00;
@@ -181,12 +181,12 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x75] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x76] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x77] = &c_DMGCPU::OPCode0x77;
-    OPCodes[0x78] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x78] = &c_DMGCPU::OPCode0x78;
     OPCodes[0x79] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x7A] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x7B] = &c_DMGCPU::OPCode0x7B;
     OPCodes[0x7C] = &c_DMGCPU::OPCode0x7C;
-    OPCodes[0x7D] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x7D] = &c_DMGCPU::OPCode0x7D;
     OPCodes[0x7E] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x7F] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x80] = &c_DMGCPU::OPCode0x00;
@@ -195,7 +195,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x83] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x84] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x85] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x86] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x86] = &c_DMGCPU::OPCode0x86;
     OPCodes[0x87] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x88] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x89] = &c_DMGCPU::OPCode0x00;
@@ -251,7 +251,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xBB] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xBC] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xBD] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xBE] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xBE] = &c_DMGCPU::OPCode0xBE;
     OPCodes[0xBF] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xC0] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xC1] = &c_DMGCPU::OPCode0xC1;
@@ -1241,6 +1241,46 @@ void c_DMGCPU::OPCode0x4F()
     Registers.PC.word++;
 }
 
+//Load B into A
+void c_DMGCPU::OPCode0x78()
+{
+    Registers.AF.hi = Registers.BC.hi;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD A, B");
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load L into A
+void c_DMGCPU::OPCode0x7D()
+{
+    Registers.AF.hi = Registers.HL.lo;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD A, L");
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Add value pointed to by HL to A
+void c_DMGCPU::OPCode0x86()
+{
+    UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition.
+
+    DbgOut(DBG_CPU, VERBOSE_2, "Adding (HL): 0x%x to A", MMU->ReadByte(Registers.HL.word));
+
+    if((Registers.AF.hi + MMU->ReadByte(Registers.HL.word)) == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+
+    if((Registers.AF.hi + MMU->ReadByte(Registers.HL.word)) > 0xFF)
+        SET_FLAG_BIT(CARRY_BIT);
+
+    if((Registers.AF.hi + MMU->ReadByte(Registers.HL.word)) > 0xF)
+        SET_FLAG_BIT(HC_BIT);
+
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word++;
+}
 
 //XOR A
 void c_DMGCPU::OPCode0xAF()
@@ -1250,6 +1290,30 @@ void c_DMGCPU::OPCode0xAF()
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
+}
+
+//CP (HL), Compare A against (HL)
+void c_DMGCPU::OPCode0xBE()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "Comparing A to value at: 0x%x", Registers.HL.word);
+
+    //Here we go...
+    SET_FLAG_BIT(SUB_BIT); //Always set
+
+    if(Registers.AF.hi == MMU->ReadByte(Registers.HL.word))
+        SET_FLAG_BIT(ZERO_BIT);
+
+    //What the fuck hahaha
+    if(((Registers.AF.hi - MMU->ReadByte(Registers.HL.word)) & 0xF) > (Registers.AF.hi & 0xF))
+        SET_FLAG_BIT(HC_BIT);
+
+    if(Registers.AF.hi < MMU->ReadByte(Registers.HL.word))
+        SET_FLAG_BIT(CARRY_BIT);
+
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word++;
+
 }
 
 //POP BC from the Stack
