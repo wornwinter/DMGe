@@ -61,6 +61,12 @@ uint8_t c_GPU::ReadReg(uint16_t addr)
             return scx;
         break;
 
+        //Set Colour palette data. Assuming we should put these values into pixel_t struct ()
+        //These are what defines what shades of gray to use.
+        case 0xFF47:
+            return 0x00;
+        break;
+
         //Line register.
         case 0xFF44:
             return line;
