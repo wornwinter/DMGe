@@ -33,6 +33,7 @@ void c_Canvas::OnPaint(wxPaintEvent& event)
     glLoadIdentity();
     glOrtho(-1.0, 1.0, -1.0, 1.0, 5, 100);
     glTranslatef(0.0f, 0.0f, -6.0f);
+    Scale(SCALE2x);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -103,7 +104,7 @@ void c_Canvas::PutPixel(uint8_t x, uint8_t y, t_Pixel data)
 void c_Canvas::InitGL(void)
 {
     SetCurrent();
-    glViewport(0, 0, 160 * SCALE, 144 * SCALE);
+    glViewport(0, 0, 160, 144);
 
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
@@ -111,6 +112,14 @@ void c_Canvas::InitGL(void)
 	glClearDepth(1.0f);
 
 	glGenTextures(GL_TEXTURE_2D, &tex);
+}
 
+//Scale the graphics up so we can play at a larger resolution
+void c_Canvas::Scale(uint8_t factor)
+{
+    this->SetSize(160 * factor, 144 * factor); //Reset canvas size
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity(); //Reset the projection matrix
+    glViewport(0, 0, 160* factor, 144 * factor);
 }
 
