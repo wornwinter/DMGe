@@ -117,13 +117,15 @@ void c_GPU::RenderScanline()
     //Tile map #0 - BIOS uses this, so it's a good place to start.
     uint16_t tilemapbase = 0x1800;
     uint16_t offsetbase = tilemapbase + ((((line+scy)&255)>>3)<<5);
-    uint8_t x, tindex;
+    uint8_t x, y, tindex;
+
+    y = (line + scy) & 7;
 
     for(x = 0; x < 160; x++)
     {
         tindex = vram[offsetbase + (x/8)];
 
-        if(tileset[tindex][(line/8)][x/8] > 0)
+        if(tileset[tindex][y][x % 8] > 0)
         {
             canvas->PutPixel(x, line, 0, 0, 0);
         }
