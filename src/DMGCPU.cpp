@@ -1053,7 +1053,7 @@ void c_DMGCPU::OPCode0x2D()
 void c_DMGCPU::OPCode0x2E()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "LD L, d8");
-    Registers.HL.lo = MMU->ReadByte(Registers.PC.word);
+    Registers.HL.lo = MMU->ReadByte(Registers.PC.word + 1);
     Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word += 2;

@@ -5,12 +5,12 @@
 c_GPU::c_GPU(c_Canvas* cnv)
 {
     DbgOut(DBG_VID, VERBOSE_0, "Initialising GPU...");
-    memset(&tileset, 0, sizeof(tileset));
     canvas = cnv;
     stateclock = 0;
     state = 0;
     line = 0;
-    memset(&vram, 0, sizeof(vram));
+    memset(&vram, 0, 0x2000);
+    memset(&tileset, 0, 384*8*8);
 }
 
 c_GPU::~c_GPU()
@@ -52,14 +52,22 @@ void c_GPU::UpdateTile(uint16_t addr, uint8_t data)
 void c_GPU::RenderScanline()
 {
     //Tile map #0 - BIOS uses this, so it's a good place to start.
-    uint16_t addr = 0x9923; //Start of the tilemap for the BIOS.
+    uint16_t addr = 0x9900; //Start of the tilemap for the BIOS.
     uint16_t addrtrans = addr & 0x1FFE;
     uint8_t x;
+    uint16_t tindex;
 
     for(x = 0; x <160; x++)
     {
+        if((line/8) % 2) //Check if tile is even or odd.
+        {
+            tindex = vram[addrtrans + (x/8) + 0x20];
+        }
+        else {
+            tindex = vram[addrtrans + (x/8)];
+        }
         //DbgOut(DBG_VID, VERBOSE_0, "Drawing tile: %i.", vram[addrtrans + (x/8)]);
-        if(tileset[vram[addrtrans + (x/8)]][line%8][x%8] > 0)
+        if(tileset[tindex][line%8][x%8] > 0)
         {
             canvas->PutPixel(x, line, 0, 0, 0);
         }
