@@ -97,10 +97,10 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x21] = &c_DMGCPU::OPCode0x21;
     OPCodes[0x22] = &c_DMGCPU::OPCode0x22;
     OPCodes[0x23] = &c_DMGCPU::OPCode0x23;
-    OPCodes[0x24] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x25] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x26] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x27] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x24] = &c_DMGCPU::OPCode0x24;
+    OPCodes[0x25] = &c_DMGCPU::OPCode0x25;
+    OPCodes[0x26] = &c_DMGCPU::OPCode0x26;
+    OPCodes[0x27] = &c_DMGCPU::OPCode0x27;
     OPCodes[0x28] = &c_DMGCPU::OPCode0x28;
     OPCodes[0x29] = &c_DMGCPU::OPCode0x29;
     OPCodes[0x2A] = &c_DMGCPU::OPCode0x2A;
@@ -1009,6 +1009,46 @@ void c_DMGCPU::OPCode0x2B()
     Registers.PC.word++;
 }
 
+//Increment L
+void c_DMGCPU::OPCode0x2C()
+{
+    UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition!
+
+    Registers.HL.lo++;
+
+    DbgOut(DBG_CPU, VERBOSE_2, "DEC L, L = 0x%x", Registers.HL.lo);
+
+    if(Registers.HL.lo == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+
+    if(Registers.HL.lo == 0xF)
+        SET_FLAG_BIT(HC_BIT);
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Decrement L
+void c_DMGCPU::OPCode0x2D()
+{
+    SET_FLAG_BIT(SUB_BIT); //We are performing an addition!
+
+    Registers.HL.lo--;
+
+    DbgOut(DBG_CPU, VERBOSE_2, "DEC L, L = 0x%x", Registers.HL.lo);
+
+    if(Registers.HL.lo == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+
+    if(Registers.HL.lo == 0xF)
+        SET_FLAG_BIT(HC_BIT);
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //Load immediate 8-bit value into L.
 void c_DMGCPU::OPCode0x2E()
 {
@@ -1017,6 +1057,37 @@ void c_DMGCPU::OPCode0x2E()
     Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word += 2;
+}
+
+//Compliment A. Flip all of A's bits
+void c_DMGCPU::OPCode0x2F()
+{
+    SET_FLAG_BIT(SUB_BIT);
+    SET_FLAG_BIT(HC_BIT);
+    ~Registers.AF.hi; //Invert A
+    DbgOut(DBG_CPU, VERBOSE_2, "CPL A");
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Jump relative by adding n-bytes to the Program Counter (signed) if the Carry flag is UNset
+void c_DMGCPU::OPCode0x30()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "JR NC r8");
+    if(!FLAG_CARRY)
+    {
+        Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1); //Signed 8-bit value
+        DbgOut(DBG_CPU, VERBOSE_2, "Carry bit not set. Jumping to 0x%x", Registers.PC.word);
+        Clock.t = 12;
+    }
+    else
+    {
+        Registers.PC.word += 2; //2 byte instruction
+        Clock.t = 8;
+    }
+
+    Clock.m = 3;
 }
 
 //Load immediate 16-bit value into SP.
@@ -1036,6 +1107,16 @@ void c_DMGCPU::OPCode0x32()
     DbgOut(DBG_CPU, VERBOSE_2, "LD (HL-), A. HL = 0x%x. A = 0x%x", Registers.HL.word, Registers.AF.hi);
     Registers.HL.word--;
     Clock.m = 1;
+    Clock.t = 8;
+    Registers.PC.word++;
+}
+
+//Increment the Stack Pointer
+void c_DMGCPU::OPCode0x33()
+{
+    Registers.SP.word++;
+    DbgOut(DBG_CPU, VERBOSE_2, "INC SP. SP = 0x%x", Registers.SP.word);
+    Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word++;
 }
