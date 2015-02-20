@@ -34,6 +34,7 @@ void c_DMGCPU::Tick()
 {
     if(running)
     {
+
         switch(MMU->ReadByte(Registers.PC.word))
         {
             case 0xCB:
@@ -1344,7 +1345,7 @@ void c_DMGCPU::OPCode0xC5()
 //Load 8-bit value in A into memory pointed to by 0xFF00 + 8-bit immediate value.
 void c_DMGCPU::OPCode0xE0()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "LD ($FF00 + d8), A");
+    DbgOut(DBG_CPU, VERBOSE_2, "LD ($FF00 + d8), A. Addr = 0x%x. PC = 0x%x", (0xFF00 + MMU->ReadByte(Registers.PC.word + 1)), Registers.PC.word);
     MMU->WriteByte((0xFF00 + MMU->ReadByte(Registers.PC.word + 1)), Registers.AF.hi);
     Clock.m = 2;
     Clock.t = 12;

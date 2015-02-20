@@ -31,6 +31,8 @@ class c_GPU {
         uint8_t bgbuffer[256][256];
         c_Canvas* canvas;
         void RenderScanline();
+        void RenderScreen();
+        void ClearScreen();
 
     public:
         c_GPU(c_Canvas *cnv);

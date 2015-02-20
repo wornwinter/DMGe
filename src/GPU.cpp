@@ -28,11 +28,13 @@ void c_GPU::WriteReg(uint16_t addr, uint8_t data)
 
         //SCY.
         case 0xFF42:
+            DbgOut(DBG_VID, VERBOSE_2, "Writing SCY: 0x%x", data);
             scy = data;
         break;
 
         //SCX.
         case 0xFF43:
+            DbgOut(DBG_VID, VERBOSE_2, "Writing SCX: 0x%x", data);
             scx = data;
         break;
 
@@ -113,22 +115,15 @@ void c_GPU::UpdateTile(uint16_t addr, uint8_t data)
 void c_GPU::RenderScanline()
 {
     //Tile map #0 - BIOS uses this, so it's a good place to start.
-    uint16_t addr = 0x9900; //Start of the tilemap for the BIOS.
-    uint16_t addrtrans = addr & 0x1FFE;
-    uint8_t x;
-    uint16_t tindex;
+    uint16_t tilemapbase = 0x1800;
+    uint16_t offsetbase = tilemapbase + ((((line+scy)&255)>>3)<<5);
+    uint8_t x, tindex;
 
-    for(x = 0; x <160; x++)
+    for(x = 0; x < 160; x++)
     {
-        if((line/8) % 2) //Check if tile is even or odd.
-        {
-            tindex = vram[addrtrans + (x/8) + 0x20];
-        }
-        else {
-            tindex = vram[addrtrans + (x/8)];
-        }
-        //DbgOut(DBG_VID, VERBOSE_0, "Drawing tile: %i.", vram[addrtrans + (x/8)]);
-        if(tileset[tindex][line%8][x%8] > 0)
+        tindex = vram[offsetbase + (x/8)];
+
+        if(tileset[tindex][(line/8)][x/8] > 0)
         {
             canvas->PutPixel(x, line, 0, 0, 0);
         }
@@ -136,7 +131,18 @@ void c_GPU::RenderScanline()
             canvas->PutPixel(x, line, 255, 255, 255);
         }
     }
+}
 
+void c_GPU::ClearScreen()
+{
+    int x, y;
+    for(x = 0; x < 160; x++)
+    {
+        for(y = 0; y < 144; y++)
+        {
+            canvas->PutPixel(x, y, 255, 255, 255);
+        }
+    }
 }
 
 void c_GPU::Tick(uint32_t clock)
@@ -180,6 +186,7 @@ void c_GPU::Tick(uint32_t clock)
                     //Finished drawing the last time. State should be VBLANK now.
                     state = STATE_VBLANK;
                     //Draw framebuffer to the screen here.
+                    //ClearScreen();
                     canvas->Refresh();
                 }
                 else {

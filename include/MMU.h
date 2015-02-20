@@ -20,7 +20,7 @@ class c_GPU;
 class c_MMU {
     private:
         uint8_t memory[0xFFFF];
-        uint8_t bios[0xFF];
+        uint8_t bios[0xFF1];
         uint8_t rom[0xFF][0x4000]; //16k ROM banks.
         uint8_t vram[0x2000]; //8k Video RAM.
         uint8_t eram[0x2000]; //8k External RAM.
