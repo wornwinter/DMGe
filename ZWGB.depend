@@ -11256,7 +11256,7 @@
 
 1423823360 c:\users\darren\documents\github\dmge\include\macro.h
 
-1424359849 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
+1424363055 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
 	"DMGCPU.h"
 	"DMG_opcodes.h"
 	"debug.h"
@@ -15111,7 +15111,7 @@
 
 1424127991 c:\users\darren\documents\github\dmge\include\logo.xpm
 
-1424348743 c:\users\darren\documents\github\dmge\include\gpu.h
+1424424411 c:\users\darren\documents\github\dmge\include\gpu.h
 	<cstring>
 	<cstdint>
 	<iostream>
@@ -15163,14 +15163,14 @@
 	"wx/window.h"
 	<OpenGL/gl.h>
 
-1424344359 c:\users\darren\documents\github\dmge\include\canvas.h
+1424420159 c:\users\darren\documents\github\dmge\include\canvas.h
 	<GL/gl.h>
 	<GL/glu.h>
 	<GL/glext.h>
 	<wx/glcanvas.h>
 	<wx/dcclient.h>
 
-1424345835 source:c:\users\darren\documents\github\dmge\src\canvas.cpp
+1424420226 source:c:\users\darren\documents\github\dmge\src\canvas.cpp
 	"canvas.h"
 	"debug.h"
 

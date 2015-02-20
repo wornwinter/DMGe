@@ -74,11 +74,7 @@ void c_Canvas::GenTestPattern(void)
         for(y = 0; y < 144; y++)
         {
             uint8_t c = x ^ y;
-            t_Pixel pix;
-            pix.r = c;
-            pix.g = c;
-            pix.b = c;
-            PutPixel(x, y, pix);
+            PutPixel(x, y, c, c, c);
         }
     }
 
@@ -87,18 +83,18 @@ void c_Canvas::GenTestPattern(void)
     {
         for(y = 10; y < 40; y++)
         {
-            t_Pixel pix;
-            pix.r = 255;
-            pix.g = 0;
-            pix.b = 0;
-            PutPixel(x, y, pix);
+            PutPixel(x, y, 255, 0, 0);
         }
     }
 }
 
-void c_Canvas::PutPixel(uint8_t x, uint8_t y, t_Pixel data)
+void c_Canvas::PutPixel(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b)
 {
-    pixels[160*y+x] = data;
+    t_Pixel pix;
+    pix.r = r;
+    pix.g = g;
+    pix.b = b;
+    pixels[160*y+x] = pix;
 }
 
 void c_Canvas::InitGL(void)

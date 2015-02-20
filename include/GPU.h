@@ -26,7 +26,7 @@ class c_GPU {
         uint8_t line;
         //Three dimensional array for tiles. Tile index, y, x.
         uint8_t tileset[384][8][8];
-        uint8_t vram[0x1FFF];
+        uint8_t vram[0x2000];
         c_Canvas* canvas;
         void RenderScanline();
 

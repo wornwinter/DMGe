@@ -37,7 +37,7 @@ class c_Canvas : public wxGLCanvas {
         void InitGL(void);
 
         void GenTestPattern(void);
-        void PutPixel(uint8_t x, uint8_t y, t_Pixel data);
+        void PutPixel(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b);
 
         void Scale(uint8_t factor);
 

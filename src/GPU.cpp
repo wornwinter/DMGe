@@ -32,7 +32,7 @@ void c_GPU::WriteByte(uint16_t addr, uint8_t data)
 void c_GPU::UpdateTile(uint16_t addr, uint8_t data)
 {
     uint16_t addrtrans = addr & 0x1FFE;
-    uint16_t tileindex = (addrtrans >> 4) & 0x511;
+    uint16_t tileindex = (addrtrans >> 4);
     uint8_t y = (addrtrans >> 1) & 7;
 
     DbgOut(DBG_CPU, VERBOSE_0, "Updating tile: %i. Line: %i", tileindex, y);
@@ -52,13 +52,22 @@ void c_GPU::UpdateTile(uint16_t addr, uint8_t data)
 void c_GPU::RenderScanline()
 {
     //Tile map #0 - BIOS uses this, so it's a good place to start.
-    uint16_t addr;
+    uint16_t addr = 0x9923; //Start of the tilemap for the BIOS.
+    uint16_t addrtrans = addr & 0x1FFE;
     uint8_t x;
 
-    for(addr = 0x9800; addr < 0x9BFF; addr++)
+    for(x = 0; x <160; x++)
     {
-        uint8_t tileindex = vram[addr & 0x1FFF];
+        //DbgOut(DBG_VID, VERBOSE_0, "Drawing tile: %i.", vram[addrtrans + (x/8)]);
+        if(tileset[vram[addrtrans + (x/8)]][line%8][x%8] > 0)
+        {
+            canvas->PutPixel(x, line, 0, 0, 0);
+        }
+        else {
+            canvas->PutPixel(x, line, 255, 255, 255);
+        }
     }
+
 }
 
 void c_GPU::Tick(uint32_t clock)
