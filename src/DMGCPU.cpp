@@ -12,8 +12,8 @@ c_DMGCPU::c_DMGCPU(c_MMU* pMMU)
     memset(&Registers, 0, sizeof(Registers));
 
 #ifdef _DEBUG
-    Registers.PC.word = 0x000C; //Skips that huge loop at the start for debugging purposes.
-    Registers.SP.word = 0xFFFE;
+    //Registers.PC.word = 0x000C; //Skips that huge loop at the start for debugging purposes.
+    //Registers.SP.word = 0xFFFE;
 #endif // _DEBUG
 
 }
@@ -185,7 +185,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x79] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x7A] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x7B] = &c_DMGCPU::OPCode0x7B;
-    OPCodes[0x7C] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x7C] = &c_DMGCPU::OPCode0x7C;
     OPCodes[0x7D] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x7E] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x7F] = &c_DMGCPU::OPCode0x00;
@@ -205,7 +205,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x8D] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x8E] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x8F] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x90] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x90] = &c_DMGCPU::OPCode0x90;
     OPCodes[0x91] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x92] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x93] = &c_DMGCPU::OPCode0x00;
@@ -1187,6 +1187,45 @@ void c_DMGCPU::OPCode0x7B()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "LD A, E");
     Registers.AF.hi = Registers.DE.lo;
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load H into A.
+void c_DMGCPU::OPCode0x7C()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD A, H");
+    Registers.AF.hi = Registers.HL.hi;
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Subtract B from A, then store in A.
+void c_DMGCPU::OPCode0x90()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "SUB B");
+
+    if((Registers.AF.hi - Registers.BC.hi) < 0)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
+
+    if(((Registers.AF.hi - Registers.BC.hi) & 0xF) > (Registers.AF.hi & 0xF))
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    if(Registers.AF.hi - Registers.BC.hi == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    SET_FLAG_BIT(SUB_BIT);
+
+    Registers.AF.hi -= Registers.BC.hi;
+
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;

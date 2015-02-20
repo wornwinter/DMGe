@@ -98,7 +98,7 @@ uint8_t c_MMU::ReadByte(uint16_t addr)
 
                                 //GPU
                                 case 0x40: case 0x50: case 0x60: case 0x70:
-                                    return 0x00;
+                                    return GPU->ReadReg(addr);
                                 break;
 
                             }
@@ -213,6 +213,7 @@ void c_MMU::WriteByte(uint16_t addr, uint8_t data)
                                     }
                                     else {
                                         //gpu->WriteByte(addr, data);
+                                        GPU->WriteReg(addr, data);
                                     }
                                 break;
                             }

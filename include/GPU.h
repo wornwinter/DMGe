@@ -27,6 +27,8 @@ class c_GPU {
         //Three dimensional array for tiles. Tile index, y, x.
         uint8_t tileset[384][8][8];
         uint8_t vram[0x2000];
+        uint8_t scx, scy; //Scroll registers.
+        uint8_t bgbuffer[256][256];
         c_Canvas* canvas;
         void RenderScanline();
 
@@ -34,6 +36,8 @@ class c_GPU {
         c_GPU(c_Canvas *cnv);
         ~c_GPU();
         void WriteByte(uint16_t addr, uint8_t data);
+        void WriteReg(uint16_t addr, uint8_t data);
+        uint8_t ReadReg(uint16_t addr);
         void UpdateTile(uint16_t addr, uint8_t data);
 
         void Tick(uint32_t clock);

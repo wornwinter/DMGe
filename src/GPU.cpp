@@ -18,6 +18,61 @@ c_GPU::~c_GPU()
 
 }
 
+void c_GPU::WriteReg(uint16_t addr, uint8_t data)
+{
+    switch(addr)
+    {
+        //LCD control register.
+        case 0xFF40:
+        break;
+
+        //SCY.
+        case 0xFF42:
+            scy = data;
+        break;
+
+        //SCX.
+        case 0xFF43:
+            scx = data;
+        break;
+
+        default:
+            DbgOut(DBG_VID, VERBOSE_0, "Unimplemented or read only GPU register: 0x%x", addr);
+        break;
+    }
+}
+
+uint8_t c_GPU::ReadReg(uint16_t addr)
+{
+    switch(addr)
+    {
+        //LCD control register.
+        case 0xFF40:
+            return 0x00;
+        break;
+
+        //SCY.
+        case 0xFF42:
+            return scy;
+        break;
+
+        //SCX.
+        case 0xFF43:
+            return scx;
+        break;
+
+        //Line register.
+        case 0xFF44:
+            return line;
+        break;
+
+        default:
+            DbgOut(DBG_VID, VERBOSE_0, "Unimplemented GPU register: 0x%x", addr);
+            return 0x00;
+        break;
+    }
+}
+
 void c_GPU::WriteByte(uint16_t addr, uint8_t data)
 {
     //GameBoy code has requested to write to vram.
