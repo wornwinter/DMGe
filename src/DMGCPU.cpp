@@ -45,7 +45,7 @@ void c_DMGCPU::Tick()
             case 0xCB:
                 //0xCB special opcode. Look up in separate opcode table.
                 if((this->OPCodesCB[MMU->ReadByte(Registers.PC.word+1)]) == NULL)
-                    IllegalOperation(MMU->ReadByte(Registers.PC.word));
+                    IllegalOperation(MMU->ReadByte(Registers.PC.word), true);
                 else {
                     DbgOut(DBG_CPU, VERBOSE_2, "0xCB opcode: 0x%x", MMU->ReadByte(Registers.PC.word + 1));
                     (this->*OPCodesCB[MMU->ReadByte(Registers.PC.word + 1)])();
@@ -55,7 +55,7 @@ void c_DMGCPU::Tick()
 
             default:
                 if((this->OPCodes[MMU->ReadByte(Registers.PC.word)]) == NULL)
-                    IllegalOperation(MMU->ReadByte(Registers.PC.word));
+                    IllegalOperation(MMU->ReadByte(Registers.PC.word), false);
                 else
                 //Anything else. Hopefully a standard opcode.
                 (this->*OPCodes[MMU->ReadByte(Registers.PC.word)])();
@@ -345,10 +345,18 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodesCB[0x7C] = &c_DMGCPU::OPCodeCB0x7C;
 }
 
-void c_DMGCPU::IllegalOperation(uint8_t opcode)
+void c_DMGCPU::IllegalOperation(uint8_t opcode, bool iscb)
 {
     DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
-    DbgOut(DBG_CPU, VERBOSE_0, "Unknown opcode/%s: 0x%x. PC: 0x%x", DMG_opcodes[MMU->ReadByte(Registers.PC.word)], MMU->ReadByte(Registers.PC.word), Registers.PC.word);
+
+    if(iscb)
+    {
+        DbgOut(DBG_CPU, VERBOSE_0, "Unknown opcode: 0xCB%x. PC: 0x%x", MMU->ReadByte(Registers.PC.word+1), Registers.PC.word);
+    }
+    else {
+        DbgOut(DBG_CPU, VERBOSE_0, "Unknown opcode/%s: 0x%x. PC: 0x%x", DMG_opcodes[MMU->ReadByte(Registers.PC.word)], MMU->ReadByte(Registers.PC.word), Registers.PC.word);
+    }
+
     running = false;
     //Dump Registers.
     DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
