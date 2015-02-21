@@ -332,7 +332,6 @@ void c_DMGCPU::OPCode0x00()
 {
     DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
     DbgOut(DBG_CPU, VERBOSE_0, "Unknown opcode/%s: 0x%x. PC: 0x%x", DMG_opcodes[MMU->ReadByte(Registers.PC.word)], MMU->ReadByte(Registers.PC.word), Registers.PC.word);
-    running = false; //Halt CPU.
     //Dump Registers.
     DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
     DbgOut(DBG_CPU, VERBOSE_0, "Register Dump");
@@ -349,9 +348,17 @@ void c_DMGCPU::OPCode0x00()
     DbgOut(DBG_CPU, VERBOSE_0, "SP = 0x%x", Registers.SP.word);
     DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
 
-    //Registers.PC.word++;
-    //Clock.m = 1;
-    //Clock.t = 4;
+    //Dirty hack to catch unimplemented opcodes.
+    if(MMU->ReadByte(Registers.PC.word) == 0x00)
+    {
+        Registers.PC.word++;
+        Clock.m = 1;
+        Clock.t = 4;
+    }
+    else {
+        running = false; //Halt CPU.
+    }
+
 }
 
 //Load immediate 16-bit value into BC
