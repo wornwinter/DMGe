@@ -11239,7 +11239,7 @@
 1424479096 c:\users\darren\documents\github\dmge\include\gameboy.h
 	<iostream>
 
-1424479096 c:\users\darren\documents\github\dmge\include\dmgcpu.h
+1424512113 c:\users\darren\documents\github\dmge\include\dmgcpu.h
 	<cstring>
 	<stdint.h>
 	<stdio.h>
@@ -11256,13 +11256,13 @@
 
 1424479096 c:\users\darren\documents\github\dmge\include\macro.h
 
-1424439818 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
+1424512113 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
 	"DMGCPU.h"
 	"DMG_opcodes.h"
 	"debug.h"
 	<cstring>
 
-1424252089 c:\users\darren\documents\github\dmge\include\dmg_opcodes.h
+1424479096 c:\users\darren\documents\github\dmge\include\dmg_opcodes.h
 
 1424479096 source:c:\users\darren\documents\github\dmge\src\gameboy.cpp
 	"GameBoy.h"
@@ -15091,19 +15091,19 @@
 	<commdlg.h>
 	"wx/msw/winundef.h"
 
-1424479096 source:c:\users\darren\documents\github\dmge\src\app.cpp
+1424512113 source:c:\users\darren\documents\github\dmge\src\app.cpp
 	"app.h"
 	"mainFrame.h"
 
 1424479096 c:\users\darren\documents\github\dmge\include\app.h
 	<wx/wx.h>
 
-1424479096 c:\users\darren\documents\github\dmge\include\mainframe.h
+1424512113 c:\users\darren\documents\github\dmge\include\mainframe.h
 	<wx/wx.h>
 	<wx/glcanvas.h>
 	<stdlib.h>
 
-1424479096 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
+1424512482 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
 	"mainFrame.h"
 	"canvas.h"
 	"logo.xpm"
@@ -15111,7 +15111,7 @@
 
 1424479096 c:\users\darren\documents\github\dmge\include\logo.xpm
 
-1424479096 c:\users\darren\documents\github\dmge\include\gpu.h
+1424512113 c:\users\darren\documents\github\dmge\include\gpu.h
 	<cstring>
 	<cstdint>
 	<iostream>
@@ -15121,7 +15121,7 @@
 	"debug.h"
 	"macro.h"
 
-1424479096 source:c:\users\darren\documents\github\dmge\src\gpu.cpp
+1424512113 source:c:\users\darren\documents\github\dmge\src\gpu.cpp
 	"GPU.h"
 	"debug.h"
 	"canvas.h"
@@ -15163,14 +15163,14 @@
 	"wx/window.h"
 	<OpenGL/gl.h>
 
-1424479096 c:\users\darren\documents\github\dmge\include\canvas.h
+1424512724 c:\users\darren\documents\github\dmge\include\canvas.h
 	<GL/gl.h>
 	<GL/glu.h>
 	<GL/glext.h>
 	<wx/glcanvas.h>
 	<wx/dcclient.h>
 
-1424479096 source:c:\users\darren\documents\github\dmge\src\canvas.cpp
+1424512723 source:c:\users\darren\documents\github\dmge\src\canvas.cpp
 	"canvas.h"
 	"debug.h"
 

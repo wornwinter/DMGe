@@ -36,7 +36,7 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
     SetMenuBar(menuBar);
 
     wxIcon mainIcon(logo_xpm);
-    SetIcon(mainIcon);
+    //SetIcon(mainIcon);
 
     //Use a panel for absolute positioning. Temporary.
     wxPanel* panel = new wxPanel(this, -1);

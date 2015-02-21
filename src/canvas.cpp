@@ -16,6 +16,7 @@ c_Canvas::~c_Canvas(void)
 
 BEGIN_EVENT_TABLE(c_Canvas, wxGLCanvas)
     EVT_PAINT(c_Canvas::OnPaint)
+    EVT_SIZE(c_Canvas::OnSize)
 END_EVENT_TABLE()
 
 void c_Canvas::OnPaint(wxPaintEvent& event)
@@ -61,6 +62,13 @@ void c_Canvas::OnPaint(wxPaintEvent& event)
     glEnd();
 
 	SwapBuffers();
+}
+
+void c_Canvas::OnSize(wxSizeEvent& event)
+{
+    wxGLCanvas::OnSize(event);
+
+    Refresh(true);
 }
 
 //Generates a greyscale XOR pattern.

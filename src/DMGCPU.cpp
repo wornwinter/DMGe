@@ -32,6 +32,11 @@ uint32_t c_DMGCPU::GetClock()
 //Run one instruction.
 void c_DMGCPU::Tick()
 {
+    if(Registers.PC.word > 0x100)
+    {
+        //We're running the ROM, so do debugging stuff here.
+        DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
+    }
     if(running)
     {
 
