@@ -71,6 +71,7 @@ private:
     void (c_DMGCPU::*OPCodes[0xFF])(void);
     void (c_DMGCPU::*OPCodesCB[0xFF])(void);
     void InitOpcodeTables();
+    void IllegalOperation(uint8_t opcode);
 
     regs_t  Registers;
     clock_t Clock;
