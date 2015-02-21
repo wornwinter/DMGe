@@ -13,11 +13,12 @@
 #define SCALE3x 3
 #define SCALE4x 4
 
-class c_Canvas : public wxGLCanvas {
-
     typedef struct {
         uint8_t r, g, b;
     } t_Pixel;
+
+class c_Canvas : public wxGLCanvas {
+
 
     private:
         bool init;
@@ -38,8 +39,7 @@ class c_Canvas : public wxGLCanvas {
 
         void InitGL(void);
 
-        void GenTestPattern(void);
-        void PutPixel(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b);
+        void PutPixel(uint8_t x, uint8_t y, t_Pixel pix);
 
         void Scale(uint8_t factor);
 

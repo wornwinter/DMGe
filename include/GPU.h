@@ -7,10 +7,10 @@
 #include <fstream>
 #include <string>
 #include <stdio.h>
+#include "canvas.h"
 #include "debug.h"
 #include "macro.h"
 
-class c_Canvas;
 
 //GPU state definitions.
 #define STATE_OAM_READ 2
@@ -30,6 +30,8 @@ class c_GPU {
         uint8_t scx, scy; //Scroll registers.
         uint8_t wndx, wndy; //Window registers
         uint8_t bgbuffer[256][256];
+        t_Pixel paletteref[4];
+        uint8_t palette[4];
         c_Canvas* canvas;
         void RenderScanline();
         void RenderScreen();

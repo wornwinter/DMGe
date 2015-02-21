@@ -7,7 +7,7 @@ c_Canvas::c_Canvas(wxWindow *parent, const wxWindowID id,
             : wxGLCanvas(parent, (wxGLCanvas*)0, id, pos, sz, style, name),
             init(false)
 {
-    GenTestPattern();
+
 }
 
 c_Canvas::~c_Canvas(void)
@@ -71,36 +71,9 @@ void c_Canvas::OnSize(wxSizeEvent& event)
     Refresh(true);
 }
 
-//Generates a greyscale XOR pattern.
-void c_Canvas::GenTestPattern(void)
+
+void c_Canvas::PutPixel(uint8_t x, uint8_t y, t_Pixel pix)
 {
-    int x, y;
-
-    for(x = 0; x < 160; x++)
-    {
-        for(y = 0; y < 144; y++)
-        {
-            uint8_t c = x ^ y;
-            PutPixel(x, y, c, c, c);
-        }
-    }
-
-    //Draw 40x40 red square at (10, 10) to show origin.
-    for(x = 10; x < 40; x++)
-    {
-        for(y = 10; y < 40; y++)
-        {
-            PutPixel(x, y, 255, 0, 0);
-        }
-    }
-}
-
-void c_Canvas::PutPixel(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b)
-{
-    t_Pixel pix;
-    pix.r = r;
-    pix.g = g;
-    pix.b = b;
     pixels[160*y+x] = pix;
 }
 
