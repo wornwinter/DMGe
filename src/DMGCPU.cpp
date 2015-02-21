@@ -35,7 +35,7 @@ void c_DMGCPU::Tick()
     if(Registers.PC.word > 0x100)
     {
         //We're running the ROM, so do debugging stuff here.
-        DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
+        //DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
     }
     if(running)
     {
@@ -44,8 +44,13 @@ void c_DMGCPU::Tick()
         {
             case 0xCB:
                 //0xCB special opcode. Look up in separate opcode table.
-                DbgOut(DBG_CPU, VERBOSE_2, "0xCB opcode: 0x%x", MMU->ReadByte(Registers.PC.word + 1));
-                (this->*OPCodesCB[MMU->ReadByte(Registers.PC.word + 1)])();
+                if((this->OPCodesCB[MMU->ReadByte(Registers.PC.word+1)]) == NULL)
+                    IllegalOperation(MMU->ReadByte(Registers.PC.word));
+                else {
+                    DbgOut(DBG_CPU, VERBOSE_2, "0xCB opcode: 0x%x", MMU->ReadByte(Registers.PC.word + 1));
+                    (this->*OPCodesCB[MMU->ReadByte(Registers.PC.word + 1)])();
+                }
+
             break;
 
             default:
@@ -330,6 +335,11 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xFF] = NULL;
 
     //CB opcode table. Make sure to update tick function when opcodes are implemented.
+    uint8_t i;
+    for(i = 0; i < 0xFF; i++)
+    {
+        OPCodesCB[i] = NULL; //Initialise table with nulls to stop it crashing on unknowns.
+    }
     OPCodesCB[0x11] = &c_DMGCPU::OPCodeCB0x11;
     OPCodesCB[0x17] = &c_DMGCPU::OPCodeCB0x17;
     OPCodesCB[0x7C] = &c_DMGCPU::OPCodeCB0x7C;

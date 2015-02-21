@@ -21,6 +21,8 @@
 #define MENU_SCALE3 9
 #define MENU_SCALE4 10
 
+#define frameStyle (wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN)
+
 class c_GameBoy;
 class c_Canvas;
 
