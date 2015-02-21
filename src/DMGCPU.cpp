@@ -1136,6 +1136,7 @@ void c_DMGCPU::OPCode0x36()
     MMU->WriteByte(Registers.HL.word, MMU->ReadByte(Registers.PC.word+1));
     Clock.m = 2;
     Clock.t = 12;
+    Registers.PC.word += 2;
 }
 
 //Decrement A
