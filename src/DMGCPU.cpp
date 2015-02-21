@@ -242,7 +242,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xAE] = NULL;
     OPCodes[0xAF] = &c_DMGCPU::OPCode0xAF;
     OPCodes[0xB0] = NULL;
-    OPCodes[0xB1] = NULL;
+    OPCodes[0xB1] = &c_DMGCPU::OPCode0xB1;
     OPCodes[0xB2] = NULL;
     OPCodes[0xB3] = NULL;
     OPCodes[0xB4] = NULL;
@@ -297,7 +297,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xE3] = NULL;
     OPCodes[0xE4] = NULL;
     OPCodes[0xE5] = NULL;
-    OPCodes[0xE6] = NULL;
+    OPCodes[0xE6] = &c_DMGCPU::OPCode0xE6;
     OPCodes[0xE7] = NULL;
     OPCodes[0xE8] = NULL;
     OPCodes[0xE9] = NULL;
@@ -318,7 +318,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xF8] = NULL;
     OPCodes[0xF9] = NULL;
     OPCodes[0xFA] = NULL;
-    OPCodes[0xFB] = NULL;
+    OPCodes[0xFB] = &c_DMGCPU::OPCode0xFB;
     OPCodes[0xFC] = NULL;
     OPCodes[0xFD] = NULL;
     OPCodes[0xFE] = &c_DMGCPU::OPCode0xFE;
@@ -1309,6 +1309,24 @@ void c_DMGCPU::OPCode0xAF()
     Registers.PC.word++;
 }
 
+//OR A with C
+void c_DMGCPU::OPCode0xB1()
+{
+    UNSET_FLAG_BIT(SUB_BIT);
+    UNSET_FLAG_BIT(CARRY_BIT);
+    UNSET_FLAG_BIT(HC_BIT);
+
+    Registers.AF.hi |= Registers.BC.lo;
+    DbgOut(DBG_CPU, VERBOSE_2, "OR A, C, A = 0x%x", Registers.AF.hi);
+
+    if(Registers.AF.hi == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //CP (HL), Compare A against (HL)
 void c_DMGCPU::OPCode0xBE()
 {
@@ -1410,6 +1428,23 @@ void c_DMGCPU::OPCode0xCD()
     Clock.t = 24;
 }
 
+//And A with 8-bit immediate value
+void c_DMGCPU::OPCode0xE6()
+{
+    UNSET_FLAG_BIT(SUB_BIT);
+    UNSET_FLAG_BIT(CARRY_BIT);
+    SET_FLAG_BIT(HC_BIT);
+    Registers.AF.hi &= MMU->ReadByte(Registers.PC.word + 1);
+
+    if(Registers.AF.hi == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+
+    DbgOut(DBG_CPU, VERBOSE_2, "AND A, d8 A = 0x%x", Registers.AF.hi);
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word += 2; //2-byte instruction
+}
+
 //Write A to 16-bit immediate address.
 void c_DMGCPU::OPCode0xEA()
 {
@@ -1456,6 +1491,16 @@ void c_DMGCPU::OPCode0xF5()
     Clock.m = 1;
     Clock.t = 8;
     Registers.PC.word += 2;
+}
+
+//Enable Interrupts
+void c_DMGCPU::OPCode0xFB()
+{
+    //Enable interrupts
+    intenabled = true;
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
 }
 
 // CB opcodes.
