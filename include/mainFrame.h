@@ -16,6 +16,11 @@
 #define MENU_STOP 5
 #define MENU_SUPPRESS 6
 
+#define MENU_SCALE1 7
+#define MENU_SCALE2 8
+#define MENU_SCALE3 9
+#define MENU_SCALE4 10
+
 class c_GameBoy;
 class c_Canvas;
 
@@ -28,6 +33,10 @@ class mainFrame : public wxFrame
         void Tick(wxIdleEvent& event);
         void StartEmulation(wxCommandEvent& event);
         void StopEmulation(wxCommandEvent& event);
+        void Scale1(wxCommandEvent& event);
+        void Scale2(wxCommandEvent& event);
+        void Scale3(wxCommandEvent& event);
+        void Scale4(wxCommandEvent& event);
         void Exit(wxCommandEvent& event);
 
     private:

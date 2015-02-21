@@ -33,7 +33,6 @@ void c_Canvas::OnPaint(wxPaintEvent& event)
     glLoadIdentity();
     glOrtho(-1.0, 1.0, -1.0, 1.0, 5, 100);
     glTranslatef(0.0f, 0.0f, -6.0f);
-    Scale(SCALE2x);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
