@@ -116,7 +116,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x33] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x34] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x35] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0x36] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0x36] = &c_DMGCPU::OPCode0x36;
     OPCodes[0x37] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x38] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x39] = &c_DMGCPU::OPCode0x00;
@@ -307,7 +307,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xF0] = &c_DMGCPU::OPCode0xF0;
     OPCodes[0xF1] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xF2] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xF3] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xF3] = &c_DMGCPU::OPCode0xF3;
     OPCodes[0xF4] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xF5] = &c_DMGCPU::OPCode0xF5;
     OPCodes[0xF6] = &c_DMGCPU::OPCode0x00;
@@ -1129,6 +1129,15 @@ void c_DMGCPU::OPCode0x33()
     Registers.PC.word++;
 }
 
+//Load immediate 8-bit value into pointer HL.
+void c_DMGCPU::OPCode0x36()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD (HL), d8");
+    MMU->WriteByte(Registers.HL.word, MMU->ReadByte(Registers.PC.word+1));
+    Clock.m = 2;
+    Clock.t = 12;
+}
+
 //Decrement A
 void c_DMGCPU::OPCode0x3D()
 {
@@ -1420,6 +1429,15 @@ void c_DMGCPU::OPCode0xF0()
     Clock.m = 2;
     Clock.t = 12;
     Registers.PC.word += 2;
+}
+
+//Disable interrupts at start of next cycle.
+void c_DMGCPU::OPCode0xF3()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "DI");
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
 }
 
 //OR A with immediate 8-bit value,store result in A
