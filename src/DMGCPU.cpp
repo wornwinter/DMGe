@@ -257,7 +257,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xC0] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xC1] = &c_DMGCPU::OPCode0xC1;
     OPCodes[0xC2] = &c_DMGCPU::OPCode0x00;
-    OPCodes[0xC3] = &c_DMGCPU::OPCode0x00;
+    OPCodes[0xC3] = &c_DMGCPU::OPCode0xC3;
     OPCodes[0xC4] = &c_DMGCPU::OPCode0x00;
     OPCodes[0xC5] = &c_DMGCPU::OPCode0xC5;
     OPCodes[0xC6] = &c_DMGCPU::OPCode0x00;
@@ -1328,6 +1328,15 @@ void c_DMGCPU::OPCode0xC1()
     Clock.t = 12;
 }
 
+//Jump to immediate 16-bit address.
+void c_DMGCPU::OPCode0xC3()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "JP 0x%x", MMU->ReadWord(Registers.PC.word+1));
+    Registers.PC.word =  MMU->ReadWord(Registers.PC.word+1);
+    Clock.m = 3;
+    Clock.t = 16;
+}
+
 //Push BC onto the stack
 void c_DMGCPU::OPCode0xC5()
 {
@@ -1498,6 +1507,7 @@ void c_DMGCPU::OPCodeCB0x17()
 
     if(MSB(Registers.AF.hi) > 0)
         SET_FLAG_BIT(CARRY_BIT);
+
 
     regi = (regi << 1) | carryi;
 
