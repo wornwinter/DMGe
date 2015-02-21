@@ -38,6 +38,18 @@ void c_GPU::WriteReg(uint16_t addr, uint8_t data)
             scx = data;
         break;
 
+        //WY
+        case 0xFF4A:
+            DbgOut(DBG_VID, VERBOSE_2, "Writing WNDY: 0x%x", data);
+            wndy = data;
+        break;
+
+        //WX
+        case 0xFF4B:
+            DbgOut(DBG_VID, VERBOSE_2, "Writing WNDX: 0x%x", data);
+            wndx = data;
+        break;
+
         default:
             DbgOut(DBG_VID, VERBOSE_0, "Unimplemented or read only GPU register: 0x%x", addr);
         break;
@@ -72,6 +84,16 @@ uint8_t c_GPU::ReadReg(uint16_t addr)
         //Line register.
         case 0xFF44:
             return line;
+        break;
+
+        //Window Y register
+        case 0xFF4A:
+            return wndy;
+        break;
+
+        //Window X Register
+        case 0xFF4B:
+            return wndx;
         break;
 
         default:

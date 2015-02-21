@@ -28,6 +28,7 @@ class c_GPU {
         uint8_t tileset[384][8][8];
         uint8_t vram[0x2000];
         uint8_t scx, scy; //Scroll registers.
+        uint8_t wndx, wndy; //Window registers
         uint8_t bgbuffer[256][256];
         c_Canvas* canvas;
         void RenderScanline();

@@ -8,6 +8,7 @@
 #include <wx/glcanvas.h>
 #include <wx/dcclient.h>
 
+#define SCALE1x 1
 #define SCALE2x 2
 #define SCALE3x 3
 #define SCALE4x 4
