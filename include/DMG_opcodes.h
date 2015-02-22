@@ -113,7 +113,7 @@ const char* DMG_opcodes[256] =
     "LD E, H",
     "LD E, L",
     "LD E, (HL)",
-    "LD C, A",
+    "LD E, A",
     "LD H, B",
     "LD H, C",
     "LD H, D",
