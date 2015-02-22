@@ -32,10 +32,10 @@ uint32_t c_DMGCPU::GetClock()
 //Run one instruction.
 void c_DMGCPU::Tick()
 {
-    if(Registers.PC.word > 0x100)
+    if(Registers.PC.word > 0x68)
     {
         //We're running the ROM, so do debugging stuff here.
-        //DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
+        DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
     }
     if(running)
     {
@@ -454,6 +454,8 @@ void c_DMGCPU::OPCode0x05()
 
     if((Registers.BC.hi & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
     if(Registers.BC.hi == 0)
         SET_FLAG_BIT(ZERO_BIT);
@@ -485,6 +487,8 @@ void c_DMGCPU::OPCode0x07()
 
     if(MSB(Registers.AF.hi))
         SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
     Registers.AF.hi <<= 1;
     Registers.AF.hi |= (Registers.AF.lo & CARRY_BIT) >> 4;
@@ -581,6 +585,8 @@ void c_DMGCPU::OPCode0x0D()
 
     if((Registers.BC.lo & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
     if(Registers.BC.lo == 0)
         SET_FLAG_BIT(ZERO_BIT);
@@ -612,6 +618,8 @@ void c_DMGCPU::OPCode0x0F()
 
     if(LSB(Registers.AF.hi))
         SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
     Registers.AF.hi >>= 1;
     Registers.AF.hi |= (Registers.AF.lo & CARRY_BIT) << 3;
@@ -682,6 +690,8 @@ void c_DMGCPU::OPCode0x14()
 
     if((Registers.DE.hi & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
     if(Registers.DE.hi == 0)
         SET_FLAG_BIT(ZERO_BIT);
@@ -703,6 +713,8 @@ void c_DMGCPU::OPCode0x15()
 
     if((Registers.DE.hi & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
     if(Registers.DE.hi == 0)
         SET_FLAG_BIT(ZERO_BIT);
@@ -739,6 +751,8 @@ void c_DMGCPU::OPCode0x17()
 
     if(bit7)
         SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
     Registers.AF.hi <<= 1;
     Registers.AF.hi |= cflag;
@@ -799,16 +813,26 @@ void c_DMGCPU::OPCode0x1C()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "INC E");
 
+    uint8_t result = Registers.DE.lo + 1;
+
     UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition
 
-    if(Registers.DE.lo++ == 0)
+    if(result == 0)
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
-    if(Registers.DE.lo++ > 0xF)
+    if((Registers.DE.lo + 1) > 0xF)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
-    Registers.DE.lo++; //Actually perform the subtraction
+    if((Registers.DE.lo + 1) > 0xFF)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
+    Registers.DE.lo = result;
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
@@ -821,13 +845,19 @@ void c_DMGCPU::OPCode0x1D()
 
     SET_FLAG_BIT(SUB_BIT); //We are performing a subtraction!
 
-    if(Registers.DE.lo-- == 0)
+    uint8_t result = Registers.DE.lo - 1;
+
+    if(result == 0)
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
-    if(Registers.DE.lo-- > 0xF)
+    if(result > 0xF)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
-    Registers.DE.lo--; //Actually perform the subtraction
+    Registers.DE.lo = result; //Actually perform the subtraction
 
     Clock.m = 1;
     Clock.t = 4;
@@ -859,6 +889,8 @@ void c_DMGCPU::OPCode0x1F()
 
     if(bit0)
         SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
     Registers.AF.hi >>= 1;
     Registers.AF.hi |= cflag << 7;
@@ -917,17 +949,31 @@ void c_DMGCPU::OPCode0x23()
 }
 
 //Increment H
+//Using variable++ anywhere will increment the variable by 1.
 void c_DMGCPU::OPCode0x24()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "INC H");
 
     UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition
 
-    if(Registers.HL.hi++ == 0)
-        SET_FLAG_BIT(ZERO_BIT);
+    uint8_t result = Registers.HL.hi + 1;
 
-    if(Registers.HL.hi++ > 0xF)
+    if(result == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    if(result > 0xF)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    if((Registers.HL.hi + 1 > 0xFF))
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
+
+    Registers.HL.hi = result;
 
     Clock.m = 1;
     Clock.t = 4;
@@ -941,12 +987,19 @@ void c_DMGCPU::OPCode0x25()
 
     UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition
 
-    if(Registers.HL.hi-- == 0)
+    uint8_t result = Registers.HL.hi - 1;
+
+    if(result == 0)
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
-    if(Registers.HL.hi-- > 0xF)
+    if(result > 0xF)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
+    Registers.HL.hi = result;
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++; //1 byte instruction
@@ -1044,15 +1097,26 @@ void c_DMGCPU::OPCode0x2C()
 {
     UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition!
 
-    Registers.HL.lo++;
-
     DbgOut(DBG_CPU, VERBOSE_2, "DEC L, L = 0x%x", Registers.HL.lo);
 
-    if(Registers.HL.lo == 0)
-        SET_FLAG_BIT(ZERO_BIT);
+    uint8_t result = Registers.HL.lo + 1;
 
-    if(Registers.HL.lo == 0xF)
+    if(result == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    if(result > 0xF)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    if((Registers.HL.lo + 1) > 0xFF)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
+
+    Registers.HL.lo = result;
 
     Clock.m = 1;
     Clock.t = 4;
@@ -1070,9 +1134,13 @@ void c_DMGCPU::OPCode0x2D()
 
     if(Registers.HL.lo == 0)
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
-    if(Registers.HL.lo == 0xF)
+    if(Registers.HL.lo > 0xF)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
     Clock.m = 1;
     Clock.t = 4;
@@ -1171,6 +1239,8 @@ void c_DMGCPU::OPCode0x3D()
 
     if((Registers.AF.hi & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
     if(Registers.AF.hi == 0)
         SET_FLAG_BIT(ZERO_BIT);
@@ -1357,16 +1427,22 @@ void c_DMGCPU::OPCode0x86()
 {
     UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition.
 
-    DbgOut(DBG_CPU, VERBOSE_2, "Adding (HL): 0x%x to A", MMU->ReadByte(Registers.HL.word));
+    DbgOut(DBG_CPU, VERBOSE_0, "Adding (HL): 0x%x to A", MMU->ReadByte(Registers.HL.word));
 
     if((Registers.AF.hi + MMU->ReadByte(Registers.HL.word)) == 0)
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
     if((Registers.AF.hi + MMU->ReadByte(Registers.HL.word)) > 0xFF)
         SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
     if((Registers.AF.hi + MMU->ReadByte(Registers.HL.word)) > 0xF)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
     Registers.AF.hi += MMU->ReadByte(Registers.HL.word);
 
@@ -1384,12 +1460,18 @@ void c_DMGCPU::OPCode0x87()
 
     if(Registers.AF.hi + Registers.AF.hi == 0)
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
     if(Registers.AF.hi + Registers.AF.hi > 0xFF)
         SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
     if(Registers.AF.hi + Registers.AF.hi > 0xF)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
     Registers.AF.hi += Registers.AF.hi;
 
@@ -1410,6 +1492,8 @@ void c_DMGCPU::OPCode0xA1()
 
     if(Registers.AF.hi == 0)
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
     Clock.m = 1;
     Clock.t = 4;
@@ -1428,6 +1512,8 @@ void c_DMGCPU::OPCode0xA9()
 
     if(Registers.AF.hi == 0)
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
     Clock.m = 1;
     Clock.t = 4;
@@ -1446,6 +1532,8 @@ void c_DMGCPU::OPCode0xAF()
 
     if(Registers.AF.hi == 0)
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
     Clock.m = 1;
     Clock.t = 4;
@@ -1464,6 +1552,8 @@ void c_DMGCPU::OPCode0xB0()
 
     if(Registers.AF.hi == 0)
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
     Clock.m = 1;
     Clock.t = 4;
@@ -1482,6 +1572,8 @@ void c_DMGCPU::OPCode0xB1()
 
     if(Registers.AF.hi == 0)
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
     Clock.m = 1;
     Clock.t = 4;
@@ -1498,13 +1590,20 @@ void c_DMGCPU::OPCode0xBE()
 
     if(Registers.AF.hi == MMU->ReadByte(Registers.HL.word))
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
     //What the fuck hahaha
+    //It's just checking if the 4 least significant bits of a - (hl) are greater than the 4 lsb's of A on its own.
     if(((Registers.AF.hi - MMU->ReadByte(Registers.HL.word)) & 0xF) > (Registers.AF.hi & 0xF))
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
     if(Registers.AF.hi < MMU->ReadByte(Registers.HL.word))
         SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
     Clock.m = 2;
     Clock.t = 8;
@@ -1637,6 +1736,8 @@ void c_DMGCPU::OPCode0xE6()
 
     if(Registers.AF.hi == 0)
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
     DbgOut(DBG_CPU, VERBOSE_2, "AND A, d8 A = 0x%x", Registers.AF.hi);
     Clock.m = 2;
@@ -1696,6 +1797,9 @@ void c_DMGCPU::OPCode0xF5()
 
     if(!(Registers.AF.hi & 0xFF))
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
     Clock.m = 1;
     Clock.t = 8;
     Registers.PC.word += 2;
@@ -1730,6 +1834,8 @@ void c_DMGCPU::OPCodeCB0x11()
 
     if(MSB(Registers.BC.lo) > 0)
         SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
     regi = (regi << 1) | carryi;
 
@@ -1785,6 +1891,8 @@ void c_DMGCPU::OPCodeCB0x17()
 
     if(MSB(Registers.AF.hi) > 0)
         SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
 
     regi = (regi << 1) | carryi;
@@ -1812,6 +1920,8 @@ void c_DMGCPU::OPCodeCB0x37()
 
     if(Registers.AF.lo == 0)
         SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
     Clock.m = 2;
     Clock.t = 8;
@@ -1822,13 +1932,12 @@ void c_DMGCPU::OPCodeCB0x37()
 void c_DMGCPU::OPCodeCB0x7C()
 {
     DbgOut(DBG_CPU, VERBOSE_2,  "BIT 7, H. H = 0x%x", Registers.HL.hi);
+
     if(!(MSB(Registers.HL.hi)))
-    {
         SET_FLAG_BIT(ZERO_BIT);
-    }
-    else {
+    else
         UNSET_FLAG_BIT(ZERO_BIT);
-    }
+
     SET_FLAG_BIT(HC_BIT);
     UNSET_FLAG_BIT(SUB_BIT);
     Clock.m = 2;

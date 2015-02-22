@@ -8,6 +8,17 @@ c_Canvas::c_Canvas(wxWindow *parent, const wxWindowID id,
             init(false)
 {
 
+    //Clear framebuffer.
+    int x, y;
+
+    for(x = 0; x < 160; x++)
+    {
+        for(y = 0; y < 144; y++)
+        {
+            t_Pixel pix = {156, 189, 15};
+            PutPixel(x, y, pix);
+        }
+    }
 }
 
 c_Canvas::~c_Canvas(void)
