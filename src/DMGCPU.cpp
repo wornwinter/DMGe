@@ -35,7 +35,7 @@ void c_DMGCPU::Tick()
     if(Registers.PC.word > 0x68)
     {
         //We're running the ROM, so do debugging stuff here.
-        DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
+        //DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
     }
     if(running)
     {
@@ -1427,9 +1427,10 @@ void c_DMGCPU::OPCode0x86()
 {
     UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition.
 
-    DbgOut(DBG_CPU, VERBOSE_0, "Adding (HL): 0x%x to A", MMU->ReadByte(Registers.HL.word));
+    uint8_t result = (Registers.AF.hi + MMU->ReadByte(Registers.HL.word));
+    DbgOut(DBG_CPU, VERBOSE_0, "Adding (HL): 0x%x to A. A = 0x%x. Result = 0x%x", MMU->ReadByte(Registers.HL.word), Registers.AF.hi, result);
 
-    if((Registers.AF.hi + MMU->ReadByte(Registers.HL.word)) == 0)
+    if(result == 0)
         SET_FLAG_BIT(ZERO_BIT);
     else
         UNSET_FLAG_BIT(ZERO_BIT);
@@ -1444,7 +1445,7 @@ void c_DMGCPU::OPCode0x86()
     else
         UNSET_FLAG_BIT(HC_BIT);
 
-    Registers.AF.hi += MMU->ReadByte(Registers.HL.word);
+    Registers.AF.hi = result;
 
     Clock.m = 2;
     Clock.t = 8;
