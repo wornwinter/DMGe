@@ -160,7 +160,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x53] = NULL;
     OPCodes[0x54] = NULL;
     OPCodes[0x55] = NULL;
-    OPCodes[0x56] = NULL;
+    OPCodes[0x56] = &c_DMGCPU::OPCode0x56;
     OPCodes[0x57] = &c_DMGCPU::OPCode0x57;
     OPCodes[0x58] = NULL;
     OPCodes[0x59] = NULL;
@@ -289,7 +289,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xD2] = NULL;
     OPCodes[0xD3] = NULL;
     OPCodes[0xD4] = NULL;
-    OPCodes[0xD5] = NULL;
+    OPCodes[0xD5] = &c_DMGCPU::OPCode0xD5;
     OPCodes[0xD6] = NULL;
     OPCodes[0xD7] = NULL;
     OPCodes[0xD8] = NULL;
@@ -309,7 +309,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xE6] = &c_DMGCPU::OPCode0xE6;
     OPCodes[0xE7] = NULL;
     OPCodes[0xE8] = NULL;
-    OPCodes[0xE9] = NULL;
+    OPCodes[0xE9] = &c_DMGCPU::OPCode0xE9;
     OPCodes[0xEA] = &c_DMGCPU::OPCode0xEA;
     OPCodes[0xEB] = NULL;
     OPCodes[0xEC] = NULL;
@@ -1203,6 +1203,16 @@ void c_DMGCPU::OPCode0x47()
     Registers.PC.word++;
 }
 
+//Load value pointed to by HL into D
+void c_DMGCPU::OPCode0x56()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD D, (HL)");
+    Registers.DE.hi = MMU->ReadByte(Registers.HL.word);
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //Load A into D.
 void c_DMGCPU::OPCode0x57()
 {
@@ -1603,6 +1613,20 @@ void c_DMGCPU::OPCode0xCD()
     Clock.t = 24;
 }
 
+//PUSH DE to the stack
+void c_DMGCPU::OPCode0xD5()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "PUSH DE. DE = 0x%x", Registers.DE.word);
+    //Increment the stackpointer DOWNWARDS
+    Registers.SP.word -= 2;
+    //Push BC onto the stack according to where the stackpointer is
+    MMU->WriteWord(Registers.SP.word, Registers.DE.word);
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //And A with 8-bit immediate value
 void c_DMGCPU::OPCode0xE6()
 {
@@ -1618,6 +1642,15 @@ void c_DMGCPU::OPCode0xE6()
     Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word += 2; //2-byte instruction
+}
+
+//Jump to address contained in HL
+void c_DMGCPU::OPCode0xE9()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "JP (HL). Jumping to address 0x%x", Registers.HL.word);
+    Registers.PC.word = MMU->ReadWord(Registers.HL.word);
+    Clock.m = 1;
+    Clock.t = 4;
 }
 
 //Write A to 16-bit immediate address.
