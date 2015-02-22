@@ -11256,7 +11256,7 @@
 
 1424614392 c:\users\darren\documents\github\dmge\include\macro.h
 
-1424619454 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
+1424619737 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
 	"DMGCPU.h"
 	"DMG_opcodes.h"
 	"debug.h"
@@ -11264,12 +11264,14 @@
 
 1424614392 c:\users\darren\documents\github\dmge\include\dmg_opcodes.h
 
-1424618739 source:c:\users\darren\documents\github\dmge\src\gameboy.cpp
+1424621454 source:c:\users\darren\documents\github\dmge\src\gameboy.cpp
 	"GameBoy.h"
 	"DMGCPU.h"
 	"GPU.h"
 	"MMU.h"
 	"canvas.h"
+	<boost/thread/thread.hpp>
+	<boost/date_time.hpp>
 
 1424619671 source:c:\users\darren\documents\github\dmge\src\mmu.cpp
 	"MMU.h"
@@ -15091,19 +15093,20 @@
 	<commdlg.h>
 	"wx/msw/winundef.h"
 
-1424614392 source:c:\users\darren\documents\github\dmge\src\app.cpp
+1424622183 source:c:\users\darren\documents\github\dmge\src\app.cpp
 	"app.h"
 	"mainFrame.h"
 
 1424614392 c:\users\darren\documents\github\dmge\include\app.h
 	<wx/wx.h>
 
-1424614392 c:\users\darren\documents\github\dmge\include\mainframe.h
+1424620659 c:\users\darren\documents\github\dmge\include\mainframe.h
 	<wx/wx.h>
 	<wx/glcanvas.h>
 	<stdlib.h>
+	<boost/thread/thread.hpp>
 
-1424614392 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
+1424622196 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
 	"mainFrame.h"
 	"canvas.h"
 	"logo.xpm"

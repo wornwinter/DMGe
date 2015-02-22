@@ -4,6 +4,7 @@
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
 #include <stdlib.h> //Exit signal stuff
+#include <boost/thread/thread.hpp> //For threading. wxThreads aren't great.
 
 
 
@@ -44,6 +45,7 @@ class mainFrame : public wxFrame
     private:
         c_GameBoy* gameboy;
         c_Canvas *glCanvas;
+        boost::thread* emuthread;
         wxDECLARE_EVENT_TABLE();
 };
 

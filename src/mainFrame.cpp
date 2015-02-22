@@ -48,13 +48,15 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
     gameboy = new c_GameBoy("roms/tetris.gb", glCanvas);
     gameboy->pause = true;
 
+    emuthread = new boost::thread(boost::bind(&c_GameBoy::Run, gameboy));
+
     //wxTimer* timer = new wxTimer(this, GB_TIMER);
     //timer->Start(1); //Interval in milliseconds.
 }
 
 wxBEGIN_EVENT_TABLE(mainFrame, wxFrame)
     //EVT_TIMER(GB_TIMER, mainFrame::Tick)
-    EVT_IDLE(mainFrame::Tick)
+    //EVT_IDLE(mainFrame::Tick)
     EVT_MENU(MENU_START, mainFrame::StartEmulation)
     EVT_MENU(MENU_STOP, mainFrame::StopEmulation)
     EVT_MENU(MENU_SCALE1, mainFrame::Scale1)

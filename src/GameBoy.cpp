@@ -3,6 +3,8 @@
 #include "GPU.h"
 #include "MMU.h"
 #include "canvas.h"
+#include <boost/thread/thread.hpp> //For threading. wxThreads aren't great.
+#include <boost/date_time.hpp>
 
 c_GameBoy::c_GameBoy(const char* romfname, c_Canvas* cnv)
 {
@@ -24,9 +26,14 @@ c_GameBoy::~c_GameBoy()
 //Called by application in event loop.
 void c_GameBoy::Run(void)
 {
-    if(!pause)
+    boost::posix_time::microseconds worktime(50);
+    while(1)
     {
-       CPU->Tick();
-       GPU->Tick(CPU->GetClock(), MMU);
+        if(!pause)
+        {
+           CPU->Tick();
+           GPU->Tick(CPU->GetClock(), MMU);
+        }
+        boost::this_thread::sleep(worktime);
     }
 }
