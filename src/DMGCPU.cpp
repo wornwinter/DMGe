@@ -32,10 +32,10 @@ uint32_t c_DMGCPU::GetClock()
 //Run one instruction.
 void c_DMGCPU::Tick()
 {
-    if(Registers.PC.word > 0x68)
+    if((Registers.PC.word > 0x100) && running)
     {
         //We're running the ROM, so do debugging stuff here.
-        //DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
+        DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
     }
     if(running)
     {
@@ -274,7 +274,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xC5] = &c_DMGCPU::OPCode0xC5;
     OPCodes[0xC6] = &c_DMGCPU::OPCode0xC6;
     OPCodes[0xC7] = NULL;
-    OPCodes[0xC8] = NULL;
+    OPCodes[0xC8] = &c_DMGCPU::OPCode0xC8;
     OPCodes[0xC9] = &c_DMGCPU::OPCode0xC9;
     OPCodes[0xCA] = NULL;
     //Function to read a CB opcode, not an actual opcode in itself
@@ -305,7 +305,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xE2] = &c_DMGCPU::OPCode0xE2;
     OPCodes[0xE3] = NULL;
     OPCodes[0xE4] = NULL;
-    OPCodes[0xE5] = NULL;
+    OPCodes[0xE5] = &c_DMGCPU::OPCode0xE5;
     OPCodes[0xE6] = &c_DMGCPU::OPCode0xE6;
     OPCodes[0xE7] = NULL;
     OPCodes[0xE8] = NULL;
@@ -347,6 +347,7 @@ void c_DMGCPU::InitOpcodeTables()
 
 void c_DMGCPU::IllegalOperation(uint8_t opcode, bool iscb)
 {
+    running = false;
     DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
 
     if(iscb)
@@ -357,7 +358,6 @@ void c_DMGCPU::IllegalOperation(uint8_t opcode, bool iscb)
         DbgOut(DBG_CPU, VERBOSE_0, "Unknown opcode/%s: 0x%x. PC: 0x%x", DMG_opcodes[MMU->ReadByte(Registers.PC.word)], MMU->ReadByte(Registers.PC.word), Registers.PC.word);
     }
 
-    running = false;
     //Dump Registers.
     DbgOut(DBG_CPU, VERBOSE_0, "-------------------------------------------------");
     DbgOut(DBG_CPU, VERBOSE_0, "Register Dump");
@@ -1718,6 +1718,23 @@ void c_DMGCPU::OPCode0xC6()
     Registers.PC.word += 2;
 }
 
+//Return if zero flag is set.
+void c_DMGCPU::OPCode0xC8()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "RET Z");
+    if(FLAG_ZERO)
+    {
+        Registers.PC.word = MMU->ReadWord(Registers.SP.word);
+        Registers.SP.word += 2;
+        Clock.t = 20;
+    }
+    else {
+        Registers.PC.word++;
+        Clock.t = 8;
+    }
+    Clock.m = 1;
+}
+
 //Load 8-bit value in A into memory pointed to by 0xFF00 + 8-bit immediate value.
 void c_DMGCPU::OPCode0xE0()
 {
@@ -1793,6 +1810,20 @@ void c_DMGCPU::OPCode0xD5()
     Registers.SP.word -= 2;
     //Push BC onto the stack according to where the stackpointer is
     MMU->WriteWord(Registers.SP.word, Registers.DE.word);
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Push HL onto the stack
+void c_DMGCPU::OPCode0xE5()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "PUSH HL. HL = 0x%x", Registers.HL.word);
+    //Increment the stackpointer DOWNWARDS
+    Registers.SP.word -= 2;
+    //Push BC onto the stack according to where the stackpointer is
+    MMU->WriteWord(Registers.SP.word, Registers.HL.word);
 
     Clock.m = 1;
     Clock.t = 4;
