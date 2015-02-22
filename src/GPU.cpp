@@ -65,7 +65,7 @@ void c_GPU::WriteReg(uint16_t addr, uint8_t data)
         break;
 
         default:
-            DbgOut(DBG_VID, VERBOSE_0, "Unimplemented or read only GPU register: 0x%x", addr);
+            DbgOut(DBG_VID, VERBOSE_2, "Unimplemented or read only GPU register: 0x%x", addr);
         break;
     }
 }

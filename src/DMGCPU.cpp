@@ -134,7 +134,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x39] = NULL;
     OPCodes[0x3A] = NULL;
     OPCodes[0x3B] = NULL;
-    OPCodes[0x3C] = NULL;
+    OPCodes[0x3C] = &c_DMGCPU::OPCode0x3C;
     OPCodes[0x3D] = &c_DMGCPU::OPCode0x3D;
     OPCodes[0x3E] = &c_DMGCPU::OPCode0x3E;
     OPCodes[0x3F] = NULL;
@@ -200,7 +200,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x7B] = &c_DMGCPU::OPCode0x7B;
     OPCodes[0x7C] = &c_DMGCPU::OPCode0x7C;
     OPCodes[0x7D] = &c_DMGCPU::OPCode0x7D;
-    OPCodes[0x7E] = NULL;
+    OPCodes[0x7E] = &c_DMGCPU::OPCode0x7E;
     OPCodes[0x7F] = NULL;
     OPCodes[0x80] = NULL;
     OPCodes[0x81] = NULL;
@@ -272,7 +272,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xC3] = &c_DMGCPU::OPCode0xC3;
     OPCodes[0xC4] = NULL;
     OPCodes[0xC5] = &c_DMGCPU::OPCode0xC5;
-    OPCodes[0xC6] = NULL;
+    OPCodes[0xC6] = &c_DMGCPU::OPCode0xC6;
     OPCodes[0xC7] = NULL;
     OPCodes[0xC8] = NULL;
     OPCodes[0xC9] = &c_DMGCPU::OPCode0xC9;
@@ -317,7 +317,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xEE] = NULL;
     OPCodes[0xEF] = &c_DMGCPU::OPCode0xEF;
     OPCodes[0xF0] = &c_DMGCPU::OPCode0xF0;
-    OPCodes[0xF1] = NULL;
+    OPCodes[0xF1] = &c_DMGCPU::OPCode0xF1;
     OPCodes[0xF2] = NULL;
     OPCodes[0xF3] = &c_DMGCPU::OPCode0xF3;
     OPCodes[0xF4] = NULL;
@@ -532,6 +532,7 @@ void c_DMGCPU::OPCode0x0A()
     DbgOut(DBG_CPU, VERBOSE_2, "LD A, (BC), A = 0x%x", Registers.AF.hi);
     Clock.m = 3;
     Clock.t = 8;
+    Registers.PC.word++;
 }
 
 //Decrement B
@@ -1229,6 +1230,37 @@ void c_DMGCPU::OPCode0x36()
     Registers.PC.word += 2;
 }
 
+//Increment A
+void c_DMGCPU::OPCode0x3C()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "INC A");
+
+    uint8_t result = Registers.AF.hi + 1;
+
+    if(result == 0)
+        SET_FLAG_BIT(FLAG_ZERO);
+    else
+        UNSET_FLAG_BIT(FLAG_ZERO);
+
+    UNSET_FLAG_BIT(SUB_BIT);
+
+    if((result & 0xF) > 0xF)
+        SET_FLAG_BIT(FLAG_HC);
+    else
+        UNSET_FLAG_BIT(FLAG_HC);
+
+    if((Registers.AF.hi + 1) > 0xFF)
+        SET_FLAG_BIT(FLAG_CARRY);
+    else
+        UNSET_FLAG_BIT(FLAG_CARRY);
+
+    Registers.AF.hi = result;
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //Decrement A
 void c_DMGCPU::OPCode0x3D()
 {
@@ -1419,6 +1451,16 @@ void c_DMGCPU::OPCode0x7D()
     DbgOut(DBG_CPU, VERBOSE_2, "LD A, L");
     Clock.m = 1;
     Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load value pointed to by HL into A
+void c_DMGCPU::OPCode0x7E()
+{
+    Registers.AF.hi = MMU->ReadByte(Registers.HL.word);
+    DbgOut(DBG_CPU, VERBOSE_2, "LD A, (HL), A = 0x%x", Registers.AF.hi);
+    Clock.m = 3;
+    Clock.t = 8;
     Registers.PC.word++;
 }
 
@@ -1646,6 +1688,36 @@ void c_DMGCPU::OPCode0xC5()
     Registers.PC.word++;
 }
 
+//Add immediate byte to A.
+void c_DMGCPU::OPCode0xC6()
+{
+    UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition.
+
+    uint8_t result = (Registers.AF.hi + MMU->ReadByte(Registers.PC.word+1));
+    DbgOut(DBG_CPU, VERBOSE_2, "ADD A, d8");
+
+    if(result == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    if((Registers.AF.hi + MMU->ReadByte(Registers.PC.word+1)) > 0xFF)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
+
+    if((Registers.AF.hi + MMU->ReadByte(Registers.PC.word+1)) > 0xF)
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    Registers.AF.hi = result;
+
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word += 2;
+}
+
 //Load 8-bit value in A into memory pointed to by 0xFF00 + 8-bit immediate value.
 void c_DMGCPU::OPCode0xE0()
 {
@@ -1774,6 +1846,17 @@ void c_DMGCPU::OPCode0xF0()
     Clock.m = 2;
     Clock.t = 12;
     Registers.PC.word += 2;
+}
+
+//POP AF from the Stack
+void c_DMGCPU::OPCode0xF1()
+{
+    Registers.AF.word = MMU->ReadWord(Registers.SP.word);
+    Registers.SP.word += 2;
+    DbgOut(DBG_CPU, VERBOSE_2, "POP AF. New AF = 0x%x.", Registers.AF.word);
+    Clock.m = 1;
+    Clock.t = 12;
+    Registers.PC.word++;
 }
 
 //Disable interrupts at start of next cycle.
