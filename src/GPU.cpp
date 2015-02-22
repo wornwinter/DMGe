@@ -1,6 +1,7 @@
 #include "GPU.h"
 #include "debug.h"
 #include "canvas.h"
+#include "MMU.h"
 
 c_GPU::c_GPU(c_Canvas* cnv)
 {
@@ -15,6 +16,7 @@ c_GPU::c_GPU(c_Canvas* cnv)
     paletteref[1] = {140, 173, 15};
     paletteref[2] = {48, 98, 48};
     paletteref[3] = {15, 56, 15};
+    vblankstart = true;
 }
 
 c_GPU::~c_GPU()
@@ -171,7 +173,7 @@ void c_GPU::ClearScreen()
     }
 }
 
-void c_GPU::Tick(uint32_t clock)
+void c_GPU::Tick(uint32_t clock, c_MMU* MMU)
 {
 
     stateclock += clock;
@@ -210,6 +212,7 @@ void c_GPU::Tick(uint32_t clock)
                 if(line == 143)
                 {
                     //Finished drawing the last time. State should be VBLANK now.
+                    vblankstart = true;
                     state = STATE_VBLANK;
                     //Draw framebuffer to the screen here.
                     //ClearScreen();
@@ -223,6 +226,16 @@ void c_GPU::Tick(uint32_t clock)
 
         case STATE_VBLANK:
             //DbgOut(DBG_VID, VERBOSE_1, "STATE = VBLANK");
+            if(vblankstart)
+            {
+                //Set vblank interrupt flag.
+                MMU->intflags |= 0x1;
+                vblankstart = false;
+            }
+            else {
+                //Disable vblank flag.
+                MMU->intflags &= 0x1E;
+            }
             if(stateclock >= 456)
             {
                 stateclock = 0;

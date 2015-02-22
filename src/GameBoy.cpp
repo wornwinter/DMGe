@@ -27,6 +27,6 @@ void c_GameBoy::Run(void)
     if(!pause)
     {
        CPU->Tick();
-       GPU->Tick(CPU->GetClock());
+       GPU->Tick(CPU->GetClock(), MMU);
     }
 }

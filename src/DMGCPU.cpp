@@ -35,8 +35,24 @@ void c_DMGCPU::Tick()
     if((Registers.PC.word > 0x100) && running)
     {
         //We're running the ROM, so do debugging stuff here.
-        DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
+        //DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
     }
+
+    if(IME && running)
+    {
+        //Do interrupts.
+        //Check interrupt that has fired. Mask off disabled interrupts.
+        uint8_t intfired = MMU->intenable & MMU->intflags;
+        if(intfired & 0x1)
+        {
+            DbgOut(DBG_CPU, VERBOSE_0, "Interrupt: Calling VBLANK service routine.");
+            //Call interrupt service routine.
+            Registers.SP.word -= 2;
+            MMU->WriteWord(Registers.SP.word, Registers.PC.word);
+            Registers.PC.word = 0x0040; //ISR is always at 0x0040 for vblank.
+        }
+    }
+
     if(running)
     {
         switch(MMU->ReadByte(Registers.PC.word))
@@ -1894,6 +1910,7 @@ void c_DMGCPU::OPCode0xF1()
 void c_DMGCPU::OPCode0xF3()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "DI");
+    IME = false;
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
@@ -1924,7 +1941,7 @@ void c_DMGCPU::OPCode0xF5()
 void c_DMGCPU::OPCode0xFB()
 {
     //Enable interrupts
-    intenabled = true;
+    IME = true;
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;

@@ -18,6 +18,8 @@
 #define STATE_HBLANK 0
 #define STATE_VBLANK 1
 
+class c_MMU;
+
 class c_GPU {
 
     private:
@@ -36,6 +38,7 @@ class c_GPU {
         void RenderScanline();
         void RenderScreen();
         void ClearScreen();
+        bool vblankstart;
 
     public:
         c_GPU(c_Canvas *cnv);
@@ -45,7 +48,7 @@ class c_GPU {
         uint8_t ReadReg(uint16_t addr);
         void UpdateTile(uint16_t addr, uint8_t data);
 
-        void Tick(uint32_t clock);
+        void Tick(uint32_t clock, c_MMU* MMU);
 
 };
 #endif // GPU_H

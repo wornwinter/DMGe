@@ -27,13 +27,16 @@ class c_MMU {
         uint8_t wram[0x2000]; //8k Working RAM.
         uint8_t oam[0xA0];
         uint8_t zram[0x7F];
-        uint8_t intflags; //Interrupt flags register.
+
 
         uint8_t activerombank = 1;
         bool biosmapped = false;
         c_GPU* GPU;
 
     public:
+        uint8_t intflags = 0x00; //Interrupt flags register.
+        uint8_t intenable = 0x00;
+
         c_MMU(c_GPU* pGPU);
         ~c_MMU();
         uint8_t ReadByte(uint16_t addr);

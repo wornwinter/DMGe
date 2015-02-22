@@ -78,7 +78,9 @@ uint8_t c_MMU::ReadByte(uint16_t addr)
                     break;
 
                     case 0xF00:
-                        if(addr >= 0xFF80)
+                        if(addr == 0xFFFF)
+                            return intenable;
+                        else if(addr >= 0xFF80)
                             return zram[addr & 0x7F];
                         else
                         {
@@ -87,13 +89,8 @@ uint8_t c_MMU::ReadByte(uint16_t addr)
                             {
 
                                 case 0x00:
-                                    switch(addr & 0x000F)
-                                    {
-                                        //Interrupt flags.
-                                        case 0x0F:
-                                            return intflags;
-                                        break;
-                                    }
+                                    if(addr == 0xFF0F)
+                                        return intflags;
                                 break;
 
                                 //GPU
@@ -186,7 +183,11 @@ void c_MMU::WriteByte(uint16_t addr, uint8_t data)
                     break;
 
                     case 0xF00:
-                        if(addr >= 0xFF80)
+                        if(addr == 0xFFFF)
+                        {
+                            intenable = data;
+                        }
+                        else if(addr >= 0xFF80)
                             zram[addr & 0x7F] = data;
                         else
                         {

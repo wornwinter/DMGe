@@ -78,7 +78,7 @@ private:
     clock_t ClockTotal;
 
     bool running = true;
-    bool intenabled = false;
+    bool IME = true;
 
     //OPCODES
     void OPCode0x00();
