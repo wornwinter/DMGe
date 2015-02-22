@@ -45,7 +45,7 @@ void c_GPU::WriteReg(uint16_t addr, uint8_t data)
         //Set Colour palette data. Assuming we should put these values into pixel_t struct ()
         //These are what defines what shades of gray to use.
         case 0xFF47:
-            DbgOut(DBG_VID, VERBOSE_0, "Writing palette: 0x%x", data);
+            DbgOut(DBG_VID, VERBOSE_1, "Writing palette: 0x%x", data);
             palette[3] = (data & 0xC0) >> 6;
             palette[2] = (data & 0x30) >> 4;
             palette[1] = (data & 0x0C) >> 2;
@@ -65,7 +65,7 @@ void c_GPU::WriteReg(uint16_t addr, uint8_t data)
         break;
 
         default:
-            DbgOut(DBG_VID, VERBOSE_2, "Unimplemented or read only GPU register: 0x%x", addr);
+            DbgOut(DBG_VID, VERBOSE_1, "Unimplemented or read only GPU register: 0x%x", addr);
         break;
     }
 }
@@ -106,7 +106,7 @@ uint8_t c_GPU::ReadReg(uint16_t addr)
         break;
 
         default:
-            DbgOut(DBG_VID, VERBOSE_0, "Unimplemented GPU register: 0x%x", addr);
+            DbgOut(DBG_VID, VERBOSE_1, "Unimplemented GPU register: 0x%x", addr);
             return 0x00;
         break;
     }
