@@ -309,3 +309,8 @@ void c_MMU::LoadROM(const char *fname)
         DbgOut(DBG_MMU, VERBOSE_0,  "Error loading ROM file!");
     }
 }
+
+void c_MMU::faulthandler(uint16_t faultaddr)
+{
+
+}
