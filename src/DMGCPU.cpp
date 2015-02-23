@@ -99,10 +99,6 @@ void c_DMGCPU::Tick()
 
 void c_DMGCPU::InitOpcodeTables()
 {
-    //Clear opcode tables with NULL (easy to check for invalid operation / unimplemented opcode)
-    memset(c_DMGCPU::OPCodes, NULL, 0xFF);
-    memset(c_DMGCPU::OPCodesCB, NULL, 0xFF);
-
     //Fill our opcode table
     OPCodes[0x00] = &c_DMGCPU::OPCode0x00;
     OPCodes[0x01] = &c_DMGCPU::OPCode0x01;
@@ -232,16 +228,16 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x7D] = &c_DMGCPU::OPCode0x7D;
     OPCodes[0x7E] = &c_DMGCPU::OPCode0x7E;
     OPCodes[0x7F] = NULL;
-    OPCodes[0x80] = NULL;
+    OPCodes[0x80] = &c_DMGCPU::OPCode0x80;
     OPCodes[0x81] = NULL;
     OPCodes[0x82] = NULL;
     OPCodes[0x83] = NULL;
-    OPCodes[0x84] = NULL;
+    OPCodes[0x84] = &c_DMGCPU::OPCode0x84;
     OPCodes[0x85] = NULL;
     OPCodes[0x86] = &c_DMGCPU::OPCode0x86;
     OPCodes[0x87] = &c_DMGCPU::OPCode0x87;
-    OPCodes[0x88] = NULL;
-    OPCodes[0x89] = NULL;
+    OPCodes[0x88] = &c_DMGCPU::OPCode0x88;
+    OPCodes[0x89] = &c_DMGCPU::OPCode0x89;
     OPCodes[0x8A] = NULL;
     OPCodes[0x8B] = NULL;
     OPCodes[0x8C] = NULL;
@@ -372,6 +368,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodesCB[0x11] = &c_DMGCPU::OPCodeCB0x11;
     OPCodesCB[0x17] = &c_DMGCPU::OPCodeCB0x17;
     OPCodesCB[0x37] = &c_DMGCPU::OPCodeCB0x37;
+    OPCodesCB[0x6F] = &c_DMGCPU::OPCodeCB0x6F;
     OPCodesCB[0x77] = &c_DMGCPU::OPCodeCB0x77;
     OPCodesCB[0x7C] = &c_DMGCPU::OPCodeCB0x7C;
 }
@@ -1884,6 +1881,64 @@ void c_DMGCPU::OPCode0x7E()
     Registers.PC.word++;
 }
 
+//ADD B to A
+void c_DMGCPU::OPCode0x80()
+{
+    UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition.
+
+    DbgOut(DBG_CPU, VERBOSE_2, "ADD A, B");
+
+    if(Registers.AF.hi + Registers.BC.hi == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    if(Registers.AF.hi + Registers.BC.hi > 0xFF)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
+
+    if(Registers.AF.hi + Registers.BC.hi > 0xF)
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    Registers.AF.hi += Registers.BC.hi;
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//ADD H to A
+void c_DMGCPU::OPCode0x84()
+{
+    UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition.
+
+    DbgOut(DBG_CPU, VERBOSE_2, "ADD A, H");
+
+    if(Registers.AF.hi + Registers.HL.hi == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    if(Registers.AF.hi + Registers.HL.hi > 0xFF)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
+
+    if(((Registers.AF.hi + Registers.HL.hi) & 0xF) == 0xF)
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    Registers.AF.hi += Registers.HL.hi;
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //Add value pointed to by HL to A
 void c_DMGCPU::OPCode0x86()
 {
@@ -1940,6 +1995,70 @@ void c_DMGCPU::OPCode0x87()
 
     Clock.m = 2;
     Clock.t = 8;
+    Registers.PC.word++;
+}
+
+//Add B + carry flag to A.
+void c_DMGCPU::OPCode0x88()
+{
+    UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition.
+
+    uint8_t carry = (FLAG_CARRY ? 1 : 0);
+    uint8_t value = Registers.BC.hi + carry;
+    uint8_t result = Registers.AF.hi + value;
+    DbgOut(DBG_CPU, VERBOSE_2, "ADC A, B");
+
+    if(result == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    if((Registers.AF.hi + value) > 0xFF)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
+
+    if((Registers.AF.hi + value) > 0xF)
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    Registers.AF.hi = result;
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Add C + carry flag to A.
+void c_DMGCPU::OPCode0x89()
+{
+    UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition.
+
+    uint8_t carry = (FLAG_CARRY ? 1 : 0);
+    uint8_t value = Registers.BC.lo + carry;
+    uint8_t result = Registers.AF.hi + value;
+    DbgOut(DBG_CPU, VERBOSE_2, "ADC A, C");
+
+    if(result == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    if((Registers.AF.hi + value) > 0xFF)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
+
+    if((Registers.AF.hi + value) > 0xF)
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    Registers.AF.hi = result;
+
+    Clock.m = 1;
+    Clock.t = 4;
     Registers.PC.word++;
 }
 
@@ -2618,6 +2737,23 @@ void c_DMGCPU::OPCodeCB0x37()
     Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word += 2;
+}
+
+//Test bit 5 of A.
+void c_DMGCPU::OPCodeCB0x6F()
+{
+    DbgOut(DBG_CPU, VERBOSE_2,  "BIT 5, A.");
+
+    if(!(Registers.AF.hi & 0x20))
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    SET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(SUB_BIT);
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word += 2; //2 bytes, as this is a 2-byte opcode.
 }
 
 //Test bit 6 of A register.
