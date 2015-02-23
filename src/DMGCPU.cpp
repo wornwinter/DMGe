@@ -178,7 +178,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x4B] = &c_DMGCPU::OPCode0x4B;
     OPCodes[0x4C] = &c_DMGCPU::OPCode0x4C;
     OPCodes[0x4D] = &c_DMGCPU::OPCode0x4D;
-    OPCodes[0x4E] = NULL;
+    OPCodes[0x4E] = &c_DMGCPU::OPCode0x3E;
     OPCodes[0x4F] = &c_DMGCPU::OPCode0x4F;
     OPCodes[0x50] = NULL;
     OPCodes[0x51] = NULL;
@@ -205,7 +205,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x66] = NULL;
     OPCodes[0x67] = &c_DMGCPU::OPCode0x67;
     OPCodes[0x68] = NULL;
-    OPCodes[0x69] = NULL;
+    OPCodes[0x69] = &c_DMGCPU::OPCode0x69;
     OPCodes[0x6A] = NULL;
     OPCodes[0x6B] = NULL;
     OPCodes[0x6C] = NULL;
@@ -376,6 +376,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodesCB[0x77] = &c_DMGCPU::OPCodeCB0x77;
     OPCodesCB[0x7C] = &c_DMGCPU::OPCodeCB0x7C;
     OPCodesCB[0x7F] = &c_DMGCPU::OPCodeCB0x7F;
+    OPCodesCB[0xFE] = &c_DMGCPU::OPCodeCB0xFE;
 
 }
 
@@ -1622,6 +1623,16 @@ void c_DMGCPU::OPCode0x4D()
     Registers.PC.word++;
 }
 
+//Load Value pointed by HL into C
+void c_DMGCPU::OPCode0x4E()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD C, (HL)");
+    Registers.BC.lo = MMU->ReadByte(Registers.HL.word);
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //Load H into D.
 void c_DMGCPU::OPCode0x54()
 {
@@ -1688,6 +1699,16 @@ void c_DMGCPU::OPCode0x67()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "LD H, A");
     Registers.HL.hi = Registers.AF.hi;
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load C into L.
+void c_DMGCPU::OPCode0x69()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD L, C");
+    Registers.HL.lo = Registers.BC.lo;
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
@@ -3081,3 +3102,16 @@ void c_DMGCPU::OPCodeCB0x7F()
     Registers.PC.word += 2; //2 bytes, as this is a 2-byte opcode.
 }
 
+//Set bit 7 of memory location pointed to by HL.
+void c_DMGCPU::OPCodeCB0xFE()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "SET 7, HL");
+
+    uint8_t data = MMU->ReadByte(Registers.HL.word);
+
+    data |= 0x80; //Set bit 7 to on.
+
+    Clock.m = 2;
+    Clock.t = 16;
+    Registers.PC.word += 2;
+}
