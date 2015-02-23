@@ -57,7 +57,7 @@ void c_DMGCPU::Tick()
             Registers.PC.word = 0x0040; //ISR is always at 0x0040 for vblank.
             IME = false;
         }
-        if(intfired & 0x8) //Serial IRQ
+        if(intfired & 0x4) //Serial IRQ
         {
             DbgOut(DBG_CPU, VERBOSE_2, "Interrupt: Calling SERIAL service routine.");
             Registers.SP.word -= 2;
@@ -123,7 +123,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x14] = &c_DMGCPU::OPCode0x14;
     OPCodes[0x15] = &c_DMGCPU::OPCode0x15;
     OPCodes[0x16] = &c_DMGCPU::OPCode0x16;
-    OPCodes[0x17] = &c_DMGCPU::OPCodeCB0x17;
+    OPCodes[0x17] = &c_DMGCPU::OPCode0x17;
     OPCodes[0x18] = &c_DMGCPU::OPCode0x18;
     OPCodes[0x19] = &c_DMGCPU::OPCode0x19;
     OPCodes[0x1A] = &c_DMGCPU::OPCode0x1A;
@@ -768,26 +768,32 @@ void c_DMGCPU::OPCode0x16()
 //Rotate A left. Bit 7 to Carry, Carry bit to Bit 0
 void c_DMGCPU::OPCode0x17()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "RLA");
-    //Unset Flag bits
-    UNSET_FLAG_BIT(ZERO_BIT);
+    //Store carry flag.
+    uint8_t carryi = FLAG_CARRY ? 1 : 0;
+    uint8_t regi = Registers.AF.hi;
+
+    //Unset flag bits
     UNSET_FLAG_BIT(SUB_BIT);
     UNSET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(ZERO_BIT);
+    UNSET_FLAG_BIT(CARRY_BIT);
 
-    //MSB of the A register
-    uint8_t bit7 = MSB(Registers.AF.hi);
-    uint8_t cflag = FLAG_CARRY; //Carry at this point in time (not AFTER the shift)
 
-    if(bit7)
+    if(MSB(Registers.AF.hi) > 0)
         SET_FLAG_BIT(CARRY_BIT);
     else
         UNSET_FLAG_BIT(CARRY_BIT);
 
-    Registers.AF.hi <<= 1;
-    Registers.AF.hi |= cflag;
-    Clock.m = 1;
-    Clock.t =4;
-    Registers.PC.word++;
+
+    regi = (regi << 1) | carryi;
+
+    DbgOut(DBG_CPU, VERBOSE_2, "RL A. Aorig = 0x%x. Anow= 0x%x carryi = %i.", Registers.AF.hi, regi, carryi);
+    Registers.AF.hi = regi;
+
+    Clock.t = 1;
+    Clock.m = 4;
+    //Needs to be changed.
+    Registers.PC.word += 1;
 }
 
 //Jump relative by adding n bytes to the current program counter
