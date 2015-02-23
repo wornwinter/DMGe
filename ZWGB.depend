@@ -11256,7 +11256,7 @@
 
 1424614392 c:\users\darren\documents\github\dmge\include\macro.h
 
-1424697732 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
+1424705873 source:c:\users\darren\documents\github\dmge\src\dmgcpu.cpp
 	"DMGCPU.h"
 	"DMG_opcodes.h"
 	"debug.h"
@@ -11264,7 +11264,7 @@
 
 1424614392 c:\users\darren\documents\github\dmge\include\dmg_opcodes.h
 
-1424649870 source:c:\users\darren\documents\github\dmge\src\gameboy.cpp
+1424705865 source:c:\users\darren\documents\github\dmge\src\gameboy.cpp
 	"GameBoy.h"
 	"DMGCPU.h"
 	"GPU.h"
@@ -15106,7 +15106,7 @@
 	<stdlib.h>
 	<boost/thread/thread.hpp>
 
-1424695231 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
+1424705364 source:c:\users\darren\documents\github\dmge\src\mainframe.cpp
 	"mainFrame.h"
 	"canvas.h"
 	"logo.xpm"

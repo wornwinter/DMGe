@@ -1240,20 +1240,20 @@ void c_DMGCPU::OPCode0x2F()
 {
     SET_FLAG_BIT(SUB_BIT);
     SET_FLAG_BIT(HC_BIT);
-    Registers.AF.hi = !Registers.AF.hi; //Invert A
+    Registers.AF.hi = ~Registers.AF.hi; //Invert A
     DbgOut(DBG_CPU, VERBOSE_2, "CPL A");
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
 }
 
-//Jump relative by adding n-bytes to the Program Counter (signed) if the Carry flag is UNset
+//Jump relative by adding n-bytes to the Program Counter (signed) if the Carry flag is unset
 void c_DMGCPU::OPCode0x30()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "JR NC r8");
+    DbgOut(DBG_CPU, VERBOSE_2, "JR NC, r8");
     if(!FLAG_CARRY)
     {
-        Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1); //Signed 8-bit value
+        Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2; //Signed 8-bit value
         DbgOut(DBG_CPU, VERBOSE_2, "Carry bit not set. Jumping to 0x%x", Registers.PC.word);
         Clock.t = 12;
     }
@@ -1311,7 +1311,7 @@ void c_DMGCPU::OPCode0x34()
     else
         UNSET_FLAG_BIT(ZERO_BIT);
 
-    if(value > 0xF)
+    if((value & 0xF) == 0)
         SET_FLAG_BIT(HC_BIT);
     else
         UNSET_FLAG_BIT(HC_BIT);
@@ -1337,7 +1337,7 @@ void c_DMGCPU::OPCode0x35()
     else
         UNSET_FLAG_BIT(ZERO_BIT);
 
-    if(value > 0xF)
+    if((value & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
     else
         UNSET_FLAG_BIT(HC_BIT);
