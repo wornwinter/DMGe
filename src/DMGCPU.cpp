@@ -57,6 +57,14 @@ void c_DMGCPU::Tick()
             Registers.PC.word = 0x0040; //ISR is always at 0x0040 for vblank.
             IME = false;
         }
+        if(intfired & 0x80) //Serial Interupt
+        {
+            DbgOut(DBG_CPU, VERBOSE_2, "Interrupt: Calling SERIAL service routine.");
+            Registers.SP.word -= 2;
+            MMU->WriteWord(Registers.SP.word, Registers.PC.word);
+            Registers.PC.word = 0x0058;
+            IME = false;
+        }
     }
 
     if(running)
