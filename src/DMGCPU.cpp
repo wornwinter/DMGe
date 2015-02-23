@@ -141,7 +141,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x2A] = &c_DMGCPU::OPCode0x2A;
     OPCodes[0x2B] = &c_DMGCPU::OPCode0x2B;
     OPCodes[0x2C] = NULL;
-    OPCodes[0x2D] = NULL;
+    OPCodes[0x2D] = &c_DMGCPU::OPCode0x2D;
     OPCodes[0x2E] = &c_DMGCPU::OPCode0x2E;
     OPCodes[0x2F] = &c_DMGCPU::OPCode0x2F;
     OPCodes[0x30] = &c_DMGCPU::OPCode0x30;
@@ -152,9 +152,9 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x35] = NULL;
     OPCodes[0x36] = &c_DMGCPU::OPCode0x36;
     OPCodes[0x37] = &c_DMGCPU::OPCode0x37;
-    OPCodes[0x38] = NULL;
+    OPCodes[0x38] = &c_DMGCPU::OPCode0x38;
     OPCodes[0x39] = &c_DMGCPU::OPCode0x39;
-    OPCodes[0x3A] = NULL;
+    OPCodes[0x3A] = &c_DMGCPU::OPCode0x3A;
     OPCodes[0x3B] = NULL;
     OPCodes[0x3C] = &c_DMGCPU::OPCode0x3C;
     OPCodes[0x3D] = &c_DMGCPU::OPCode0x3D;
@@ -207,7 +207,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x6C] = NULL;
     OPCodes[0x6D] = NULL;
     OPCodes[0x6E] = NULL;
-    OPCodes[0x6F] = NULL;
+    OPCodes[0x6F] = &c_DMGCPU::OPCode0x6F;
     OPCodes[0x70] = NULL;
     OPCodes[0x71] = NULL;
     OPCodes[0x72] = NULL;
@@ -246,7 +246,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x93] = NULL;
     OPCodes[0x94] = NULL;
     OPCodes[0x95] = NULL;
-    OPCodes[0x96] = NULL;
+    OPCodes[0x96] = &c_DMGCPU::OPCode0x96;
     OPCodes[0x97] = &c_DMGCPU::OPCode0x97;
     OPCodes[0x98] = NULL;
     OPCodes[0x99] = NULL;
@@ -364,6 +364,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodesCB[0x11] = &c_DMGCPU::OPCodeCB0x11;
     OPCodesCB[0x17] = &c_DMGCPU::OPCodeCB0x17;
     OPCodesCB[0x37] = &c_DMGCPU::OPCodeCB0x37;
+    OPCodesCB[0x77] = &c_DMGCPU::OPCodeCB0x77;
     OPCodesCB[0x7C] = &c_DMGCPU::OPCodeCB0x7C;
 }
 
@@ -377,7 +378,7 @@ void c_DMGCPU::IllegalOperation(uint8_t opcode, bool iscb)
         DbgOut(DBG_CPU, VERBOSE_0, "Unknown opcode: 0xCB%x. PC: 0x%x", MMU->ReadByte(Registers.PC.word+1), Registers.PC.word);
     }
     else {
-        DbgOut(DBG_CPU, VERBOSE_0, "Unknown opcode/%s: 0x%x. PC: 0x%x", DMG_opcodes[MMU->ReadByte(Registers.PC.word)], MMU->ReadByte(Registers.PC.word), Registers.PC.word);
+        DbgOut(DBG_CPU, VERBOSE_0, "Unknown opcode: 0x%x. PC: 0x%x", MMU->ReadByte(Registers.PC.word), Registers.PC.word);
     }
 
     //Dump Registers.
@@ -1264,6 +1265,25 @@ void c_DMGCPU::OPCode0x37()
     Registers.PC.word++;
 }
 
+//Relative jump if carry flag is set. Add immediate (signed) value to PC.
+void c_DMGCPU::OPCode0x38()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "JR C, d8");
+    if(FLAG_CARRY)
+    {
+        //Zero flag is set. Jump.
+        Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2;
+        DbgOut(DBG_CPU, VERBOSE_2, "Carry bit set. Jumping to 0x%x", Registers.PC.word);
+        Clock.t = 12;
+    }
+    else {
+        Registers.PC.word += 2;
+        DbgOut(DBG_CPU, VERBOSE_2, "Carry bit not set, not jumping.");
+        Clock.t = 8;
+    }
+    Clock.m = 2;
+}
+
 //Add SP to HL.
 void c_DMGCPU::OPCode0x39()
 {
@@ -1283,6 +1303,17 @@ void c_DMGCPU::OPCode0x39()
 
     Clock.m = 2;
     Clock.t = 16;
+    Registers.PC.word++;
+}
+
+//Load value pointed to by HL into A then decrement HL.
+void c_DMGCPU::OPCode0x3A()
+{
+    Registers.AF.hi = MMU->ReadByte(Registers.HL.word);
+    DbgOut(DBG_CPU, VERBOSE_2, "LD A, (HL-), A = 0x%x", Registers.AF.hi);
+    Registers.HL.word--;
+    Clock.m = 1;
+    Clock.t = 8;
     Registers.PC.word++;
 }
 
@@ -1421,6 +1452,16 @@ void c_DMGCPU::OPCode0x67()
     Registers.PC.word++;
 }
 
+//Load A into L.
+void c_DMGCPU::OPCode0x6F()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD L, A");
+    Registers.HL.lo = Registers.AF.hi;
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //Store 8-bit value in register A into pointer HL.
 void c_DMGCPU::OPCode0x77()
 {
@@ -1500,6 +1541,36 @@ void c_DMGCPU::OPCode0x90()
     Registers.PC.word++;
 }
 
+//Subtract value stored in (HL) from A.
+void c_DMGCPU::OPCode0x96()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "SUB (HL)");
+
+    uint8_t operand = MMU->ReadByte(Registers.HL.word);
+
+    if((Registers.AF.hi - operand) < 0)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
+
+    if(((Registers.AF.hi - operand) & 0xF) > (Registers.AF.hi & 0xF))
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    if(Registers.AF.hi - operand == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    SET_FLAG_BIT(SUB_BIT);
+
+    Registers.AF.hi -= operand;
+
+    Clock.m = 1;
+    Clock.t = 8;
+    Registers.PC.word++;
+}
 //Subtract A from A, then store in A.
 void c_DMGCPU::OPCode0x97()
 {
@@ -2282,6 +2353,23 @@ void c_DMGCPU::OPCodeCB0x37()
     Registers.PC.word += 2;
 }
 
+//Test bit 6 of A register.
+void c_DMGCPU::OPCodeCB0x77()
+{
+    DbgOut(DBG_CPU, VERBOSE_2,  "BIT 6, A.");
+
+    if(!(Registers.AF.hi & 0x40))
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    SET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(SUB_BIT);
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word += 2; //2 bytes, as this is a 2-byte opcode.
+}
+
 //Test bit 7(msb) of E register. Reset N. Set Z flag if bit is zero. Set H.
 void c_DMGCPU::OPCodeCB0x7C()
 {
@@ -2298,3 +2386,4 @@ void c_DMGCPU::OPCodeCB0x7C()
     Clock.t = 8;
     Registers.PC.word += 2; //2 bytes, as this is a 2-byte opcode.
 }
+
