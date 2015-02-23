@@ -943,10 +943,10 @@ void c_DMGCPU::OPCode0x1F()
     else
         UNSET_FLAG_BIT(CARRY_BIT);
 
-    Registers.AF.hi >>= 1;
+    Registers.AF.hi  = Registers.AF.hi >> 1;
     Registers.AF.hi |= cflag << 7;
     Clock.m = 1;
-    Clock.t =4;
+    Clock.t = 4;
     Registers.PC.word++;
 }
 
@@ -1014,12 +1014,12 @@ void c_DMGCPU::OPCode0x24()
     else
         UNSET_FLAG_BIT(ZERO_BIT);
 
-    if(result > 0xF)
+    if((result & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
     else
         UNSET_FLAG_BIT(HC_BIT);
 
-    if((Registers.HL.hi + 1 > 0xFF))
+    if((Registers.HL.hi + 1) > 0xFF)
         SET_FLAG_BIT(CARRY_BIT);
     else
         UNSET_FLAG_BIT(CARRY_BIT);
@@ -1036,7 +1036,7 @@ void c_DMGCPU::OPCode0x25()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "DEC H");
 
-    UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition
+    SET_FLAG_BIT(SUB_BIT); //We are performing a subtraction.
 
     uint8_t result = Registers.HL.hi - 1;
 
@@ -1045,7 +1045,7 @@ void c_DMGCPU::OPCode0x25()
     else
         UNSET_FLAG_BIT(ZERO_BIT);
 
-    if(result > 0xF)
+    if((result & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
     else
         UNSET_FLAG_BIT(HC_BIT);
@@ -1072,12 +1072,35 @@ void c_DMGCPU::OPCode0x27()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "DAA (Decimal Adjust A)");
 
+    uint8_t a = Registers.AF.hi;
+
+    if(FLAG_SUB)
+    {
+        if(FLAG_HC)
+            a = (a - 0x06) & 0xFF;
+        if(FLAG_CARRY)
+            a -= 0x60;
+    }
+    else
+    {
+        if(FLAG_HC || (a & 0xF) > 9)
+            a += 0x06;
+        if(FLAG_CARRY || a > 0x9F)
+            a += 0x60;
+    }
+
+    Registers.AF.hi = a;
     UNSET_FLAG_BIT(HC_BIT);
 
-    if(FLAG_SUB == 0) //Only do this for addition
-    {
+    if(!Registers.AF.hi)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
 
-    }
+    if(a >= 0x100)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
     Clock.m = 1;
     Clock.t = 4;
@@ -1108,25 +1131,28 @@ void c_DMGCPU::OPCode0x29()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "ADD HL, HL");
 
-    UNSET_FLAG_BIT(SUB_BIT); //We are perfoming an instruction
+    UNSET_FLAG_BIT(SUB_BIT);
 
-    if(Registers.HL.word + Registers.HL.word > 0xFF)
+    if((Registers.HL.word + Registers.HL.word) > 0xFFFF)
         SET_FLAG_BIT(CARRY_BIT);
 
-    if(Registers.HL.word + Registers.HL.word > 0xF)
-        SET_FLAG_BIT(CARRY_BIT);
+    if((Registers.HL.word + Registers.HL.word) > 0xFF)
+        SET_FLAG_BIT(HC_BIT);
 
     Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word += 2; //2 byte instruction
 }
 
-//Load value pointed to by HLI into A
+//Load value pointed to by HL into A, then increment HL.
 void c_DMGCPU::OPCode0x2A()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "LD A, (HLI)");
+    DbgOut(DBG_CPU, VERBOSE_2, "LD A, (HL+)");
 
-    Registers.AF.hi = MMU->ReadByte(Registers.HL.word + 1);
+    Registers.AF.hi = MMU->ReadByte(Registers.HL.word);
+
+    Registers.HL.word++;
+
     Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word++; //1 byte instruction
@@ -1138,8 +1164,9 @@ void c_DMGCPU::OPCode0x2B()
     DbgOut(DBG_CPU, VERBOSE_2, "DEC HL");
 
     Registers.HL.word--;
-    Clock.m = 2;
+    Clock.m = 1;
     Clock.t = 8;
+
     Registers.PC.word++;
 }
 
@@ -1157,7 +1184,7 @@ void c_DMGCPU::OPCode0x2C()
     else
         UNSET_FLAG_BIT(ZERO_BIT);
 
-    if(result > 0xF)
+    if((result & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
     else
         UNSET_FLAG_BIT(HC_BIT);
@@ -1177,7 +1204,12 @@ void c_DMGCPU::OPCode0x2C()
 //Decrement L
 void c_DMGCPU::OPCode0x2D()
 {
-    SET_FLAG_BIT(SUB_BIT); //We are performing an addition!
+    SET_FLAG_BIT(SUB_BIT);
+
+    if((Registers.HL.lo & 0xF) == 0xF)
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
     Registers.HL.lo--;
 
@@ -1187,11 +1219,6 @@ void c_DMGCPU::OPCode0x2D()
         SET_FLAG_BIT(ZERO_BIT);
     else
         UNSET_FLAG_BIT(ZERO_BIT);
-
-    if(Registers.HL.lo > 0xF)
-        SET_FLAG_BIT(HC_BIT);
-    else
-        UNSET_FLAG_BIT(HC_BIT);
 
     Clock.m = 1;
     Clock.t = 4;

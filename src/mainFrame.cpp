@@ -46,9 +46,9 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
     //gameboy = new c_GameBoy("roms/opus5.gb", glCanvas);
     //gameboy = new c_GameBoy("roms/SPACE.GB", glCanvas);
-    //gameboy = new c_GameBoy("roms/tetris.gb", glCanvas);
-    //gameboy = new c_GameBoy("roms/instr_timing.gb", glCanvas);
     gameboy = new c_GameBoy("roms/tetris.gb", glCanvas);
+    //gameboy = new c_GameBoy("roms/instr_timing.gb", glCanvas);
+    //gameboy = new c_GameBoy("roms/tetris.gb", glCanvas);
 
     gameboy->pause = true;
 
