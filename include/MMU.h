@@ -31,9 +31,6 @@ class c_MMU {
 
         uint8_t activerombank = 1;
         bool biosmapped = false;
-
-        void faulthandler(uint16_t faultaddr);
-
         c_GPU* GPU;
 
     public:
