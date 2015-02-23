@@ -123,7 +123,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x14] = &c_DMGCPU::OPCode0x14;
     OPCodes[0x15] = &c_DMGCPU::OPCode0x15;
     OPCodes[0x16] = &c_DMGCPU::OPCode0x16;
-    OPCodes[0x17] = &c_DMGCPU::OPCodeCB0x17;
+    OPCodes[0x17] = &c_DMGCPU::OPCode0x17;
     OPCodes[0x18] = &c_DMGCPU::OPCode0x18;
     OPCodes[0x19] = &c_DMGCPU::OPCode0x19;
     OPCodes[0x1A] = &c_DMGCPU::OPCode0x1A;
