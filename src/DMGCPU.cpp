@@ -15,7 +15,6 @@ c_DMGCPU::c_DMGCPU(c_MMU* pMMU)
     //Use this for testing roms without the BIOS.
     //Registers.PC.word = 0x0100; //Skips that huge loop at the start for debugging purposes.
     //Registers.SP.word = 0xFFFE;
-    //MMU->MapBIOS(false);
 #endif // _DEBUG
 
 }
@@ -34,7 +33,11 @@ uint32_t c_DMGCPU::GetClock()
 //Run one instruction.
 void c_DMGCPU::Tick()
 {
-    if((Registers.PC.word > 0x100) && running)
+    if(MMU->ReadByte(Registers.PC.word) == 0xEF)
+    {
+        printinst = true;
+    }
+    if(printinst)
     {
         //We're running the ROM, so do debugging stuff here.
         //DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
@@ -1853,7 +1856,7 @@ void c_DMGCPU::OPCode0xC5()
     MMU->WriteWord(Registers.SP.word, Registers.BC.word);
 
     Clock.m = 1;
-    Clock.t = 4;
+    Clock.t = 16;
     Registers.PC.word++;
 }
 
@@ -1966,14 +1969,14 @@ void c_DMGCPU::OPCode0xE2()
 //RST 28h. Push Present address to stack and jump to $0000 + 28
 void c_DMGCPU::OPCode0xEF()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "RST 28");
+    DbgOut(DBG_CPU, VERBOSE_2, "RST 28H");
     //Here we go...
     //Decrement Stack pointer
     Registers.SP.word -= 2;
-    MMU->WriteWord(Registers.SP.word, Registers.PC.word); //Write current Adddress to stack
+    MMU->WriteWord(Registers.SP.word, Registers.PC.word); //Write current Address to stack
     Clock.m = 4;
     Clock.t = 16;
-    Registers.PC.word = (0x0000 + 0x28);
+    Registers.PC.word = 0x0028;
 }
 
 //Return from function.
@@ -2131,25 +2134,19 @@ void c_DMGCPU::OPCode0xF3()
     Registers.PC.word++;
 }
 
-//OR A with immediate 8-bit value,store result in A
+//Push AF onto the stack.
 void c_DMGCPU::OPCode0xF5()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "OR d8");
+    DbgOut(DBG_CPU, VERBOSE_2, "PUSH AF");
 
-    UNSET_FLAG_BIT(SUB_BIT);
-    UNSET_FLAG_BIT(CARRY_BIT);
-    UNSET_FLAG_BIT(HC_BIT);
-    //OR A with d8
-    Registers.AF.hi |= MMU->ReadByte(Registers.PC.word++);
-
-    if(!(Registers.AF.hi & 0xFF))
-        SET_FLAG_BIT(ZERO_BIT);
-    else
-        UNSET_FLAG_BIT(ZERO_BIT);
+    //Increment the stackpointer DOWNWARDS
+    Registers.SP.word -= 2;
+    //Push AF onto the stack according to where the stackpointer is
+    MMU->WriteWord(Registers.SP.word, Registers.AF.word);
 
     Clock.m = 1;
-    Clock.t = 8;
-    Registers.PC.word += 2;
+    Clock.t = 16;
+    Registers.PC.word++;
 }
 
 //Load data at immediate address into A.

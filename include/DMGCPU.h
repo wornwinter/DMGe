@@ -80,6 +80,7 @@ private:
     bool running = true;
     bool IME = true;
 
+    bool printinst = false;
     //OPCODES
     void OPCode0x00();
     void OPCode0x01();
