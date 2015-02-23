@@ -159,20 +159,20 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x3C] = &c_DMGCPU::OPCode0x3C;
     OPCodes[0x3D] = &c_DMGCPU::OPCode0x3D;
     OPCodes[0x3E] = &c_DMGCPU::OPCode0x3E;
-    OPCodes[0x3F] = NULL;
-    OPCodes[0x40] = NULL;
-    OPCodes[0x41] = NULL;
-    OPCodes[0x42] = NULL;
-    OPCodes[0x43] = NULL;
-    OPCodes[0x44] = NULL;
-    OPCodes[0x45] = NULL;
-    OPCodes[0x46] = NULL;
+    OPCodes[0x3F] = &c_DMGCPU::OPCode0x3F;
+    OPCodes[0x40] = &c_DMGCPU::OPCode0x40;
+    OPCodes[0x41] = &c_DMGCPU::OPCode0x41;
+    OPCodes[0x42] = &c_DMGCPU::OPCode0x42;
+    OPCodes[0x43] = &c_DMGCPU::OPCode0x43;
+    OPCodes[0x44] = &c_DMGCPU::OPCode0x44;
+    OPCodes[0x45] = &c_DMGCPU::OPCode0x45;
+    OPCodes[0x46] = &c_DMGCPU::OPCode0x46;
     OPCodes[0x47] = &c_DMGCPU::OPCode0x47;
-    OPCodes[0x48] = NULL;
-    OPCodes[0x49] = NULL;
+    OPCodes[0x48] = &c_DMGCPU::OPCode0x48;
+    OPCodes[0x49] = &c_DMGCPU::OPCode0x49;
     OPCodes[0x4A] = &c_DMGCPU::OPCode0x4A;
-    OPCodes[0x4B] = NULL;
-    OPCodes[0x4C] = NULL;
+    OPCodes[0x4B] = &c_DMGCPU::OPCode0x4B;
+    OPCodes[0x4C] = &c_DMGCPU::OPCode0x4C;
     OPCodes[0x4D] = NULL;
     OPCodes[0x4E] = NULL;
     OPCodes[0x4F] = &c_DMGCPU::OPCode0x4F;
@@ -1451,7 +1451,7 @@ void c_DMGCPU::OPCode0x3F()
     DbgOut(DBG_CPU, VERBOSE_2, "CCF");
     if(FLAG_CARRY)
     {
-        DbgOut(DBG_CPU, VERBOSE_2, "Carry bit set! Restting it...")
+        DbgOut(DBG_CPU, VERBOSE_2, "Carry bit set! Restting it...");
         UNSET_FLAG_BIT(CARRY_BIT);
 
     }
@@ -1465,12 +1465,131 @@ void c_DMGCPU::OPCode0x3F()
     Registers.PC.word++;
 }
 
+//Load B into B
+void c_DMGCPU::OPCode0x40()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "LD B, B");
+    Registers.BC.hi = Registers.BC.hi;
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load C into B
+void c_DMGCPU::OPCode0x41()
+{
+    Registers.BC.hi = Registers.BC.lo;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD B, C. B = 0x%x", Registers.BC.hi);
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load D into B
+void c_DMGCPU::OPCode0x42()
+{
+    Registers.BC.hi = Registers.DE.hi;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD B, D. B = 0x%x", Registers.BC.hi);
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load E into B
+void c_DMGCPU::OPCode0x43()
+{
+    Registers.BC.hi = Registers.DE.lo;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD B, E. B = 0x%x", Registers.BC.hi);
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load H into B
+void c_DMGCPU::OPCode0x44()
+{
+    Registers.BC.hi = Registers.HL.hi;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD B, H. B = 0x%x", Registers.BC.hi);
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load L into B
+void c_DMGCPU::OPCode0x45()
+{
+    Registers.BC.hi = Registers.HL.lo;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD B, L. B = 0x%x", Registers.BC.hi);
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load value pointed to by HL into B
+void c_DMGCPU::OPCode0x46()
+{
+    Registers.BC.hi = MMU->ReadByte(Registers.HL.word);
+    DbgOut(DBG_CPU, VERBOSE_2, "LD B, (HL). B = 0x%x", Registers.BC.hi);
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //Load A into B
 void c_DMGCPU::OPCode0x47()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "LD B, A");
     Registers.BC.hi = Registers.AF.hi;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD B, A. B = 0x%x", Registers.BC.hi);
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
 
+//Load B into C
+void c_DMGCPU::OPCode0x48()
+{
+    Registers.BC.lo = Registers.BC.hi;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD C, B. C = 0x%x", Registers.BC.lo);
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load C into C
+void c_DMGCPU::OPCode0x49()
+{
+    Registers.BC.lo = Registers.BC.lo;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD C, C. C = 0x%x", Registers.BC.lo);
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load D into C
+void c_DMGCPU::OPCode0x4A()
+{
+    Registers.BC.lo = Registers.DE.hi;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD C, D. C = 0x%x", Registers.BC.lo);
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load E into C
+void c_DMGCPU::OPCode0x4B()
+{
+    Registers.BC.lo = Registers.DE.lo;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD C, E. C = 0x%x", Registers.BC.lo);
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//Load H into C
+void c_DMGCPU::OPCode0x4C()
+{
+    Registers.BC.lo = Registers.HL.hi;
+    DbgOut(DBG_CPU, VERBOSE_2, "LD C, H. C = 0x%x", Registers.BC.lo);
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
@@ -1689,16 +1808,6 @@ void c_DMGCPU::OPCode0x4F()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "LD C, A");
     Registers.BC.lo = Registers.AF.hi;
-    Clock.m = 1;
-    Clock.t = 4;
-    Registers.PC.word++;
-}
-
-//Load D into C.
-void c_DMGCPU::OPCode0x4A()
-{
-    DbgOut(DBG_CPU, VERBOSE_2, "LD C, D");
-    Registers.BC.lo = Registers.DE.hi;
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;
