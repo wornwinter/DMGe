@@ -768,26 +768,32 @@ void c_DMGCPU::OPCode0x16()
 //Rotate A left. Bit 7 to Carry, Carry bit to Bit 0
 void c_DMGCPU::OPCode0x17()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "RLA");
-    //Unset Flag bits
-    UNSET_FLAG_BIT(ZERO_BIT);
+    //Store carry flag.
+    uint8_t carryi = FLAG_CARRY ? 1 : 0;
+    uint8_t regi = Registers.AF.hi;
+
+    //Unset flag bits
     UNSET_FLAG_BIT(SUB_BIT);
     UNSET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(ZERO_BIT);
+    UNSET_FLAG_BIT(CARRY_BIT);
 
-    //MSB of the A register
-    uint8_t bit7 = MSB(Registers.AF.hi);
-    uint8_t cflag = FLAG_CARRY; //Carry at this point in time (not AFTER the shift)
 
-    if(bit7)
+    if(MSB(Registers.AF.hi) > 0)
         SET_FLAG_BIT(CARRY_BIT);
     else
         UNSET_FLAG_BIT(CARRY_BIT);
 
-    Registers.AF.hi <<= 1;
-    Registers.AF.hi |= cflag;
-    Clock.m = 1;
-    Clock.t =4;
-    Registers.PC.word++;
+
+    regi = (regi << 1) | carryi;
+
+    DbgOut(DBG_CPU, VERBOSE_2, "RL A. Aorig = 0x%x. Anow= 0x%x carryi = %i.", Registers.AF.hi, regi, carryi);
+    Registers.AF.hi = regi;
+
+    Clock.t = 1;
+    Clock.m = 4;
+    //Needs to be changed.
+    Registers.PC.word += 1;
 }
 
 //Jump relative by adding n bytes to the current program counter
