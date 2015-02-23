@@ -33,14 +33,21 @@ uint32_t c_DMGCPU::GetClock()
 //Run one instruction.
 void c_DMGCPU::Tick()
 {
-    if(MMU->ReadByte(Registers.PC.word) == 0xEF)
+    if(Registers.PC.word == 0x0284)
+    //if(Registers.PC.word == 0x0100)
     {
+        //DbgOut(DBG_CPU, VERBOSE_0, "First opcode: 0x%x", MMU->ReadByte(Registers.PC.word));
         printinst = true;
     }
+    else
+    {
+        printinst = false;
+    }
+
     if(printinst)
     {
         //We're running the ROM, so do debugging stuff here.
-        //DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
+        DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
     }
 
     if(IME && running)
@@ -2282,7 +2289,7 @@ void c_DMGCPU::OPCode0xA7()
     UNSET_FLAG_BIT(HC_BIT);
 
     Registers.AF.hi &= Registers.AF.hi;
-    DbgOut(DBG_CPU, VERBOSE_2, "AND A. A = 0x%x", Registers.AF.hi);
+    DbgOut(DBG_CPU, VERBOSE_2, "AND A. Result = 0x%x", Registers.AF.hi);
 
     if(Registers.AF.hi == 0)
         SET_FLAG_BIT(ZERO_BIT);

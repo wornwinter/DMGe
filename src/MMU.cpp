@@ -80,8 +80,6 @@ uint8_t c_MMU::ReadByte(uint16_t addr)
                     case 0xF00:
                         if(addr == 0xFFFF)
                             return intenable;
-                        else if(addr >= 0xFF80)
-                            return zram[addr & 0x7F];
                         else
                         {
                             //IO
@@ -96,6 +94,17 @@ uint8_t c_MMU::ReadByte(uint16_t addr)
                                 //GPU
                                 case 0x40: case 0x50: case 0x60: case 0x70:
                                     return GPU->ReadReg(addr);
+                                break;
+
+                                case 0x80:
+                                case 0x90:
+                                case 0xA0:
+                                case 0xB0:
+                                case 0xC0:
+                                case 0xD0:
+                                case 0xE0:
+                                case 0xF0:
+                                    return zram[addr & 0x7F];
                                 break;
 
                             }
@@ -187,8 +196,6 @@ void c_MMU::WriteByte(uint16_t addr, uint8_t data)
                         {
                             intenable = data;
                         }
-                        else if(addr >= 0xFF80)
-                            zram[addr & 0x7F] = data;
                         else
                         {
                             //IO.
@@ -216,6 +223,17 @@ void c_MMU::WriteByte(uint16_t addr, uint8_t data)
                                         //gpu->WriteByte(addr, data);
                                         GPU->WriteReg(addr, data);
                                     }
+                                break;
+
+                                case 0x80:
+                                case 0x90:
+                                case 0xA0:
+                                case 0xB0:
+                                case 0xC0:
+                                case 0xD0:
+                                case 0xE0:
+                                case 0xF0:
+                                    zram[addr & 0x7F] = data;
                                 break;
                             }
                         }
