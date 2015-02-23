@@ -131,7 +131,7 @@ void c_GPU::UpdateTile(uint16_t addr, uint8_t data)
     uint16_t tileindex = (addrtrans >> 4);
     uint8_t y = (addrtrans >> 1) & 7;
 
-    DbgOut(DBG_CPU, VERBOSE_1, "Updating tile: %i. Line: %i", tileindex, y);
+    DbgOut(DBG_CPU, VERBOSE_0, "Updating tile: %i. Line: %i", tileindex, y);
 
     uint8_t sx, x;
 
