@@ -37,7 +37,7 @@ void c_DMGCPU::Tick()
     //if(Registers.PC.word == 0x0100)
     {
         //DbgOut(DBG_CPU, VERBOSE_0, "First opcode: 0x%x", MMU->ReadByte(Registers.PC.word));
-        printinst = true;
+        //printinst = true;
     }
     else
     {
@@ -470,15 +470,10 @@ void c_DMGCPU::OPCode0x04()
 
     UNSET_FLAG_BIT(SUB_BIT);
 
-    if((result & 0xF) > 0xF)
+    if((Registers.BC.hi & 0xF) == 0xF)
         SET_FLAG_BIT(FLAG_HC);
     else
         UNSET_FLAG_BIT(FLAG_HC);
-
-    if((Registers.BC.hi + 1) > 0xFF)
-        SET_FLAG_BIT(FLAG_CARRY);
-    else
-        UNSET_FLAG_BIT(FLAG_CARRY);
 
     Registers.BC.hi = result;
 
@@ -523,18 +518,21 @@ void c_DMGCPU::OPCode0x06()
 //Rotate A left through Carry bit (Bit 7 to carry and Carry bit)
 void c_DMGCPU::OPCode0x07()
 {
+    uint8_t carryi = (FLAG_CARRY ? 1 : 0);
+
     UNSET_FLAG_BIT(SUB_BIT);
     UNSET_FLAG_BIT(ZERO_BIT);
     UNSET_FLAG_BIT(HC_BIT);
     UNSET_FLAG_BIT(CARRY_BIT);
+
 
     if(MSB(Registers.AF.hi))
         SET_FLAG_BIT(CARRY_BIT);
     else
         UNSET_FLAG_BIT(CARRY_BIT);
 
-    Registers.AF.hi <<= 1;
-    Registers.AF.hi |= (Registers.AF.lo & CARRY_BIT) >> 4;
+    Registers.AF.hi = Registers.AF.hi << 1;
+    Registers.AF.hi |= carryi;
 
     Clock.m = 1;
     Clock.t = 4;
@@ -555,10 +553,10 @@ void c_DMGCPU::OPCode0x09()
 {
     UNSET_FLAG_BIT(SUB_BIT);
 
-    if(Registers.HL.word + Registers.BC.word > 0xFF)
+    if((Registers.HL.word + Registers.BC.word) >= 0x10000)
         SET_FLAG_BIT(CARRY_BIT);
 
-    if(Registers.HL.word + Registers.BC.word > 0x0F)
+    if(((Registers.HL.word + Registers.BC.word) & 0xFFF) < (Registers.HL.word & 0xFFF))
         SET_FLAG_BIT(HC_BIT);
 
     Registers.HL.word += Registers.BC.word;
@@ -602,15 +600,10 @@ void c_DMGCPU::OPCode0x0C()
 
     UNSET_FLAG_BIT(SUB_BIT);
 
-    if((result & 0xF) > 0xF)
+    if((result & 0xF) == 0)
         SET_FLAG_BIT(FLAG_HC);
     else
         UNSET_FLAG_BIT(FLAG_HC);
-
-    if((Registers.BC.lo + 1) > 0xFF)
-        SET_FLAG_BIT(FLAG_CARRY);
-    else
-        UNSET_FLAG_BIT(FLAG_CARRY);
 
     Registers.BC.lo = result;
 
@@ -625,12 +618,12 @@ void c_DMGCPU::OPCode0x0D()
     DbgOut(DBG_CPU, VERBOSE_2, "DEC C");
     SET_FLAG_BIT(SUB_BIT);
 
-    Registers.BC.lo--;
-
     if((Registers.BC.lo & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
     else
         UNSET_FLAG_BIT(HC_BIT);
+
+    Registers.BC.lo--;
 
     if(Registers.BC.lo == 0)
         SET_FLAG_BIT(ZERO_BIT);
@@ -652,21 +645,23 @@ void c_DMGCPU::OPCode0x0E()
     Registers.PC.word += 2;
 }
 
-//Rotate A right through Carry bit (Bit 7 to carry and Carry bit)
+//Rotate A right. Store old bit 0 in carry.
 void c_DMGCPU::OPCode0x0F()
 {
+    DbgOut(DBG_CPU, VERBOSE_2, "RRCA");
     UNSET_FLAG_BIT(SUB_BIT);
     UNSET_FLAG_BIT(ZERO_BIT);
     UNSET_FLAG_BIT(HC_BIT);
-    UNSET_FLAG_BIT(CARRY_BIT);
 
     if(LSB(Registers.AF.hi))
         SET_FLAG_BIT(CARRY_BIT);
     else
         UNSET_FLAG_BIT(CARRY_BIT);
 
-    Registers.AF.hi >>= 1;
-    Registers.AF.hi |= (Registers.AF.lo & CARRY_BIT) << 3;
+    uint8_t carryn = (FLAG_CARRY ? 1 : 0);
+
+    Registers.AF.hi = Registers.AF.hi >> 1;
+    Registers.AF.hi |= (carryn << 7);
 
     Clock.m = 1;
     Clock.t = 4;
@@ -728,14 +723,15 @@ void c_DMGCPU::OPCode0x13()
 void c_DMGCPU::OPCode0x14()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "INC D");
-    SET_FLAG_BIT(SUB_BIT);
-
-    Registers.DE.hi++;
+    UNSET_FLAG_BIT(SUB_BIT);
 
     if((Registers.DE.hi & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
     else
         UNSET_FLAG_BIT(HC_BIT);
+
+
+    Registers.DE.hi++;
 
     if(Registers.DE.hi == 0)
         SET_FLAG_BIT(ZERO_BIT);
@@ -784,7 +780,7 @@ void c_DMGCPU::OPCode0x16()
 void c_DMGCPU::OPCode0x17()
 {
     //Store carry flag.
-    uint8_t carryi = FLAG_CARRY ? 1 : 0;
+    uint8_t carryi = (FLAG_CARRY ? 1 : 0);
     uint8_t regi = Registers.AF.hi;
 
     //Unset flag bits
@@ -815,10 +811,9 @@ void c_DMGCPU::OPCode0x17()
 void c_DMGCPU::OPCode0x18()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "JR r8");
-    Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1); //Signed 8-bit value
+    Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2; //Signed 8-bit value
     Clock.m = 3;
     Clock.t = 4;
-    Registers.PC.word += 2; //2 byte instruction
 }
 
 //Add DE to HL, store in HL
@@ -828,13 +823,19 @@ void c_DMGCPU::OPCode0x19()
 
     UNSET_FLAG_BIT(SUB_BIT);
 
-    //Check for overflow before the actual addition
-    if(Registers.HL.word + Registers.DE.word >= 0xFF)
+    uint16_t result = Registers.HL.word + Registers.DE.word;
+
+    if((result & 0xFFF) < (Registers.HL.word & 0xFFF));
+
+    Registers.HL.word = result;
+
+    if((Registers.HL.word + Registers.DE.word) > 0xFFFF)
         SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
-    if(Registers.HL.word + Registers.DE.word > 0xF)
-        SET_FLAG_BIT(HC_BIT);
-
+    Clock.m = 1;
+    Clock.t = 8;
     Registers.PC.word++; //1 byte instruction
 }
 
@@ -872,7 +873,7 @@ void c_DMGCPU::OPCode0x1C()
     else
         UNSET_FLAG_BIT(ZERO_BIT);
 
-    if((Registers.DE.lo + 1) > 0xF)
+    if((result & 0xF) == 0xF)
         SET_FLAG_BIT(HC_BIT);
     else
         UNSET_FLAG_BIT(HC_BIT);
@@ -2285,8 +2286,8 @@ void c_DMGCPU::OPCode0xA1()
 void c_DMGCPU::OPCode0xA7()
 {
     UNSET_FLAG_BIT(CARRY_BIT);
-    SET_FLAG_BIT(SUB_BIT);
-    UNSET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(SUB_BIT);
+    SET_FLAG_BIT(HC_BIT);
 
     Registers.AF.hi &= Registers.AF.hi;
     DbgOut(DBG_CPU, VERBOSE_2, "AND A. Result = 0x%x", Registers.AF.hi);
