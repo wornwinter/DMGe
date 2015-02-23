@@ -140,22 +140,22 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x29] = &c_DMGCPU::OPCode0x29;
     OPCodes[0x2A] = &c_DMGCPU::OPCode0x2A;
     OPCodes[0x2B] = &c_DMGCPU::OPCode0x2B;
-    OPCodes[0x2C] = NULL;
+    OPCodes[0x2C] = &c_DMGCPU::OPCode0x2C;
     OPCodes[0x2D] = &c_DMGCPU::OPCode0x2D;
     OPCodes[0x2E] = &c_DMGCPU::OPCode0x2E;
     OPCodes[0x2F] = &c_DMGCPU::OPCode0x2F;
     OPCodes[0x30] = &c_DMGCPU::OPCode0x30;
     OPCodes[0x31] = &c_DMGCPU::OPCode0x31;
     OPCodes[0x32] = &c_DMGCPU::OPCode0x32;
-    OPCodes[0x33] = NULL;
-    OPCodes[0x34] = NULL;
-    OPCodes[0x35] = NULL;
+    OPCodes[0x33] = &c_DMGCPU::OPCode0x33;
+    OPCodes[0x34] = &c_DMGCPU::OPCode0x34;
+    OPCodes[0x35] = &c_DMGCPU::OPCode0x35;
     OPCodes[0x36] = &c_DMGCPU::OPCode0x36;
     OPCodes[0x37] = &c_DMGCPU::OPCode0x37;
     OPCodes[0x38] = &c_DMGCPU::OPCode0x38;
     OPCodes[0x39] = &c_DMGCPU::OPCode0x39;
     OPCodes[0x3A] = &c_DMGCPU::OPCode0x3A;
-    OPCodes[0x3B] = NULL;
+    OPCodes[0x3B] = &c_DMGCPU::OPCode0x3B;
     OPCodes[0x3C] = &c_DMGCPU::OPCode0x3C;
     OPCodes[0x3D] = &c_DMGCPU::OPCode0x3D;
     OPCodes[0x3E] = &c_DMGCPU::OPCode0x3E;
@@ -1243,6 +1243,58 @@ void c_DMGCPU::OPCode0x33()
     Registers.PC.word++;
 }
 
+//Increment value pointed to by HL
+void c_DMGCPU::OPCode0x34()
+{
+    UNSET_FLAG_BIT(SUB_BIT);
+
+    uint8_t value = MMU->ReadByte(Registers.HL.word);
+    value++;
+    DbgOut(DBG_CPU, VERBOSE_2, "INC (HL) (HL) = 0x%x", value);
+
+    if(value == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    if(value > 0xF)
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    MMU->WriteByte(Registers.HL.word, value);
+
+    Clock.m = 3;
+    Clock.t = 12;
+    Registers.PC.word++;
+}
+
+//Decrement Value pointed to by HL
+void c_DMGCPU::OPCode0x35()
+{
+    UNSET_FLAG_BIT(SUB_BIT);
+
+    uint8_t value = MMU->ReadByte(Registers.HL.word);
+    value--;
+    DbgOut(DBG_CPU, VERBOSE_2, "DEC (HL) (HL) = 0x%x", value);
+
+    if(value == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    if(value > 0xF)
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    MMU->WriteByte(Registers.HL.word, value);
+
+    Clock.m = 3;
+    Clock.t = 12;
+    Registers.PC.word++;
+}
+
 //Load immediate 8-bit value into pointer HL.
 void c_DMGCPU::OPCode0x36()
 {
@@ -1317,6 +1369,16 @@ void c_DMGCPU::OPCode0x3A()
     Registers.PC.word++;
 }
 
+//Decrement Stack pointer
+void c_DMGCPU::OPCode0x3B()
+{
+    Registers.SP.word++;
+    DbgOut(DBG_CPU, VERBOSE_2, "INC SP, SP = 0x%x", Registers.SP.word);
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word++;
+}
+
 //Increment A
 void c_DMGCPU::OPCode0x3C()
 {
@@ -1379,6 +1441,28 @@ void c_DMGCPU::OPCode0x3E()
     Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word += 2;
+}
+
+//Compliment the carry flag, if it's set, reset it, if not set it
+void c_DMGCPU::OPCode0x3F()
+{
+    UNSET_FLAG_BIT(SUB_BIT);
+    UNSET_FLAG_BIT(HC_BIT);
+    DbgOut(DBG_CPU, VERBOSE_2, "CCF");
+    if(FLAG_CARRY)
+    {
+        DbgOut(DBG_CPU, VERBOSE_2, "Carry bit set! Restting it...")
+        UNSET_FLAG_BIT(CARRY_BIT);
+
+    }
+    else{
+        DbgOut(DBG_CPU, VERBOSE_2, "Carry bit not set! Setting...");
+        SET_FLAG_BIT(CARRY_BIT);
+    }
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
 }
 
 //Load A into B
