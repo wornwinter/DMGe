@@ -257,7 +257,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x96] = &c_DMGCPU::OPCode0x96;
     OPCodes[0x97] = &c_DMGCPU::OPCode0x97;
     OPCodes[0x98] = NULL;
-    OPCodes[0x99] = NULL;
+    OPCodes[0x99] = &c_DMGCPU::OPCode0x99;
     OPCodes[0x9A] = NULL;
     OPCodes[0x9B] = NULL;
     OPCodes[0x9C] = NULL;
@@ -328,7 +328,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xDB] = NULL;
     OPCodes[0xDC] = NULL;
     OPCodes[0xDD] = NULL;
-    OPCodes[0xDE] = NULL;
+    OPCodes[0xDE] = &c_DMGCPU::OPCode0xDE;
     OPCodes[0xDF] = NULL;
     OPCodes[0xE0] = &c_DMGCPU::OPCode0xE0;
     OPCodes[0xE1] = &c_DMGCPU::OPCode0xE1;
@@ -1194,7 +1194,7 @@ void c_DMGCPU::OPCode0x2F()
 {
     SET_FLAG_BIT(SUB_BIT);
     SET_FLAG_BIT(HC_BIT);
-    ~Registers.AF.hi; //Invert A
+    Registers.AF.hi = !Registers.AF.hi; //Invert A
     DbgOut(DBG_CPU, VERBOSE_2, "CPL A");
     Clock.m = 1;
     Clock.t = 4;
@@ -1811,6 +1811,39 @@ void c_DMGCPU::OPCode0x97()
     Registers.PC.word++;
 }
 
+//Subtract C + Carry flag from A.
+void c_DMGCPU::OPCode0x99()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "SBC A, C");
+
+    uint8_t carry = (FLAG_CARRY ? 1 : 0);
+
+    uint8_t value = Registers.BC.lo + carry;
+
+    if((Registers.AF.hi - value) < 0)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
+
+    if(((Registers.AF.hi - value) & 0xF) > (Registers.AF.hi & 0xF))
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    if(Registers.AF.hi - value == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    SET_FLAG_BIT(SUB_BIT);
+
+    Registers.AF.hi -= value;
+
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
 //Load Register A into Register C
 void c_DMGCPU::OPCode0x4F()
 {
@@ -2204,6 +2237,39 @@ void c_DMGCPU::OPCode0xD1()
     DbgOut(DBG_CPU, VERBOSE_2, "POP DE. New DE = 0x%x.", Registers.DE.word);
     Clock.m = 1;
     Clock.t = 12;
+    Registers.PC.word++;
+}
+
+//Subtract immediate byte + Carry flag from A.
+void c_DMGCPU::OPCode0xDE()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "SBC A, d8");
+
+    uint8_t carry = (FLAG_CARRY ? 1 : 0);
+
+    uint8_t value = MMU->ReadByte(Registers.PC.word+1) + carry;
+
+    if((Registers.AF.hi - value) < 0)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
+
+    if(((Registers.AF.hi - value) & 0xF) > (Registers.AF.hi & 0xF))
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    if(Registers.AF.hi - value == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    SET_FLAG_BIT(SUB_BIT);
+
+    Registers.AF.hi -= value;
+
+    Clock.m = 2;
+    Clock.t = 8;
     Registers.PC.word++;
 }
 
