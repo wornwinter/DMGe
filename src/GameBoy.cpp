@@ -12,6 +12,7 @@ c_GameBoy::c_GameBoy(const char* romfname, c_Canvas* cnv)
     GPU = new c_GPU(canvas);
     MMU = new c_MMU(GPU);
     CPU = new c_DMGCPU(MMU);
+    cart = new Cartridge();
 
     MMU->LoadBIOS("roms/bios.bin");
     //At the minute this should be a rom without bank switching. Tetris for example.
