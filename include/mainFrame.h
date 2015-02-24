@@ -3,6 +3,7 @@
 
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
+#include <wx/filedlg.h>
 #include <stdlib.h> //Exit signal stuff
 #include <boost/thread/thread.hpp> //For threading. wxThreads aren't great.
 
@@ -36,6 +37,7 @@ class mainFrame : public wxFrame
         void Tick(wxIdleEvent& event);
         void StartEmulation(wxCommandEvent& event);
         void StopEmulation(wxCommandEvent& event);
+        void OpenROM(wxCommandEvent& event);
         void Scale1(wxCommandEvent& event);
         void Scale2(wxCommandEvent& event);
         void Scale3(wxCommandEvent& event);
