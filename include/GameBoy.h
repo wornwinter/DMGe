@@ -7,6 +7,7 @@
 #define GAMEBOY_H
 
 #include <iostream>
+#include "Cartridge.h"
 
 class c_DMGCPU;
 class c_GPU;
@@ -19,6 +20,7 @@ class c_GameBoy {
         c_MMU* MMU;
         c_GPU* GPU;
         c_Canvas* canvas;
+        Cartridge* cart;
 
     public:
         c_GameBoy(const char* romfname, c_Canvas* cnv);

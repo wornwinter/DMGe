@@ -63,6 +63,7 @@ wxBEGIN_EVENT_TABLE(mainFrame, wxFrame)
     //EVT_IDLE(mainFrame::Tick)
     EVT_MENU(MENU_START, mainFrame::StartEmulation)
     EVT_MENU(MENU_STOP, mainFrame::StopEmulation)
+    EVT_MENU(MENU_OPEN, mainFrame::OpenROM)
     EVT_MENU(MENU_SCALE1, mainFrame::Scale1)
     EVT_MENU(MENU_SCALE2, mainFrame::Scale2)
     EVT_MENU(MENU_SCALE3, mainFrame::Scale3)
@@ -85,6 +86,16 @@ void mainFrame::StartEmulation(wxCommandEvent& event)
 void mainFrame::StopEmulation(wxCommandEvent& event)
 {
     gameboy->pause = true;
+}
+
+void mainFrame::OpenROM(wxCommandEvent& event)
+{
+    wxFileDialog* open = new wxFileDialog(this, _("Open ROM"), "", "", _("GameBoy files (.gb) | *.gb|ROM Files (.rom) | *.rom|ZIP Files (.zip)|*.zip"), wxFD_OPEN, wxDefaultPosition);
+
+    if(open->ShowModal() == wxID_OK)
+    {
+
+    }
 }
 
 void mainFrame::Scale1(wxCommandEvent& event)
