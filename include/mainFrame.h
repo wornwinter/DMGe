@@ -4,6 +4,7 @@
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
 #include <wx/filedlg.h>
+#include <wx/filename.h>
 #include <stdlib.h> //Exit signal stuff
 #include <boost/thread/thread.hpp> //For threading. wxThreads aren't great.
 

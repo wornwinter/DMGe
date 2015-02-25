@@ -28,6 +28,7 @@ class c_GameBoy {
         bool pause = true;
 
         void Run(void);
+        void LoadROM(const char* fname);
 };
 
 #endif // GAMEBOY_H

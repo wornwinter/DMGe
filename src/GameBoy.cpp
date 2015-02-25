@@ -16,7 +16,7 @@ c_GameBoy::c_GameBoy(const char* romfname, c_Canvas* cnv)
 
     MMU->LoadBIOS("roms/bios.bin");
     //At the minute this should be a rom without bank switching. Tetris for example.
-    MMU->LoadROM(romfname);
+    LoadROM(romfname);
     MMU->MapBIOS(true);
 }
 
@@ -37,4 +37,10 @@ void c_GameBoy::Run(void)
         }
         boost::this_thread::sleep(worktime);
     }
+}
+
+//Public version of opening ROM. Don't directly call the MMU
+void c_GameBoy::LoadROM(const char* fname)
+{
+    MMU->LoadROM(fname);
 }
