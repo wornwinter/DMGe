@@ -16,7 +16,7 @@ c_GameBoy::c_GameBoy(const char* romfname, c_Canvas* cnv)
 
     MMU->LoadBIOS("roms/bios.bin");
     //At the minute this should be a rom without bank switching. Tetris for example.
-    MMU->LoadROM(romfname);
+    LoadROM(romfname);
     MMU->MapBIOS(true);
 }
 
@@ -37,4 +37,21 @@ void c_GameBoy::Run(void)
         }
         boost::this_thread::sleep(worktime);
     }
+}
+
+//Public version of opening ROM. Don't directly call the MMU
+void c_GameBoy::LoadROM(const char* fname)
+{
+    cart = (Cartridge*)malloc(26); // D: C code!!
+    MMU->LoadROM(fname);
+    cart->title = "NINTENDO        "; //16-byte title
+    cart->gbtype = MMU->ReadByte(0x143);
+    cart->gbsgb = MMU->ReadByte(0x146);
+    cart->cart_type = MMU->ReadByte(0x147);
+    cart->rom_size = MMU->ReadByte(0x148);
+    cart->ram_size = MMU->ReadByte(0x149);
+    cart->region = MMU->ReadByte(0x14A);
+    cart->licensee = MMU->ReadByte(0x14B);
+    cart->ver = MMU->ReadByte(0x14C);
+    cart->checksum = MMU->ReadWord(0x14E);
 }

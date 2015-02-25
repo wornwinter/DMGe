@@ -92,10 +92,13 @@ void mainFrame::OpenROM(wxCommandEvent& event)
 {
     wxFileDialog* open = new wxFileDialog(this, _("Open ROM"), "", "", _("GameBoy files (.gb) | *.gb|ROM Files (.rom) | *.rom|ZIP Files (.zip)|*.zip"), wxFD_OPEN, wxDefaultPosition);
 
-    if(open->ShowModal() == wxID_OK)
-    {
+    if(open->ShowModal() == wxID_CANCEL)
+        return;
 
-    }
+    wxFileName fpath = open->GetPath();
+    std::string rname = std::string(fpath.GetFullName().mb_str());
+    std::string fname = "roms\\" + rname;
+    gameboy->LoadROM(fname.c_str());
 }
 
 void mainFrame::Scale1(wxCommandEvent& event)
