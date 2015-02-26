@@ -42,9 +42,9 @@ void c_GameBoy::Run(void)
 //Public version of opening ROM. Don't directly call the MMU
 void c_GameBoy::LoadROM(const char* fname)
 {
-    cart = (Cartridge*)malloc(26); // D: C code!!
+    cart = (Cartridge*)malloc(sizeof(Cartridge)); // D: C code!!
     MMU->LoadROM(fname);
-    cart->title = "NINTENDO        "; //16-byte title
+    cart->title = "NINTENDO       "; //16-byte title
     cart->gbtype = MMU->ReadByte(0x143);
     cart->gbsgb = MMU->ReadByte(0x146);
     cart->cart_type = MMU->ReadByte(0x147);
