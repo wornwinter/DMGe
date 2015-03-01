@@ -2711,7 +2711,7 @@ void c_DMGCPU::OPCode0xEF()
     //Here we go...
     //Decrement Stack pointer
     Registers.SP.word -= 2;
-    MMU->WriteWord(Registers.SP.word, Registers.PC.word); //Write current Address to stack
+    MMU->WriteWord(Registers.SP.word, (Registers.PC.word + 1)); //Write address of next instruction to stack.
     Clock.m = 4;
     Clock.t = 16;
     Registers.PC.word = 0x0028;
