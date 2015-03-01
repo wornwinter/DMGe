@@ -39,6 +39,7 @@ class c_GPU {
         void RenderScreen();
         void ClearScreen();
         bool vblankstart;
+        void DebugDraw();
 
     public:
         c_GPU(c_Canvas *cnv);

@@ -123,6 +123,11 @@ void c_GPU::WriteByte(uint16_t addr, uint8_t data)
 
     UpdateTile(addr, data);
     DbgOut(DBG_VID, VERBOSE_1, "GPU write. Addr: 0x%x. Translated: 0x%x. Data: 0x%x", addr, addrtrans, data);
+
+    if(addr == 0x8000)
+    {
+        //DbgOut(DBG_VID, VERBOSE_0, "Writing tile 0");
+    }
 }
 
 void c_GPU::UpdateTile(uint16_t addr, uint8_t data)
@@ -161,6 +166,18 @@ void c_GPU::RenderScanline()
     }
 }
 
+void c_GPU::DebugDraw()
+{
+    uint8_t x, y;
+
+    y = line & 7;
+
+    for(x = 0; x < 160; x++)
+    {
+        canvas->PutPixel(x, line, paletteref[palette[tileset[x/8][y][x % 8]]]);
+    }
+}
+
 void c_GPU::ClearScreen()
 {
     int x, y;
@@ -178,6 +195,7 @@ void c_GPU::Tick(uint32_t clock, c_MMU* MMU)
 
     stateclock += clock;
     //DbgOut(DBG_VID, VERBOSE_1, "Tick.");
+    //Not sure if this is right, but worth a shot anyways.
     switch(state)
     {
         case STATE_OAM_READ:
@@ -198,6 +216,7 @@ void c_GPU::Tick(uint32_t clock, c_MMU* MMU)
 
                 //Draw a scanline to the framebuffer here.
                 RenderScanline();
+                //DebugDraw();
 
             }
         break;

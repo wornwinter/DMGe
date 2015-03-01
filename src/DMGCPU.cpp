@@ -33,8 +33,7 @@ uint32_t c_DMGCPU::GetClock()
 //Run one instruction.
 void c_DMGCPU::Tick()
 {
-    if(Registers.PC.word == 0x0284)
-    //if(Registers.PC.word == 0x0100)
+    if(Registers.PC.word >= 0x2817)
     {
         //DbgOut(DBG_CPU, VERBOSE_0, "First opcode: 0x%x", MMU->ReadByte(Registers.PC.word));
         //printinst = true;
