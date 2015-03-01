@@ -52,14 +52,15 @@ void c_DMGCPU::Tick()
         uint8_t intfired = MMU->intenable & MMU->intflags;
         if(intfired & 0x1)
         {
-            DbgOut(DBG_CPU, VERBOSE_2, "Interrupt: Calling VBLANK service routine.");
+            DbgOut(DBG_CPU, VERBOSE_0, "Interrupt: Calling VBLANK service routine.");
+            logfile << "Vblank!" << std::endl;
             //Call interrupt service routine.
             Registers.SP.word -= 2;
             MMU->WriteWord(Registers.SP.word, Registers.PC.word);
             Registers.PC.word = 0x0040; //ISR is always at 0x0040 for vblank.
             IME = false;
         }
-        if(intfired & 0x4) //Serial IRQ
+        else if(intfired & 0x4) //Serial IRQ
         {
             DbgOut(DBG_CPU, VERBOSE_2, "Interrupt: Calling SERIAL service routine.");
             Registers.SP.word -= 2;
@@ -956,13 +957,11 @@ void c_DMGCPU::OPCode0x20()
         Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2;
         DbgOut(DBG_CPU, VERBOSE_2, "Zero bit not set. Jumping to 0x%x", Registers.PC.word);
         Clock.t = 12;
-        writelog = false;
     }
     else {
         Registers.PC.word += 2;
         DbgOut(DBG_CPU, VERBOSE_2, "Zero bit set, not jumping.");
         Clock.t = 8;
-        writelog = true;
     }
     Clock.m = 2;
 }
@@ -1112,16 +1111,14 @@ void c_DMGCPU::OPCode0x28()
     if(FLAG_ZERO)
     {
         //Zero flag is set. Jump.
-        Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2;
-        DbgOut(DBG_CPU, VERBOSE_2, "Zero bit set. Jumping to 0x%x", Registers.PC.word);
+        Registers.PC.word += (int8_t)(MMU->ReadByte(Registers.PC.word + 1) + 2);
+        DbgOut(DBG_CPU, VERBOSE_0, "Zero bit set. Jumping to 0x%x", Registers.PC.word);
         Clock.t = 12;
-        writelog = false;
     }
     else {
         Registers.PC.word += 2;
         DbgOut(DBG_CPU, VERBOSE_2, "Zero bit not set, not jumping.");
         Clock.t = 8;
-        writelog = true;
     }
     Clock.m = 2;
 }
@@ -1256,13 +1253,11 @@ void c_DMGCPU::OPCode0x30()
         Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2; //Signed 8-bit value
         DbgOut(DBG_CPU, VERBOSE_2, "Carry bit not set. Jumping to 0x%x", Registers.PC.word);
         Clock.t = 12;
-        writelog = false;
     }
     else
     {
         Registers.PC.word += 2; //2 byte instruction
         Clock.t = 8;
-        writelog = true;
     }
 
     Clock.m = 3;
@@ -1383,13 +1378,11 @@ void c_DMGCPU::OPCode0x38()
         Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2;
         DbgOut(DBG_CPU, VERBOSE_2, "Carry bit set. Jumping to 0x%x", Registers.PC.word);
         Clock.t = 12;
-        writelog = false;
     }
     else {
         Registers.PC.word += 2;
         DbgOut(DBG_CPU, VERBOSE_2, "Carry bit not set, not jumping.");
         Clock.t = 8;
-        writelog = true;
     }
     Clock.m = 2;
 }
@@ -2733,12 +2726,10 @@ void c_DMGCPU::OPCode0xC2()
     {
         Registers.PC.word = MMU->ReadWord(Registers.PC.word+1);
         Clock.t = 16;
-        writelog = false;
     }
     else {
         Registers.PC.word += 3;
         Clock.t = 12;
-        writelog = true;
     }
     Clock.m = 3;
 }
@@ -2762,12 +2753,10 @@ void c_DMGCPU::OPCode0xCA()
     {
         Registers.PC.word = MMU->ReadWord(Registers.PC.word+1);
         Clock.t = 16;
-        writelog = false;
     }
     else {
         Registers.PC.word += 3;
         Clock.t = 12;
-        writelog = true;
     }
     Clock.m = 3;
 }
@@ -2778,7 +2767,7 @@ void c_DMGCPU::OPCode0xCD()
     //Write address of next instruction to the stack and decrement SP.
     Registers.SP.word -= 2;
     MMU->WriteWord(Registers.SP.word, Registers.PC.word + 3);
-    DbgOut(DBG_CPU, VERBOSE_2, "CALL a16. Return address = 0x%x", Registers.PC.word+3);
+    DbgOut(DBG_CPU, VERBOSE_0, "CALL 0x%x. Return address = 0x%x", MMU->ReadWord(Registers.PC.word + 1), Registers.PC.word+3);
     //Set PC to address of function.
     Registers.PC.word = MMU->ReadWord(Registers.PC.word + 1);
     Clock.m = 3;
@@ -2850,12 +2839,10 @@ void c_DMGCPU::OPCode0xDA()
     {
         Registers.PC.word = MMU->ReadWord(Registers.PC.word+1);
         Clock.t = 16;
-        writelog = false;
     }
     else {
         Registers.PC.word += 3;
         Clock.t = 12;
-        writelog = true;
     }
     Clock.m = 3;
 }
@@ -2915,11 +2902,12 @@ void c_DMGCPU::OPCode0xE8()
     Registers.PC.word += 2;
 }
 
-//Jump to address contained in HL
+//Jump to address contained in HL.
+//Think this may have been breaking Tetris.
 void c_DMGCPU::OPCode0xE9()
 {
-    DbgOut(DBG_CPU, VERBOSE_2, "JP (HL). Jumping to address 0x%x", Registers.HL.word);
-    Registers.PC.word = MMU->ReadWord(Registers.HL.word);
+    DbgOut(DBG_CPU, VERBOSE_0, "LD PC, HL. Jumping to address 0x%x", Registers.HL.word);
+    Registers.PC.word = Registers.HL.word;
     Clock.m = 1;
     Clock.t = 4;
 }
