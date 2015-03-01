@@ -4,6 +4,8 @@
 #include <cstring>
 #include <stdint.h>
 #include <stdio.h>
+#include <iostream>
+#include <iomanip>
 #include "MMU.h"
 
 //Should these be hexadecimal constants for efficiency??
@@ -77,10 +79,12 @@ private:
     clock_t Clock;
     clock_t ClockTotal;
 
+    std::ofstream logfile;
     bool running = true;
     bool IME = true;
 
     bool printinst = false;
+    bool writelog = true;
     //OPCODES
     void OPCode0x00();
     void OPCode0x01();

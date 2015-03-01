@@ -17,6 +17,7 @@ c_DMGCPU::c_DMGCPU(c_MMU* pMMU)
     //Registers.SP.word = 0xFFFE;
 #endif // _DEBUG
 
+    logfile.open("trace.txt", std::ios_base::app | std::ios_base::out);
 }
 
 c_DMGCPU::~c_DMGCPU()
@@ -33,20 +34,15 @@ uint32_t c_DMGCPU::GetClock()
 //Run one instruction.
 void c_DMGCPU::Tick()
 {
-    if(Registers.PC.word >= 0x2817)
-    {
-        //DbgOut(DBG_CPU, VERBOSE_0, "First opcode: 0x%x", MMU->ReadByte(Registers.PC.word));
-        //printinst = true;
-    }
-    else
-    {
-        printinst = false;
-    }
+    if(Registers.PC.word == 0x0100)
+        printinst = true;
 
-    if(printinst)
+    if(printinst && writelog)
     {
-        //We're running the ROM, so do debugging stuff here.
-        DbgOut(DBG_CPU, VERBOSE_0, "[0x%x] %s", Registers.PC.word, DMG_opcodes[MMU->ReadByte(Registers.PC.word)]);
+    logfile << "[" << std::hex << std::setw(4) << std::setfill('0') << Registers.PC.word << "] - "
+            << DMG_opcodes[MMU->ReadByte(Registers.PC.word)] << "         - ";
+    logfile << std::hex << "AF: " << Registers.AF.word << " BC: " << Registers.BC.word << " DE: " << Registers.DE.word
+            << " HL: " << Registers.HL.word << " SP: " << Registers.SP.word << std::endl;
     }
 
     if(IME && running)
@@ -960,11 +956,13 @@ void c_DMGCPU::OPCode0x20()
         Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2;
         DbgOut(DBG_CPU, VERBOSE_2, "Zero bit not set. Jumping to 0x%x", Registers.PC.word);
         Clock.t = 12;
+        writelog = false;
     }
     else {
         Registers.PC.word += 2;
         DbgOut(DBG_CPU, VERBOSE_2, "Zero bit set, not jumping.");
         Clock.t = 8;
+        writelog = true;
     }
     Clock.m = 2;
 }
@@ -1117,11 +1115,13 @@ void c_DMGCPU::OPCode0x28()
         Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2;
         DbgOut(DBG_CPU, VERBOSE_2, "Zero bit set. Jumping to 0x%x", Registers.PC.word);
         Clock.t = 12;
+        writelog = false;
     }
     else {
         Registers.PC.word += 2;
         DbgOut(DBG_CPU, VERBOSE_2, "Zero bit not set, not jumping.");
         Clock.t = 8;
+        writelog = true;
     }
     Clock.m = 2;
 }
@@ -1256,11 +1256,13 @@ void c_DMGCPU::OPCode0x30()
         Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2; //Signed 8-bit value
         DbgOut(DBG_CPU, VERBOSE_2, "Carry bit not set. Jumping to 0x%x", Registers.PC.word);
         Clock.t = 12;
+        writelog = false;
     }
     else
     {
         Registers.PC.word += 2; //2 byte instruction
         Clock.t = 8;
+        writelog = true;
     }
 
     Clock.m = 3;
@@ -1381,11 +1383,13 @@ void c_DMGCPU::OPCode0x38()
         Registers.PC.word += (int8_t)MMU->ReadByte(Registers.PC.word + 1) + 2;
         DbgOut(DBG_CPU, VERBOSE_2, "Carry bit set. Jumping to 0x%x", Registers.PC.word);
         Clock.t = 12;
+        writelog = false;
     }
     else {
         Registers.PC.word += 2;
         DbgOut(DBG_CPU, VERBOSE_2, "Carry bit not set, not jumping.");
         Clock.t = 8;
+        writelog = true;
     }
     Clock.m = 2;
 }
@@ -2729,10 +2733,12 @@ void c_DMGCPU::OPCode0xC2()
     {
         Registers.PC.word = MMU->ReadWord(Registers.PC.word+1);
         Clock.t = 16;
+        writelog = false;
     }
     else {
         Registers.PC.word += 3;
         Clock.t = 12;
+        writelog = true;
     }
     Clock.m = 3;
 }
@@ -2751,15 +2757,17 @@ void c_DMGCPU::OPCode0xC9()
 void c_DMGCPU::OPCode0xCA()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "JP Z, (a16)");
-    uint8_t flag = (FLAG_ZERO? 1 : 0);
+    uint8_t flag = (FLAG_ZERO ? 1 : 0);
     if(flag)
     {
         Registers.PC.word = MMU->ReadWord(Registers.PC.word+1);
         Clock.t = 16;
+        writelog = false;
     }
     else {
         Registers.PC.word += 3;
         Clock.t = 12;
+        writelog = true;
     }
     Clock.m = 3;
 }
@@ -2842,10 +2850,12 @@ void c_DMGCPU::OPCode0xDA()
     {
         Registers.PC.word = MMU->ReadWord(Registers.PC.word+1);
         Clock.t = 16;
+        writelog = false;
     }
     else {
         Registers.PC.word += 3;
         Clock.t = 12;
+        writelog = true;
     }
     Clock.m = 3;
 }
