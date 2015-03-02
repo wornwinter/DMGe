@@ -3,6 +3,11 @@
 #include "debug.h"
 #include <cstring>
 
+uint16_t c_DMGCPU::GetPC()
+{
+    return Registers.PC.word;
+}
+
 c_DMGCPU::c_DMGCPU(c_MMU* pMMU)
 {
     InitOpcodeTables();
@@ -28,15 +33,15 @@ c_DMGCPU::~c_DMGCPU()
 //Returns clock periods taken for last instruction.
 uint32_t c_DMGCPU::GetClock()
 {
-    return Clock.t;
+    return Clock.m;
 }
 
 //Run one instruction.
 void c_DMGCPU::Tick()
 {
     //Uncomment these lines for trace output.
-    //if(Registers.PC.word == 0x0100)
-    //    printinst = true;
+    if(Registers.PC.word == 0x0100)
+        printinst = true;
 
     if(printinst && writelog)
     {
@@ -46,22 +51,23 @@ void c_DMGCPU::Tick()
             << " HL: " << Registers.HL.word << " SP: " << Registers.SP.word << std::endl;
     }
 
+    uint8_t intfired = MMU->intenable & MMU->intflags;
+    bool skipcycle = false;
+
     if(IME && running)
     {
         //Do interrupts.
         //Check interrupt that has fired. Mask off disabled interrupts.
-        uint8_t intfired = MMU->intenable & MMU->intflags;
         if(intfired & 0x1)
         {
             DbgOut(DBG_CPU, VERBOSE_2, "Interrupt: Calling VBLANK service routine.");
             //logfile << "Vblank!" << std::endl;
             //Call interrupt service routine.
-            Registers.SP.word -= 2;
-            MMU->WriteWord(Registers.SP.word, Registers.PC.word);
-            Registers.PC.word = 0x0040; //ISR is always at 0x0040 for vblank.
+            RST40();
             //Unset bit in intflags.
             MMU->intflags &= ~(0x01);
             IME = false;
+            skipcycle = true;
         }
         else if(intfired & 0x4) //Serial IRQ
         {
@@ -73,7 +79,7 @@ void c_DMGCPU::Tick()
         }
     }
 
-    if(running)
+    if(running && (!skipcycle))
     {
         switch(MMU->ReadByte(Registers.PC.word))
         {
@@ -3328,4 +3334,16 @@ void c_DMGCPU::OPCodeCB0xFE()
     Clock.m = 2;
     Clock.t = 16;
     Registers.PC.word += 2;
+}
+
+void c_DMGCPU::RST40()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "RST 40H. Vblank.");
+    //Here we go...
+    //Decrement Stack pointer
+    Registers.SP.word -= 2;
+    MMU->WriteWord(Registers.SP.word, Registers.PC.word);
+    Clock.m = 1;
+    Clock.t = 16;
+    Registers.PC.word = 0x0040;
 }

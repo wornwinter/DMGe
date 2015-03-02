@@ -39,6 +39,7 @@ class c_GPU {
         void ClearScreen();
         bool vblankstart;
         void DebugDraw();
+        bool lockvram = false;
 
     public:
         c_GPU(c_Canvas *cnv);

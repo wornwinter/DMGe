@@ -27,7 +27,7 @@ class c_MMU {
         uint8_t wram[0x2000]; //8k Working RAM.
         uint8_t oam[0xA0];
         uint8_t zram[0x7F];
-
+        uint8_t joyflags;
 
         uint8_t activerombank = 1;
         bool biosmapped = false;

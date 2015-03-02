@@ -65,6 +65,7 @@ public:
     ~c_DMGCPU();
     void Tick();
     uint32_t GetClock();
+    uint16_t GetPC();
 
 private:
     c_MMU* MMU;
@@ -600,6 +601,9 @@ private:
     void OPCodeCB0xFD();
     void OPCodeCB0xFE();
     void OPCodeCB0xFF();
+
+    //Interrupt functions.
+    void RST40();
 };
 
 #endif // DMGCPU_H_INCLUDED

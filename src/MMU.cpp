@@ -87,6 +87,8 @@ uint8_t c_MMU::ReadByte(uint16_t addr)
                             {
 
                                 case 0x00:
+                                    if(addr == 0xFF00)
+                                        return joyflags;
                                     if(addr == 0xFF0F)
                                         return intflags;
                                 break;
@@ -204,6 +206,10 @@ void c_MMU::WriteByte(uint16_t addr, uint8_t data)
                                 case 0x00:
                                     switch(addr & 0x000F)
                                     {
+                                        case 0x00:
+                                            joyflags = data;
+                                        break;
+
                                         //Interrupt flags.
                                         case 0x0F:
                                             intflags = data;
