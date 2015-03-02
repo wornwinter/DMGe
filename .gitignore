@@ -3,3 +3,4 @@
 roms/
 src/DMGCPU.cpp.save-failed
 *.dll
+trace.txt
