@@ -117,11 +117,16 @@ uint8_t c_GPU::ReadReg(uint16_t addr)
 void c_GPU::WriteByte(uint16_t addr, uint8_t data)
 {
     //GameBoy code has requested to write to vram.
-    uint16_t addrtrans = addr - 0x8000;
-    vram[addrtrans] = data;
 
-    UpdateTile(addr, data);
-    DbgOut(DBG_VID, VERBOSE_1, "GPU write. Addr: 0x%x. Translated: 0x%x. Data: 0x%x", addr, addrtrans, data);
+    if(!lockvram)
+    {
+        uint16_t addrtrans = addr - 0x8000;
+        vram[addrtrans] = data;
+
+        UpdateTile(addr, data);
+        DbgOut(DBG_VID, VERBOSE_1, "GPU write. Addr: 0x%x. Translated: 0x%x. Data: 0x%x", addr, addrtrans, data);
+    }
+
 
 }
 

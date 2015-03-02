@@ -28,7 +28,6 @@ c_GameBoy::~c_GameBoy()
 //Called by application in event loop.
 void c_GameBoy::Run(void)
 {
-    boost::posix_time::microseconds worktime(50);
     while(1)
     {
         if(!pause)
@@ -36,6 +35,9 @@ void c_GameBoy::Run(void)
            CPU->Tick();
            GPU->Tick(CPU->GetClock(), MMU);
         }
+
+        //Timing is not yet accurate. Work in progress.
+        boost::posix_time::microseconds worktime(600);
         boost::this_thread::sleep(worktime);
     }
 }
