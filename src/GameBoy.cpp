@@ -12,6 +12,7 @@ c_GameBoy::c_GameBoy(const char* romfname, c_Canvas* cnv)
     GPU = new c_GPU(canvas);
     MMU = new c_MMU(GPU);
     CPU = new c_DMGCPU(MMU);
+    GPU->state = 2;
     cart = new Cartridge();
 
     MMU->LoadBIOS("roms/bios.bin");

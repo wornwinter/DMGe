@@ -24,7 +24,6 @@ class c_GPU {
 
     private:
         uint32_t stateclock;
-        uint8_t state;
         uint8_t line;
         //Three dimensional array for tiles. Tile index, y, x.
         uint8_t tileset[384][8][8];
@@ -50,6 +49,7 @@ class c_GPU {
         void UpdateTile(uint16_t addr, uint8_t data);
 
         void Tick(uint32_t clock, c_MMU* MMU);
+        uint8_t state;
 
 };
 #endif // GPU_H

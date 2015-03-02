@@ -34,8 +34,9 @@ uint32_t c_DMGCPU::GetClock()
 //Run one instruction.
 void c_DMGCPU::Tick()
 {
-    if(Registers.PC.word == 0x0100)
-        printinst = true;
+    //Uncomment these lines for trace output.
+    //if(Registers.PC.word == 0x0100)
+    //    printinst = true;
 
     if(printinst && writelog)
     {
@@ -52,12 +53,14 @@ void c_DMGCPU::Tick()
         uint8_t intfired = MMU->intenable & MMU->intflags;
         if(intfired & 0x1)
         {
-            DbgOut(DBG_CPU, VERBOSE_0, "Interrupt: Calling VBLANK service routine.");
-            logfile << "Vblank!" << std::endl;
+            DbgOut(DBG_CPU, VERBOSE_2, "Interrupt: Calling VBLANK service routine.");
+            //logfile << "Vblank!" << std::endl;
             //Call interrupt service routine.
             Registers.SP.word -= 2;
             MMU->WriteWord(Registers.SP.word, Registers.PC.word);
             Registers.PC.word = 0x0040; //ISR is always at 0x0040 for vblank.
+            //Unset bit in intflags.
+            MMU->intflags &= ~(0x01);
             IME = false;
         }
         else if(intfired & 0x4) //Serial IRQ
@@ -381,6 +384,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodesCB[0x77] = &c_DMGCPU::OPCodeCB0x77;
     OPCodesCB[0x7C] = &c_DMGCPU::OPCodeCB0x7C;
     OPCodesCB[0x7F] = &c_DMGCPU::OPCodeCB0x7F;
+    OPCodesCB[0x87] = &c_DMGCPU::OPCodeCB0x87;
     OPCodesCB[0xFE] = &c_DMGCPU::OPCodeCB0xFE;
 
 }
@@ -1112,7 +1116,7 @@ void c_DMGCPU::OPCode0x28()
     {
         //Zero flag is set. Jump.
         Registers.PC.word += (int8_t)(MMU->ReadByte(Registers.PC.word + 1) + 2);
-        DbgOut(DBG_CPU, VERBOSE_0, "Zero bit set. Jumping to 0x%x", Registers.PC.word);
+        DbgOut(DBG_CPU, VERBOSE_2, "Zero bit set. Jumping to 0x%x", Registers.PC.word);
         Clock.t = 12;
     }
     else {
@@ -2767,7 +2771,7 @@ void c_DMGCPU::OPCode0xCD()
     //Write address of next instruction to the stack and decrement SP.
     Registers.SP.word -= 2;
     MMU->WriteWord(Registers.SP.word, Registers.PC.word + 3);
-    DbgOut(DBG_CPU, VERBOSE_0, "CALL 0x%x. Return address = 0x%x", MMU->ReadWord(Registers.PC.word + 1), Registers.PC.word+3);
+    DbgOut(DBG_CPU, VERBOSE_2, "CALL 0x%x. Return address = 0x%x", MMU->ReadWord(Registers.PC.word + 1), Registers.PC.word+3);
     //Set PC to address of function.
     Registers.PC.word = MMU->ReadWord(Registers.PC.word + 1);
     Clock.m = 3;
@@ -2906,7 +2910,7 @@ void c_DMGCPU::OPCode0xE8()
 //Think this may have been breaking Tetris.
 void c_DMGCPU::OPCode0xE9()
 {
-    DbgOut(DBG_CPU, VERBOSE_0, "LD PC, HL. Jumping to address 0x%x", Registers.HL.word);
+    DbgOut(DBG_CPU, VERBOSE_2, "LD PC, HL. Jumping to address 0x%x", Registers.HL.word);
     Registers.PC.word = Registers.HL.word;
     Clock.m = 1;
     Clock.t = 4;
@@ -3298,6 +3302,18 @@ void c_DMGCPU::OPCodeCB0x7F()
     Clock.m = 2;
     Clock.t = 8;
     Registers.PC.word += 2; //2 bytes, as this is a 2-byte opcode.
+}
+
+//Reset BIT 0 in register A.
+void c_DMGCPU::OPCodeCB0x87()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "RES 0, A");
+
+    Registers.AF.hi &= ~(0x01);
+
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word += 2;
 }
 
 //Set bit 7 of memory location pointed to by HL.

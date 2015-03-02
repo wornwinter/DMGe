@@ -117,17 +117,12 @@ uint8_t c_GPU::ReadReg(uint16_t addr)
 void c_GPU::WriteByte(uint16_t addr, uint8_t data)
 {
     //GameBoy code has requested to write to vram.
-    //Translate address.
     uint16_t addrtrans = addr - 0x8000;
     vram[addrtrans] = data;
 
     UpdateTile(addr, data);
     DbgOut(DBG_VID, VERBOSE_1, "GPU write. Addr: 0x%x. Translated: 0x%x. Data: 0x%x", addr, addrtrans, data);
 
-    if(addr == 0x8000)
-    {
-        //DbgOut(DBG_VID, VERBOSE_0, "Writing tile 0");
-    }
 }
 
 void c_GPU::UpdateTile(uint16_t addr, uint8_t data)
@@ -200,7 +195,7 @@ void c_GPU::Tick(uint32_t clock, c_MMU* MMU)
     {
         case STATE_OAM_READ:
             //DbgOut(DBG_VID, VERBOSE_1, "STATE = OAM_READ");
-            if(stateclock >= 80)
+            if(stateclock >= 20)
             {
                 stateclock = 0;
                 state = STATE_VRAM_READ;
@@ -209,7 +204,7 @@ void c_GPU::Tick(uint32_t clock, c_MMU* MMU)
 
         case STATE_VRAM_READ:
             //DbgOut(DBG_VID, VERBOSE_1, "STATE = VRAM_READ");
-            if(stateclock >= 172)
+            if(stateclock >= 43)
             {
                 stateclock = 0;
                 state = STATE_HBLANK;
@@ -223,7 +218,7 @@ void c_GPU::Tick(uint32_t clock, c_MMU* MMU)
 
         case STATE_HBLANK:
             //DbgOut(DBG_VID, VERBOSE_1, "STATE = HBLANK");
-            if(stateclock >= 204)
+            if(stateclock >= 51)
             {
                 stateclock = 0;
                 line++;
@@ -231,11 +226,11 @@ void c_GPU::Tick(uint32_t clock, c_MMU* MMU)
                 if(line == 143)
                 {
                     //Finished drawing the last time. State should be VBLANK now.
-                    vblankstart = true;
                     state = STATE_VBLANK;
                     //Draw framebuffer to the screen here.
                     //ClearScreen();
                     canvas->Refresh();
+                    MMU->intflags |= 1;
                 }
                 else {
                     state = STATE_OAM_READ;
@@ -245,17 +240,8 @@ void c_GPU::Tick(uint32_t clock, c_MMU* MMU)
 
         case STATE_VBLANK:
             //DbgOut(DBG_VID, VERBOSE_1, "STATE = VBLANK");
-            if(vblankstart)
-            {
-                //Set vblank interrupt flag.
-                MMU->intflags |= 0x1;
-                vblankstart = false;
-            }
-            else {
-                //Disable vblank flag.
-                MMU->intflags &= 0x1E;
-            }
-            if(stateclock >= 456)
+
+            if(stateclock >= 114)
             {
                 stateclock = 0;
                 line++;
@@ -270,7 +256,7 @@ void c_GPU::Tick(uint32_t clock, c_MMU* MMU)
 
         default:
             DbgOut(DBG_VID, VERBOSE_0, "GPU state error. State: %i. Resetting state.", state);
-            state = 0;
+            state = 2;
             break;
     }
 }
