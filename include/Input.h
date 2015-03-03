@@ -27,7 +27,7 @@
 class Input
 {
     private:
-        uint8_t values;
+        uint8_t joypad;
 
     public:
         void WriteReg(uint8_t address, uint8_t value);
