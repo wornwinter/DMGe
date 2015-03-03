@@ -21,18 +21,23 @@
     For example, when reading if A is being pushed, we check for P10 AND P15.
     If P15 is on, as well as P10, we know an A key signal MUST be being sent.
 
+    Oh, also, we need to check for an interrupt somewhere. Maybe we should have
+    an Request Interrupt (IRQ) function
+
     TODO: How do we store these keys?
 **/
 
 class c_Input
 {
     private:
+        c_MMU* MMU;
         uint8_t joypad;
 
     public:
         c_Input();
         ~c_Input();
-        void WriteReg(uint8_t address, uint8_t value);
+        void Tick(c_MMU* MMU);
+        void WriteReg(uint8_t address, uint8_t data);
         void ReadReg(uint8_t address);
 };
 
