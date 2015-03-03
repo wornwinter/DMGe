@@ -24,12 +24,14 @@
     TODO: How do we store these keys?
 **/
 
-class Input
+class c_Input
 {
     private:
         uint8_t joypad;
 
     public:
+        c_Input();
+        ~c_Input();
         void WriteReg(uint8_t address, uint8_t value);
         void ReadReg(uint8_t address);
 };
