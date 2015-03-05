@@ -36,6 +36,8 @@ class c_Canvas : public wxGLCanvas {
 
         void OnPaint(wxPaintEvent& event);
         void OnSize(wxSizeEvent& event);
+        void KeyDown(wxKeyEvent& event);
+        void KeyReleased(wxKeyEvent& event);
 
         void InitGL(void);
 

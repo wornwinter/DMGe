@@ -2,6 +2,8 @@
 #define INPUT_H
 
 #include <cstdint>
+#include <wx/event.h>
+#include "MMU.h"
 
 /**
     Okay, this is a kind of complicated process, but I think I get it.
@@ -30,7 +32,6 @@
 class c_Input
 {
     private:
-        c_MMU* MMU;
         uint8_t joypad;
 
     public:

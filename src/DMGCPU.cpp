@@ -77,6 +77,14 @@ void c_DMGCPU::Tick()
             Registers.PC.word = 0x0058;
             IME = false;
         }
+        else if(intfired & 0x8) //Joypad IRQ
+        {
+            DbgOut(DBG_CPU, VERBOSE_2, "Interrupt! Calling JOYPAD service routine.");
+            Registers.SP.word -= 2;
+            MMU->WriteWord(Registers.SP.word, Registers.PC.word);
+            Registers.PC.word = 0x0060;
+            IME = false;
+        }
     }
 
     if(running && (!skipcycle))

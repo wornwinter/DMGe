@@ -1,5 +1,4 @@
 #include "Input.h"
-#include "MMU.h"
 
 c_Input::c_Input()
 {
@@ -17,8 +16,10 @@ void c_Input::Tick(c_MMU* MMU)
 
     //We must have pushed some keys for this to be different!
     if(joyio != joypad)
+    {
         MMU->WriteByte(0xFF00, joypad);
-
+        MMU->intflags |= 8; //Joypad interrupt!
+    }
 }
 
 void c_Input::WriteReg(uint8_t address, uint8_t data)
