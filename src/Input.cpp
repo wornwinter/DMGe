@@ -27,9 +27,23 @@ void c_Input::WriteReg(uint8_t address, uint8_t data)
 
 }
 
+//We probably dont need address here..
 void c_Input::ReadReg(uint8_t address)
 {
+    uint8_t joyio = MMU->ReadByte(0xFF00);
 
+    //Goddamnit, Nintendo...
+    //Check for directional buttons, bit OFF!!
+    if(!(joyio & P14_DPAD)
+    {
+        uint8_t dpad = joyio & 0x0F; //Mask last 4-bits
+
+        //Down was pushed
+        if(!(dpad & P13)){}
+        else if(!(dpad & P12)){} //Up was pushed!
+        else if(!(dpad & P11)){} //Left was pushed
+        else if(!(dpad & P10)){} //Right was pushed
+    }
 }
 
 
