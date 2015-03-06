@@ -28,6 +28,8 @@ c_Canvas::~c_Canvas(void)
 BEGIN_EVENT_TABLE(c_Canvas, wxGLCanvas)
     EVT_PAINT(c_Canvas::OnPaint)
     EVT_SIZE(c_Canvas::OnSize)
+    EVT_KEY_DOWN(c_Canvas::KeyDown)
+    EVT_KEY_UP(c_Canvas::KeyReleased)
 END_EVENT_TABLE()
 
 void c_Canvas::OnPaint(wxPaintEvent& event)
@@ -73,6 +75,16 @@ void c_Canvas::OnPaint(wxPaintEvent& event)
     glEnd();
 
 	SwapBuffers();
+}
+
+void c_Canvas::KeyDown(wxKeyEvent& event)
+{
+    std::cout << event.GetKeyCode();
+}
+
+void c_Canvas::KeyReleased(wxKeyEvent& event)
+{
+
 }
 
 void c_Canvas::OnSize(wxSizeEvent& event)

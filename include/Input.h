@@ -2,6 +2,8 @@
 #define INPUT_H
 
 #include <cstdint>
+#include <wx/event.h>
+#include "MMU.h"
 
 /**
     Okay, this is a kind of complicated process, but I think I get it.
@@ -24,13 +26,30 @@
     Oh, also, we need to check for an interrupt somewhere. Maybe we should have
     an Request Interrupt (IRQ) function
 
+    EDIT: A better way to do this is as follows:
+    First, check whether we are working with the D-pad or the "action" buttons (A, B, STRT, SLCT).
+    P14 (BIT 4) = We are performing an action with the D-Pad
+    P15 (BIT 5) = We are performing an action with the action buttons.
+
+    NOTE: Thanks to the *awesome* engineers at Nintendo, (8 buttons, not using all 8-bits for which button is selected...)
+    when something is selected, 0 means ON and a 1 means OFF...
+
     TODO: How do we store these keys?
 **/
+
+//Ports..
+#define P15_SELECT  0x10
+#define P14_DPAD    0x20
+
+//Buttons
+#define P13         0x08
+#define P13         0x04
+#define P13         0x02
+#define P13         0x01
 
 class c_Input
 {
     private:
-        c_MMU* MMU;
         uint8_t joypad;
 
     public:
