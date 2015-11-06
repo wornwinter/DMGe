@@ -482,7 +482,7 @@ void c_DMGCPU::OPCode0x04()
     else
         UNSET_FLAG_BIT(FLAG_HC);
 
-    Registers.BC.hi += 1;
+    Registers.BC.hi++;
 
     if(Registers.BC.hi == 0)
         SET_FLAG_BIT(FLAG_ZERO);
@@ -507,7 +507,7 @@ void c_DMGCPU::OPCode0x05()
     else
         SET_FLAG_BIT(HC_BIT);
 
-    Registers.BC.hi -= 1;
+    Registers.BC.hi--;
 
     if(Registers.BC.hi)
         UNSET_FLAG_BIT(ZERO_BIT);
@@ -610,7 +610,7 @@ void c_DMGCPU::OPCode0x0C()
     else
         UNSET_FLAG_BIT(FLAG_HC);
 
-    Registers.BC.lo += 1;
+    Registers.BC.lo++;
 
     if(Registers.BC.lo == 0)
         SET_FLAG_BIT(FLAG_ZERO);
@@ -635,7 +635,7 @@ void c_DMGCPU::OPCode0x0D()
     else
         SET_FLAG_BIT(HC_BIT);
 
-    Registers.BC.lo -= 1;
+    Registers.BC.lo--;
 
     if(Registers.BC.lo)
         UNSET_FLAG_BIT(ZERO_BIT);
@@ -742,7 +742,7 @@ void c_DMGCPU::OPCode0x14()
     else
         UNSET_FLAG_BIT(FLAG_HC);
 
-    Registers.DE.hi += 1;
+    Registers.DE.hi++;
 
     if(Registers.DE.hi == 0)
         SET_FLAG_BIT(FLAG_ZERO);
@@ -767,7 +767,7 @@ void c_DMGCPU::OPCode0x15()
     else
         SET_FLAG_BIT(HC_BIT);
 
-    Registers.DE.hi -= 1;
+    Registers.DE.hi--;
 
     if(Registers.DE.hi)
         UNSET_FLAG_BIT(ZERO_BIT);
@@ -882,7 +882,7 @@ void c_DMGCPU::OPCode0x1C()
     else
         UNSET_FLAG_BIT(FLAG_HC);
 
-    Registers.DE.lo += 1;
+    Registers.DE.lo++;
 
     if(Registers.DE.lo == 0)
         SET_FLAG_BIT(FLAG_ZERO);
@@ -908,7 +908,7 @@ void c_DMGCPU::OPCode0x1D()
     else
         SET_FLAG_BIT(HC_BIT);
 
-    Registers.DE.lo -= 1;
+    Registers.DE.lo--;
 
     if(Registers.DE.lo)
         UNSET_FLAG_BIT(ZERO_BIT);
@@ -1015,7 +1015,7 @@ void c_DMGCPU::OPCode0x24()
     else
         UNSET_FLAG_BIT(FLAG_HC);
 
-    Registers.HL.hi += 1;
+    Registers.HL.hi++;
 
     if(Registers.HL.hi == 0)
         SET_FLAG_BIT(FLAG_ZERO);
@@ -1041,7 +1041,7 @@ void c_DMGCPU::OPCode0x25()
     else
         SET_FLAG_BIT(HC_BIT);
 
-    Registers.HL.hi -= 1;
+    Registers.HL.hi--;
 
     if(Registers.HL.hi)
         UNSET_FLAG_BIT(ZERO_BIT);
@@ -1179,7 +1179,7 @@ void c_DMGCPU::OPCode0x2C()
     else
         UNSET_FLAG_BIT(FLAG_HC);
 
-    Registers.HL.lo += 1;
+    Registers.HL.lo++;
 
     if(Registers.HL.lo == 0)
         SET_FLAG_BIT(FLAG_ZERO);
@@ -1204,7 +1204,7 @@ void c_DMGCPU::OPCode0x2D()
     else
         SET_FLAG_BIT(HC_BIT);
 
-    Registers.HL.lo -= 1;
+    Registers.HL.lo--;
 
     if(Registers.HL.lo)
         UNSET_FLAG_BIT(ZERO_BIT);
@@ -1438,7 +1438,7 @@ void c_DMGCPU::OPCode0x3C()
     else
         UNSET_FLAG_BIT(FLAG_HC);
 
-    Registers.AF.hi += 1;
+    Registers.AF.hi++;
 
     if(Registers.AF.hi == 0)
         SET_FLAG_BIT(FLAG_ZERO);

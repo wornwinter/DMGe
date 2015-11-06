@@ -1,6 +1,7 @@
 *.o
 *.exe
 roms/
+lib/
 src/DMGCPU.cpp.save-failed
 *.dll
 trace.txt
