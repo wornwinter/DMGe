@@ -129,6 +129,9 @@ void c_MMU::WriteByte(uint16_t addr, uint8_t data)
     if(biosmapped && ((addr>=0x00) & (addr<=0xFF)))
         return; //Read only memory. Can't write here.
 
+    if(addr == 0xff80) //Fix weird loop in tetris
+        return;
+
     else
     {
         switch((addr & 0xF000) >> 12)
