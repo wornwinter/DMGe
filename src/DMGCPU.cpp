@@ -254,7 +254,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0x82] = &c_DMGCPU::OPCode0x82;
     OPCodes[0x83] = NULL;
     OPCodes[0x84] = &c_DMGCPU::OPCode0x84;
-    OPCodes[0x85] = NULL;
+    OPCodes[0x85] = &c_DMGCPU::OPCode0x85;
     OPCodes[0x86] = &c_DMGCPU::OPCode0x86;
     OPCodes[0x87] = &c_DMGCPU::OPCode0x87;
     OPCodes[0x88] = &c_DMGCPU::OPCode0x88;
@@ -1823,6 +1823,27 @@ void c_DMGCPU::OPCode0x7C()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "LD A, H");
     Registers.AF.hi = Registers.HL.hi;
+    Clock.m = 1;
+    Clock.t = 4;
+    Registers.PC.word++;
+}
+
+//ADD A, L
+void c_DMGCPU::OPCode0x85()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "ADD A, L");
+
+    UNSET_FLAG_BIT(SUB_BIT);
+
+    if((Registers.AF.hi + Registers.HL.lo) == 0) SET_FLAG_BIT(ZERO_BIT);
+    else UNSET_FLAG_BIT(ZERO_BIT);
+    if(((Registers.AF.hi&0xF) + (Registers.HL.lo&0xF)) > 0xF) SET_FLAG_BIT(HC_BIT);
+    else UNSET_FLAG_BIT(HC_BIT);
+    if((Registers.AF.hi + Registers.HL.lo) > 0xFF) SET_FLAG_BIT(CARRY_BIT);
+    else UNSET_FLAG_BIT(CARRY_BIT);
+
+    Registers.AF.hi += Registers.HL.lo;
+
     Clock.m = 1;
     Clock.t = 4;
     Registers.PC.word++;

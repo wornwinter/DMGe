@@ -37,7 +37,7 @@ void c_GameBoy::Run(void)
         }
 
         //Timing is not yet accurate. Work in progress.
-        boost::posix_time::microseconds worktime(600);
+        boost::posix_time::microseconds worktime(10);
         boost::this_thread::sleep(worktime);
     }
 }
