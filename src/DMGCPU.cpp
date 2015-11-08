@@ -361,7 +361,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodes[0xEB] = NULL;
     OPCodes[0xEC] = NULL;
     OPCodes[0xED] = NULL;
-    OPCodes[0xEE] = NULL;
+    OPCodes[0xEE] = &c_DMGCPU::OPCode0xEE;
     OPCodes[0xEF] = &c_DMGCPU::OPCode0xEF;
     OPCodes[0xF0] = &c_DMGCPU::OPCode0xF0;
     OPCodes[0xF1] = &c_DMGCPU::OPCode0xF1;
@@ -394,6 +394,7 @@ void c_DMGCPU::InitOpcodeTables()
     OPCodesCB[0x38] = &c_DMGCPU::OPCodeCB0x38;
     OPCodesCB[0x41] = &c_DMGCPU::OPCodeCB0x41;
     OPCodesCB[0x47] = &c_DMGCPU::OPCodeCB0x47;
+    OPCodesCB[0x50] = &c_DMGCPU::OPCodeCB0x50;
     OPCodesCB[0x67] = &c_DMGCPU::OPCodeCB0x67;
     OPCodesCB[0x6F] = &c_DMGCPU::OPCodeCB0x6F;
     OPCodesCB[0x77] = &c_DMGCPU::OPCodeCB0x77;
@@ -2935,6 +2936,25 @@ void c_DMGCPU::OPCode0xEA()
     Registers.PC.word += 3;
 }
 
+//XOR A with n. Store result in A.
+void c_DMGCPU::OPCode0xEE()
+{
+    DbgOut(DBG_CPU, VERBOSE_2, "XOR n");
+
+    Registers.AF.hi ^= MMU->ReadByte((Registers.PC.word + 1));
+
+    if(Registers.AF.hi == 0) SET_FLAG_BIT(ZERO_BIT);
+    else UNSET_FLAG_BIT(ZERO_BIT);
+
+    UNSET_FLAG_BIT(SUB_BIT);
+    UNSET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(CARRY_BIT);
+
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word += 2;
+}
+
 //Load memory location 0xFF00 + immediate 8-bit into A.
 void c_DMGCPU::OPCode0xF0()
 {
@@ -3216,6 +3236,22 @@ void c_DMGCPU::OPCodeCB0x47()
     DbgOut(DBG_CPU, VERBOSE_2,  "BIT 0, A.");
 
     if(!(Registers.AF.hi & 0x01))
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    SET_FLAG_BIT(HC_BIT);
+    UNSET_FLAG_BIT(SUB_BIT);
+    Clock.m = 2;
+    Clock.t = 8;
+    Registers.PC.word += 2; //2 bytes, as this is a 2-byte opcode.
+}
+
+void c_DMGCPU::OPCodeCB0x50()
+{
+    DbgOut(DBG_CPU, VERBOSE_2,  "BIT 2, B.");
+
+    if(!(Registers.BC.hi & 0x02))
         SET_FLAG_BIT(ZERO_BIT);
     else
         UNSET_FLAG_BIT(ZERO_BIT);
