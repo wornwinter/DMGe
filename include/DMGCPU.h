@@ -66,6 +66,7 @@ public:
     void Tick();
     uint32_t GetClock();
     uint16_t GetPC();
+    void SkipBios(bool skip);
 
 private:
     c_MMU* MMU;

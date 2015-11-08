@@ -22,6 +22,7 @@ class c_GameBoy {
         c_Canvas* canvas;
         Cartridge* cart;
 
+
     public:
         c_GameBoy(const char* romfname, c_Canvas* cnv);
         ~c_GameBoy();
@@ -29,6 +30,7 @@ class c_GameBoy {
 
         void Run(void);
         void LoadROM(const char* fname);
+        void SkipBios(bool skip);
 };
 
 #endif // GAMEBOY_H

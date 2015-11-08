@@ -11,9 +11,10 @@ mainFrame::mainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
     menuFile->Append(MENU_OPEN, "&Open");
     menuFile->Append(MENU_EXIT, "&Exit");
 
-    wxMenu* menuEmu = new wxMenu;
+    menuEmu = new wxMenu;
     menuEmu->Append(MENU_START, "&Start");
     menuEmu->Append(MENU_STOP, "&Stop");
+    menuEmu->AppendCheckItem(MENU_SKIP, "&Skip BIOS");
 
     wxMenu* menuVid = new wxMenu;
     wxMenu* menuScale = new wxMenu;
@@ -69,6 +70,7 @@ wxBEGIN_EVENT_TABLE(mainFrame, wxFrame)
     EVT_MENU(MENU_SCALE3, mainFrame::Scale3)
     EVT_MENU(MENU_SCALE4, mainFrame::Scale4)
     EVT_MENU(MENU_EXIT, mainFrame::Exit)
+    EVT_MENU(MENU_SKIP, mainFrame::Skip)
 wxEND_EVENT_TABLE()
 
 void mainFrame::Tick(wxIdleEvent& event)
@@ -86,6 +88,12 @@ void mainFrame::StartEmulation(wxCommandEvent& event)
 void mainFrame::StopEmulation(wxCommandEvent& event)
 {
     gameboy->pause = true;
+}
+
+void mainFrame::Skip(wxCommandEvent& event)
+{
+    wxMenuItem *skipitem = menuEmu->FindItem(MENU_SKIP);
+    gameboy->SkipBios(skipitem->IsChecked());
 }
 
 void mainFrame::OpenROM(wxCommandEvent& event)

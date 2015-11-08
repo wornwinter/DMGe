@@ -23,6 +23,21 @@ c_DMGCPU::c_DMGCPU(c_MMU* pMMU)
 #endif // _DEBUG
 
     logfile.open("trace.txt", std::ios_base::app | std::ios_base::out);
+
+}
+
+void c_DMGCPU::SkipBios(bool skip) {
+    if(skip)
+    {
+        DbgOut(DBG_CPU, VERBOSE_0, "Will not execute bios.");
+        MMU->MapBIOS(false);
+        Registers.PC.word = 0x100;
+    }
+    else {
+        DbgOut(DBG_CPU, VERBOSE_0, "Will execute bios.");
+        MMU->MapBIOS(true);
+        Registers.PC.word = 0x00;
+    }
 }
 
 c_DMGCPU::~c_DMGCPU()

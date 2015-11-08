@@ -17,6 +17,7 @@
 
 #define MENU_START 4
 #define MENU_STOP 5
+#define MENU_SKIP 11
 #define MENU_SUPPRESS 6
 
 #define MENU_SCALE1 7
@@ -44,12 +45,14 @@ class mainFrame : public wxFrame
         void Scale3(wxCommandEvent& event);
         void Scale4(wxCommandEvent& event);
         void Exit(wxCommandEvent& event);
+        void Skip(wxCommandEvent& event);
 
     private:
         c_GameBoy* gameboy;
         c_Canvas *glCanvas;
         boost::thread* emuthread;
         wxDECLARE_EVENT_TABLE();
+        wxMenu* menuEmu;
 };
 
 #endif // MAINFRAME_H

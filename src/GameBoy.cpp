@@ -11,18 +11,21 @@ c_GameBoy::c_GameBoy(const char* romfname, c_Canvas* cnv)
     canvas = cnv;
     GPU = new c_GPU(canvas);
     MMU = new c_MMU(GPU);
+    MMU->LoadBIOS("roms/bios.bin");
+    MMU->MapBIOS(true);
     CPU = new c_DMGCPU(MMU);
     GPU->state = 2;
     cart = new Cartridge();
-
-    MMU->LoadBIOS("roms/bios.bin");
     //At the minute this should be a rom without bank switching. Tetris for example.
     LoadROM(romfname);
-    MMU->MapBIOS(true);
 }
 
 c_GameBoy::~c_GameBoy()
 {
+}
+
+void c_GameBoy::SkipBios(bool skip) {
+    CPU->SkipBios(skip);
 }
 
 //Called by application in event loop.
