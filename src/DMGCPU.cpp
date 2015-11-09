@@ -1868,14 +1868,12 @@ void c_DMGCPU::OPCode0x85()
 
     DbgOut(DBG_CPU, VERBOSE_2, "ADD A, L");
 
-    uint8_t result = Registers.AF.hi + Registers.HL.lo;
-
-    if(result & 0xFF00)
+    if((Registers.AF.hi + Registers.HL.lo) > 0xFF)
         SET_FLAG_BIT(CARRY_BIT);
     else
         UNSET_FLAG_BIT(CARRY_BIT);
 
-    if(result == 0)
+    if((Registers.AF.hi + Registers.HL.lo) == 0)
         SET_FLAG_BIT(ZERO_BIT);
     else
         UNSET_FLAG_BIT(ZERO_BIT);
@@ -1885,7 +1883,7 @@ void c_DMGCPU::OPCode0x85()
     else
         UNSET_FLAG_BIT(HC_BIT);
 
-    Registers.AF.hi = result;
+    Registers.AF.hi += Registers.HL.lo;
 
     Clock.m = 1;
     Clock.t = 4;
