@@ -587,11 +587,15 @@ void c_DMGCPU::OPCode0x09()
 {
     UNSET_FLAG_BIT(SUB_BIT);
 
-    if((Registers.HL.word + Registers.BC.word) >= 0x10000)
+    if((Registers.HL.word + Registers.BC.word) > 0xFFFF)
         SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
-    if(((Registers.HL.word + Registers.BC.word) & 0xFFF) < (Registers.HL.word & 0xFFF))
+    if(((Registers.BC.word & 0x0F) + (Registers.HL.word & 0x0F)) > 0x0F)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
     Registers.HL.word += Registers.BC.word;
 
@@ -856,16 +860,17 @@ void c_DMGCPU::OPCode0x19()
 
     UNSET_FLAG_BIT(SUB_BIT);
 
-    uint16_t result = Registers.HL.word + Registers.DE.word;
-
-    if((result & 0xFFF) < (Registers.HL.word & 0xFFF));
-
-    Registers.HL.word = result;
-
     if((Registers.HL.word + Registers.DE.word) > 0xFFFF)
         SET_FLAG_BIT(CARRY_BIT);
     else
         UNSET_FLAG_BIT(CARRY_BIT);
+
+    if(((Registers.DE.word & 0x0F) + (Registers.HL.word & 0x0F)) > 0x0F)
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    Registers.HL.word += Registers.DE.word;
 
     Clock.m = 1;
     Clock.t = 8;
@@ -1152,9 +1157,15 @@ void c_DMGCPU::OPCode0x29()
 
     if((Registers.HL.word + Registers.HL.word) > 0xFFFF)
         SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
-    if((Registers.HL.word + Registers.HL.word) > 0xFF)
+    if(((Registers.HL.word & 0x0F) + (Registers.HL.word & 0x0F)) > 0x0F)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    Registers.HL.word += Registers.HL.word;
 
     Clock.m = 2;
     Clock.t = 8;
@@ -1409,16 +1420,18 @@ void c_DMGCPU::OPCode0x38()
 void c_DMGCPU::OPCode0x39()
 {
     DbgOut(DBG_CPU, VERBOSE_2, "Add HL, SP");
-    //Zero flag is not affected.
+
     UNSET_FLAG_BIT(SUB_BIT);
-    UNSET_FLAG_BIT(CARRY_BIT);
-    UNSET_FLAG_BIT(HC_BIT);
 
     if((Registers.HL.word + Registers.SP.word) > 0xFFFF)
         SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
-    if((Registers.HL.word + Registers.SP.word) > 0xFF)
+    if(((Registers.SP.word & 0x0F) + (Registers.HL.word & 0x0F)) > 0x0F)
         SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
 
     Registers.HL.word += Registers.SP.word;
 
@@ -2086,7 +2099,7 @@ void c_DMGCPU::OPCode0x80()
     else
         UNSET_FLAG_BIT(CARRY_BIT);
 
-    if(Registers.AF.hi + Registers.BC.hi > 0xF)
+    if(((Registers.BC.hi & 0x0F) + (Registers.AF.hi & 0x0F)) > 0xF)
         SET_FLAG_BIT(HC_BIT);
     else
         UNSET_FLAG_BIT(HC_BIT);
@@ -2110,12 +2123,12 @@ void c_DMGCPU::OPCode0x81()
     else
         UNSET_FLAG_BIT(ZERO_BIT);
 
-    if(Registers.AF.hi + Registers.BC.lo > 0xFF)
+    if((Registers.AF.hi + Registers.BC.lo) > 0xFF)
         SET_FLAG_BIT(CARRY_BIT);
     else
         UNSET_FLAG_BIT(CARRY_BIT);
 
-    if(Registers.AF.hi + Registers.BC.lo > 0xF)
+    if(((Registers.BC.lo & 0x0F) + (Registers.AF.hi & 0x0F)) > 0xF)
         SET_FLAG_BIT(HC_BIT);
     else
         UNSET_FLAG_BIT(HC_BIT);
@@ -2139,12 +2152,12 @@ void c_DMGCPU::OPCode0x82()
     else
         UNSET_FLAG_BIT(ZERO_BIT);
 
-    if(Registers.AF.hi + Registers.DE.hi > 0xFF)
+    if((Registers.AF.hi + Registers.DE.hi) > 0xFF)
         SET_FLAG_BIT(CARRY_BIT);
     else
         UNSET_FLAG_BIT(CARRY_BIT);
 
-    if(Registers.AF.hi + Registers.DE.hi > 0xF)
+    if(((Registers.DE.hi & 0x0F) + (Registers.AF.hi & 0x0F)) > 0xF)
         SET_FLAG_BIT(HC_BIT);
     else
         UNSET_FLAG_BIT(HC_BIT);
@@ -2168,12 +2181,12 @@ void c_DMGCPU::OPCode0x84()
     else
         UNSET_FLAG_BIT(ZERO_BIT);
 
-    if(Registers.AF.hi + Registers.HL.hi > 0xFF)
+    if((Registers.AF.hi + Registers.HL.hi) > 0xFF)
         SET_FLAG_BIT(CARRY_BIT);
     else
         UNSET_FLAG_BIT(CARRY_BIT);
 
-    if(((Registers.AF.hi + Registers.HL.hi) & 0xF) == 0xF)
+    if(((Registers.HL.hi & 0x0F) + (Registers.AF.hi & 0x0F)) > 0xF)
         SET_FLAG_BIT(HC_BIT);
     else
         UNSET_FLAG_BIT(HC_BIT);
@@ -2190,10 +2203,9 @@ void c_DMGCPU::OPCode0x86()
 {
     UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition.
 
-    uint8_t result = (Registers.AF.hi + MMU->ReadByte(Registers.HL.word));
-    DbgOut(DBG_CPU, VERBOSE_0, "Adding (HL): 0x%x to A. A = 0x%x. Result = 0x%x", MMU->ReadByte(Registers.HL.word), Registers.AF.hi, result);
+    DbgOut(DBG_CPU, VERBOSE_0, "ADD A, (HL)");
 
-    if(result == 0)
+    if((Registers.AF.hi + MMU->ReadByte(Registers.HL.word)) == 0)
         SET_FLAG_BIT(ZERO_BIT);
     else
         UNSET_FLAG_BIT(ZERO_BIT);
@@ -2203,12 +2215,12 @@ void c_DMGCPU::OPCode0x86()
     else
         UNSET_FLAG_BIT(CARRY_BIT);
 
-    if((Registers.AF.hi + MMU->ReadByte(Registers.HL.word)) > 0xF)
+    if(((Registers.AF.word & 0x0F) + (MMU->ReadByte(Registers.HL.word) & 0x0F)) > 0x0F)
         SET_FLAG_BIT(HC_BIT);
     else
         UNSET_FLAG_BIT(HC_BIT);
 
-    Registers.AF.hi = result;
+    Registers.AF.hi += MMU->ReadByte(Registers.HL.word);
 
     Clock.m = 2;
     Clock.t = 8;
