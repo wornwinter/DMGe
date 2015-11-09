@@ -19,6 +19,14 @@
 #define FLAG_HC                 (Registers.AF.lo & 0x20)
 #define FLAG_CARRY              (Registers.AF.lo & 0x10)
 
+//Interrupts bit constants
+#define VBLANK_INTERRUPT_BIT    0x01
+#define LCD_INTERRUPT_BIT       (0x01 << 1)
+#define TIMER_INTERRUPT_BIT     (0x01 << 2)
+#define SERIAL_INTERRUPT_BIT    (0x01 << 3)
+#define JOYPAD_INTERRUPT_BIT    (0x01 << 4)
+
+
 //Should these be inline functions instead (safety)???
 #define SET_BIT(x,y)            (x |= (0x01 << y))
 #define SET_FLAG_BIT(x)         (Registers.AF.lo |= x)

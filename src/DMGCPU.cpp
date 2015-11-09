@@ -55,8 +55,8 @@ uint32_t c_DMGCPU::GetClock()
 void c_DMGCPU::Tick()
 {
     //Uncomment these lines for trace output.
-    if(Registers.PC.word == 0x0100)
-        printinst = true;
+    //if(Registers.PC.word == 0x0100)
+        //printinst = true;
 
     if(printinst && writelog)
     {
@@ -74,32 +74,36 @@ void c_DMGCPU::Tick()
     {
         //Do interrupts.
         //Check interrupt that has fired. Mask off disabled interrupts.
-        if(intfired & 0x1)
+        if(intfired & VBLANK_INTERRUPT_BIT)
         {
             DbgOut(DBG_CPU, VERBOSE_2, "Interrupt: Calling VBLANK service routine.");
+
+            IME = false; //Disable IME so we can't call multiple interrupts! (And make our GameBoy explode!!)
             //logfile << "Vblank!" << std::endl;
             //Call interrupt service routine.
             RST40();
             //Unset bit in intflags.
-            MMU->intflags &= ~(0x01);
-            IME = false;
-            skipcycle = true;
+            MMU->intflags &= ~(VBLANK_INTERRUPT_BIT);
+            //skipcycle = true;
         }
-        else if(intfired & 0x4) //Serial IRQ
+        else if(intfired & SERIAL_INTERRUPT_BIT) //Serial IRQ
         {
             DbgOut(DBG_CPU, VERBOSE_2, "Interrupt: Calling SERIAL service routine.");
+
+            IME = false;
+            MMU->intflags &= ~(SERIAL_INTERRUPT_BIT);
             Registers.SP.word -= 2;
             MMU->WriteWord(Registers.SP.word, Registers.PC.word);
             Registers.PC.word = 0x0058;
-            IME = false;
         }
-        else if(intfired & 0x8) //Joypad IRQ
+        else if(intfired & JOYPAD_INTERRUPT_BIT) //Joypad IRQ
         {
             DbgOut(DBG_CPU, VERBOSE_2, "Interrupt! Calling JOYPAD service routine.");
+
+            IME = false;
             Registers.SP.word -= 2;
             MMU->WriteWord(Registers.SP.word, Registers.PC.word);
             Registers.PC.word = 0x0060;
-            IME = false;
         }
     }
 
@@ -1847,18 +1851,28 @@ void c_DMGCPU::OPCode0x7C()
 //ADD A, L
 void c_DMGCPU::OPCode0x85()
 {
+    UNSET_FLAG_BIT(SUB_BIT); //We are performing an addition.
+
     DbgOut(DBG_CPU, VERBOSE_2, "ADD A, L");
 
-    UNSET_FLAG_BIT(SUB_BIT);
+    uint8_t result = Registers.AF.hi + Registers.HL.lo;
 
-    if((Registers.AF.hi + Registers.HL.lo) == 0) SET_FLAG_BIT(ZERO_BIT);
-    else UNSET_FLAG_BIT(ZERO_BIT);
-    if(((Registers.AF.hi&0xF) + (Registers.HL.lo&0xF)) > 0xF) SET_FLAG_BIT(HC_BIT);
-    else UNSET_FLAG_BIT(HC_BIT);
-    if((Registers.AF.hi + Registers.HL.lo) > 0xFF) SET_FLAG_BIT(CARRY_BIT);
-    else UNSET_FLAG_BIT(CARRY_BIT);
+    if(result & 0xFF00)
+        SET_FLAG_BIT(CARRY_BIT);
+    else
+        UNSET_FLAG_BIT(CARRY_BIT);
 
-    Registers.AF.hi += Registers.HL.lo;
+    if(result == 0)
+        SET_FLAG_BIT(ZERO_BIT);
+    else
+        UNSET_FLAG_BIT(ZERO_BIT);
+
+    if(((Registers.AF.hi & 0xF) + (Registers.HL.lo & 0xF)) > 0xF)
+        SET_FLAG_BIT(HC_BIT);
+    else
+        UNSET_FLAG_BIT(HC_BIT);
+
+    Registers.AF.hi = result;
 
     Clock.m = 1;
     Clock.t = 4;
@@ -3396,7 +3410,7 @@ void c_DMGCPU::RST40()
     //Decrement Stack pointer
     Registers.SP.word -= 2;
     MMU->WriteWord(Registers.SP.word, Registers.PC.word);
+    Registers.PC.word = 0x0040;
     Clock.m = 1;
     Clock.t = 16;
-    Registers.PC.word = 0x0040;
 }
