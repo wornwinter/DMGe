@@ -4,7 +4,7 @@ DMGe - A GameBoy emulator and debugger.
 ##Current State
 Currently it is not 100% functional. We have several opcodes implemented and the basis of a GUI, however both the BIOS and game ROM filenames are hardcoded for test purposes.
 
-There is some graphical output. Currently it will run the BIOS with the correct graphics output, but no sound.
+There is some graphical output. Currently it will run the BIOS with the correct graphics output, but no sound. Tetris will also boot and run to the main menu.
 
 ##Building
 Building (as of now) is a *relatively* painless task on both Linux and Windows.
